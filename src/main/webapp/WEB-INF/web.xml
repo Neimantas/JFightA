@@ -10,8 +10,28 @@
   	<description></description>
   	<servlet-class>servlets.IndexServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>UserServlet</servlet-name>
+  	<display-name>UserServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.UserServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>NewsServlet</servlet-name>
+  	<display-name>NewsServlet</display-name>
+  	<description></description>
+  	<servlet-class>servlets.NewsServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
   	<servlet-name>IndexServlet</servlet-name>
   	<url-pattern>/IndexServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UserServlet</servlet-name>
+  	<url-pattern>/UserServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>NewsServlet</servlet-name>
+  	<url-pattern>/NewsServlet</url-pattern>
   </servlet-mapping>
 </web-app>
