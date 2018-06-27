@@ -1,4 +1,4 @@
-package models.dto;
+package Models.dto;
 
 public class TestDTO {
 
