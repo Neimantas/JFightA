@@ -4,27 +4,36 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import services.IDataBase;
+import javax.inject.Singleton;
 
-public class DataBaseImpl implements IDataBase {
-	
-	Connection connection;
+import services.IDatabase;
+
+@Singleton
+public class DatabaseImpl implements IDatabase {
+
+	private Connection connection;
 
 	public Connection connect() {
 		try {
-			connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018", "Student_java2");
-			System.out.println("Works");
+			connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
+					"Student_java2");
+			System.out.println("Connection to database has been established.");
+			return connection;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Don't work");
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		return null;
 	}
 
 	public void closeConnection() {
-		// TODO Auto-generated method stub
-		
+		if (connection != null) {
+			try {
+				connection.close();
+				System.out.println("Database connection was closed.");
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
 	}
 
 }

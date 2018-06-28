@@ -1,11 +1,14 @@
-import services.impl.DataBaseImpl;
+
+import services.IDatabase;
+import services.impl.DatabaseImpl;
 
 public class DataBaseConnectionTest {
 
 	public static void main(String[] args) {
 		
-		DataBaseImpl dataBaseImpl = new DataBaseImpl();
-		dataBaseImpl.connect();
+		IDatabase database = new DatabaseImpl();
+		database.connect();
+		database.closeConnection();
 
 	}
 
