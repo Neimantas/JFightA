@@ -1,18 +1,16 @@
 package services;
 
-import Models.dto.CreateTableDTO;
-import Models.dto.DeleteTableDTO;
-import Models.dto.ReadTableDTO;
-import Models.dto.UpdateTableDTO;
+import Models.dto.DTO;
+import Models.dto.DTOext;
 
 public interface ICRUD {
 
-	public CreateTableDTO create(Object dal);
+	public <T> DTO create(T dal);
 
-	public ReadTableDTO read(Object dal);
+	public <T> DTOext<T> read(T dal);
 
-	public UpdateTableDTO update(Object dal);
+	public <T> DTO update(T dal);
 
-	public DeleteTableDTO delete(Object dal);
+	public <T> DTO delete(T dal);
 
 }

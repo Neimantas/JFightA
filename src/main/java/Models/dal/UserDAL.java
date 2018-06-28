@@ -2,7 +2,7 @@ package Models.dal;
 
 public class UserDAL {
 
-	public int userID;
+	public Integer userID;
 	public String name;
 	public String password;
 

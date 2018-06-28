@@ -2,10 +2,10 @@ package Models.dal;
 
 public class ResultDAL {
 
-	public int fightId;
-	public int winUserId;
-	public int lossUserId;
-	public int tieUser1Id;
-	public int tieUser2Id;
+	public Integer fightId;
+	public Integer winUserId;
+	public Integer lossUserId;
+	public Integer tieUser1Id;
+	public Integer tieUser2Id;
 
 }
