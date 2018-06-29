@@ -9,8 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import Models.dto.DTOmsg;
 import Models.dto.DTO;
-import Models.dto.DTOext;
 import services.ICRUD;
 import services.IDatabase;
 
@@ -25,24 +25,40 @@ public class CRUDImpl implements ICRUD {
 	}
 
 	@Override
-	public <T> DTO create(T dal) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> DTOext<T> read(T dal) {
-
-		DTOext<T> dtoExt = new DTOext<>();
-
+	public <T> DTOmsg create(T dal) {
+		
+		DTOmsg dtoMsg = new DTOmsg();
+		
 		Class<?> dalClass = dal.getClass();
 		Field[] dalClassFields = dalClass.getFields();
 		String tableName = dalClass.getSimpleName().replace("DAL", "");
+		
+		String columnValues = "";
+		
+		for (int i = 0; i < dalClassFields.length; i++) {
+			
+			
+			
+		}
+		
+		return dtoMsg;
+	}
 
-		String readQuerry = "SELECT * FROM " + tableName + ";";
+	@Override
+	public <T> DTO<T> read(T dal) {
 
-		try { // setting connection in a try block,
-				// so it will be closed automatically (since Java7)
+		try {
+
+			DTO<T> dto = new DTO<>();
+
+			Class<?> dalClass = dal.getClass();
+			Field[] dalClassFields = dalClass.getFields();
+			String tableName = dalClass.getSimpleName().replace("DAL", "");
+
+			String readQuerry = "SELECT * FROM " + tableName + ";";
+
+			// setting connection in a try block,
+			// so it will be closed automatically (since Java7)
 			setConnection();
 			ResultSet resultSet = statement.executeQuery(readQuerry);
 
@@ -55,7 +71,7 @@ public class CRUDImpl implements ICRUD {
 				for (int i = 0; i < dalClassFields.length; i++) {
 
 					Class<?> dalField = dalClassFields[i].getType();
-					dalClassFields[i].set(returnDAL, dalField.cast(resultSet.getObject(i + 1)));
+					dalClassFields[i].set(returnDAL, resultSet.getObject(i + 1, dalField));
 
 				}
 
@@ -63,28 +79,31 @@ public class CRUDImpl implements ICRUD {
 
 			}
 
-			dtoExt.transferData = dalList;
-			dtoExt.success = true;
-			dtoExt.message = "Success";
+			dto.transferData = dalList;
+			dto.success = true;
+			dto.message = "Success";
 
 			System.out.println("Database connection was closed.");
+			return dto;
+			
 		} catch (SQLException | IllegalArgumentException | IllegalAccessException | ClassCastException
 				| InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException
 				| ClassNotFoundException e) {
+			DTO<T> dtoExt = new DTO<>();
 			dtoExt.message = e.getMessage();
+			return dtoExt;
 		}
 
-		return dtoExt;
 	}
 
 	@Override
-	public <T> DTO update(T dal) {
+	public <T> DTOmsg update(T dal) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> DTO delete(T dal) {
+	public <T> DTOmsg delete(T dal) {
 		// TODO Auto-generated method stub
 		return null;
 	}
