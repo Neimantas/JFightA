@@ -1,9 +1,8 @@
 package Models.dto;
 
-import java.util.List;
+public class DTO {
 
-public class DTO<T> extends DTOmsg {
-
-	public List<T> transferData;
+	public boolean success;
+	public String message;
 
 }
