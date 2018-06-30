@@ -1,8 +1,8 @@
-package models.Const;
+package Models.Const;
 
 public enum CharacterBodyPart {
 
-	HEAD("head", 6), HANDS("hands", 4), BODY("body", 5), LEGS("legs", 4);
+	HEAD("Head", 6), HANDS("Hands", 4), BODY("Body", 5), LEGS("Legs", 4);
 
 	private String bodyPartName;
 	private int damagePoints;
@@ -14,7 +14,7 @@ public enum CharacterBodyPart {
 
 	public static CharacterBodyPart getByBodyPartName(String characterBodyPartName) {
 		for (CharacterBodyPart bodyPart : CharacterBodyPart.values()) {
-			if (characterBodyPartName.equals(bodyPart.getBodyPartName())) {
+			if (characterBodyPartName.equalsIgnoreCase(bodyPart.getBodyPartName())) {
 				return bodyPart;
 			}
 		}
