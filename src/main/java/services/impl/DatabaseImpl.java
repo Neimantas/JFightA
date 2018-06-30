@@ -13,6 +13,10 @@ public class DatabaseImpl implements IDatabase {
 
 	private Connection connection;
 
+	/**
+	 * Before changing a database please read database requirements in a project
+	 * documentation.
+	 */
 	public Connection connect() {
 		try {
 			connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
