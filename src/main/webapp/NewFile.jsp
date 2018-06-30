@@ -1,5 +1,7 @@
-
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@page import="org.omg.CORBA.Request"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,104 +36,13 @@
 </head>
 <body>
 
-
+	Hello!!!!
 	<div class="container">
 		<div class="row">
-			<div class="col-sm-4">
-			
-			${playerAName} <br/>
-			
-			Health:
-			${healthA}
-			
-			</div>
-			<div class="col-sm-4">
-				Actions
-				<form method="post" action="/JFight/fight">
-					<div class="row">
-
-						<div class="col-sm-6">
-
-							Attack:
-							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
-									name="attackHead" id="attackAction1" value="head"> <label
-									class="form-check-label" for="attackAction1"> Head </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
-									name="attackBody" id="attackAction2" value="body"> <label
-									class="form-check-label" for="attackAction2"> Body </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
-									name="attackArms" id="attackAction3" value="arms"> <label
-									class="form-check-label" for="attackAction3"> Arms </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
-									name="attackLegs" id="attackAction4" value="legs"> <label
-									class="form-check-label" for="attackAction4"> Legs </label>
-							</div>
-						</div>
-
-						<div class="col-sm-6">
-							Defend:
-							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
-									name="defenceHead" id="defenceAction1" value="head">
-								<label class="form-check-label" for="defenceAction1">
-									Head </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
-									name="defenceBody" id="defenceAction2" value="body">
-								<label class="form-check-label" for="defenceAction2">
-									Body </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
-									name="defenceArms" id="defenceAction3" value="arms">
-								<label class="form-check-label" for="defenceAction3">
-									Arms </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
-									name="defenceLegs" id="defenceAction4" value="legs">
-								<label class="form-check-label" for="defenceAction4">
-									Legs </label>
-							</div>
-
-						</div>
-
-
-					</div>
-					<div class="row">
-						
-						<div class="col-sm-4"></div>
-						<div class="col-sm-4">
-							
-							<input type="submit" value="Attack!">
-							
-						</div>
-						<div class="col-sm-4"></div>
-					</div>
-					
-					
-				</form>
-
-			</div>
-			<div class="col-sm-4">
-			
-			${playerBName} </br>
-			
-			Health:
-			${healthB}
-			
-			</div>
+			${test}
 		</div>
 	</div>
-
+	HEllo
 
 
 	<!--===============================================================================================-->

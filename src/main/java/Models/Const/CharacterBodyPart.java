@@ -1,4 +1,4 @@
-package Models.Const;
+package models.Const;
 
 public enum CharacterBodyPart {
 
