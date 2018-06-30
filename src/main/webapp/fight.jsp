@@ -43,6 +43,12 @@
 			
 			Health:
 			${healthA}
+			<div>
+				<img src="imageServlet?id=${id}" height="300" width="200">
+			</div>
+			
+			
+			
 			
 			</div>
 			<div class="col-sm-4">
@@ -127,6 +133,11 @@
 			
 			Health:
 			${healthB}
+			
+			
+			<div>
+				<img src="imageServlet?id=${id}" height="300" width="200">
+			</div>
 			
 			</div>
 		</div>

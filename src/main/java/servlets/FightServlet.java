@@ -65,9 +65,10 @@ public class FightServlet extends HttpServlet {
 		request.setAttribute("playerBName", "Petras");
 		request.setAttribute("healthA", 100);
 		request.setAttribute("healthB", 100);
+		request.setAttribute("id", 1);
 		
 		request.getRequestDispatcher("fight.jsp").forward(request, response);
-		
+//		request.getRequestDispatcher("NewFile.jsp").forward(request, response);
 		
 	}
 
