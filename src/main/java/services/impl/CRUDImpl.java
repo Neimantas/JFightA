@@ -11,10 +11,10 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import Models.dal.ResultDAL;
-import Models.dto.DTO;
-import Models.dto.ListDTO;
-import Models.dto.ObjectDTO;
+import models.dal.ResultDAL;
+import models.dto.DTO;
+import models.dto.ListDTO;
+import models.dto.ObjectDTO;
 import services.ICRUD;
 import services.IDatabase;
 
@@ -30,6 +30,7 @@ public class CRUDImpl implements ICRUD {
 	}
 
 	/**
+	 * Takes all values of a DAL and inserts as a row into database table.
 	 * Returns DTO with DAL inside which represents created row in a database.
 	 */
 	@Override
@@ -76,21 +77,22 @@ public class CRUDImpl implements ICRUD {
 			return objectDTO;
 		} catch (SQLException e) {
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
-			objectDTO.message = "Database error. " + e.getMessage();
+			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
-			objectDTO.message = e.getMessage();
+			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
 		}
 	}
 
 	/**
+	 * Makes a search in a database by input DAL and reads data.
 	 * Returns DTO with list of DALs which represent all database table rows. If the
 	 * first field of an input DAL (should represent PK or FK key in a database
 	 * table) is not NULL and greater than 0 will be selected and returned only one
-	 * row by input DAL ID. If there are no row with such ID in a database table,
+	 * row by input DAL Id. If there are no row with such Id in a database table,
 	 * will be returned DTO with an empty list.
 	 */
 	@Override
@@ -140,17 +142,18 @@ public class CRUDImpl implements ICRUD {
 			// connection setted in a try block so it closes autmatically (since Java7)
 		} catch (SQLException e) {
 			ListDTO<T> listDTO = new ListDTO<>();
-			listDTO.message = "Database error. " + e.getMessage();
+			listDTO.message = "Database error. " + e.getMessage() + ".";
 			return listDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			ListDTO<T> listDTO = new ListDTO<>();
-			listDTO.message = e.getMessage();
+			listDTO.message = e.getMessage() + ".";
 			return listDTO;
 		}
 	}
 
 	/**
+	 * Reads results in a database result table by input userId.
 	 * Returns DTO with List of ResultDALs inside, which represent only one user
 	 * results.
 	 */
@@ -194,7 +197,7 @@ public class CRUDImpl implements ICRUD {
 			return listDTO;
 		} catch (SQLException e) {
 			ListDTO<ResultDAL> listDTO = new ListDTO<>();
-			listDTO.message = "Database error. " + e.getMessage();
+			listDTO.message = "Database error. " + e.getMessage() + ".";
 			return listDTO;
 		}
 	}
@@ -252,11 +255,11 @@ public class CRUDImpl implements ICRUD {
 			return dto;
 		} catch (SQLException e) {
 			DTO dto = new DTO();
-			dto.message = "Database error. " + e.getMessage();
+			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			DTO dto = new DTO();
-			dto.message = e.getMessage();
+			dto.message = e.getMessage() + ".";
 			return dto;
 		}
 	}
@@ -302,11 +305,11 @@ public class CRUDImpl implements ICRUD {
 			return dto;
 		} catch (SQLException e) {
 			DTO dto = new DTO();
-			dto.message = e.getMessage();
+			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			DTO dto = new DTO();
-			dto.message = e.getMessage();
+			dto.message = e.getMessage() + ".";
 			return dto;
 		}
 	}

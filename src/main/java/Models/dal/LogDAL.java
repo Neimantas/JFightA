@@ -1,4 +1,4 @@
-package Models.dal;
+package models.dal;
 
 import java.sql.Timestamp;
 

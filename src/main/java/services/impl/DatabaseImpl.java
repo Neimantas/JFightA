@@ -14,8 +14,8 @@ public class DatabaseImpl implements IDatabase {
 	private Connection connection;
 
 	/**
-	 * Before changing a database please read database requirements in a project
-	 * documentation.
+	 * Before changing a database please look at the database requirements and
+	 * tables structure in a project documentation.
 	 */
 	public Connection connect() {
 		try {

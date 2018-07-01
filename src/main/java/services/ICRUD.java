@@ -1,9 +1,9 @@
 package services;
 
-import Models.dal.ResultDAL;
-import Models.dto.DTO;
-import Models.dto.ListDTO;
-import Models.dto.ObjectDTO;
+import models.dal.ResultDAL;
+import models.dto.DTO;
+import models.dto.ListDTO;
+import models.dto.ObjectDTO;
 
 public interface ICRUD {
 

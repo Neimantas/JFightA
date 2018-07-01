@@ -1,4 +1,4 @@
-package Models.dto;
+package models.dto;
 
 public class DTO {
 

@@ -1,4 +1,4 @@
-package Models.Const;
+package models.constant;
 
 public enum AccessLevel {
 
