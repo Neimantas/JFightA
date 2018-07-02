@@ -137,7 +137,6 @@ public class CRUDImpl implements ICRUD {
 					: (firstFieldValue != null && firstFieldValue > 0 ? "There are now data in a table with such ID."
 							: "The database table is empty.");
 
-			System.out.println("Database connection was closed.");
 			return listDTO;
 			// connection setted in a try block so it closes autmatically (since Java7)
 		} catch (SQLException e) {
