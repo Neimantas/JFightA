@@ -21,6 +21,7 @@ public class DatabaseImpl implements IDatabase {
 		try {
 			connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
 					"Student_java2");
+			System.out.println("Connection to database has been established.");
 			return connection;
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -32,6 +33,7 @@ public class DatabaseImpl implements IDatabase {
 		if (connection != null) {
 			try {
 				connection.close();
+				System.out.println("Database connection was closed.");
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}

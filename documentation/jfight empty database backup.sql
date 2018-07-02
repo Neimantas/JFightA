@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 30, 2018 at 10:55 PM
+-- Generation Time: Jul 02, 2018 at 11:23 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -33,7 +33,6 @@ USE `jfight`;
 DROP TABLE IF EXISTS `character`;
 CREATE TABLE IF NOT EXISTS `character` (
   `UserId` int(11) NOT NULL,
-  `ImagePath` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `HealthPoints` int(11) NOT NULL,
   `Strength` int(11) NOT NULL,
   `Experience` int(11) NOT NULL,
@@ -44,6 +43,67 @@ CREATE TABLE IF NOT EXISTS `character` (
 
 --
 -- RELATIONSHIPS FOR TABLE `character`:
+--   `UserId`
+--       `user` -> `UserId`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fightdata`
+--
+
+DROP TABLE IF EXISTS `fightdata`;
+CREATE TABLE IF NOT EXISTS `fightdata` (
+  `FightId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `HealthPoints` int(11) NOT NULL DEFAULT '100' COMMENT 'Trigger created. Null input value is automatically changing to default 100.',
+  `Damage` int(11) DEFAULT NULL,
+  `AttackHead` int(11) DEFAULT NULL,
+  `AttackBody` int(11) DEFAULT NULL,
+  `AttackHands` int(11) DEFAULT NULL,
+  `AttackLegs` int(11) DEFAULT NULL,
+  `DefenceHead` int(11) DEFAULT NULL,
+  `DefenceBody` int(11) DEFAULT NULL,
+  `DefenceHands` int(11) DEFAULT NULL,
+  `DefenceLegs` int(11) DEFAULT NULL,
+  KEY `FightId` (`FightId`),
+  KEY `UserId` (`UserId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `fightdata`:
+--   `FightId`
+--       `result` -> `FightId`
+--   `UserId`
+--       `user` -> `UserId`
+--
+
+--
+-- Triggers `fightdata`
+--
+DROP TRIGGER IF EXISTS `NullTo100`;
+DELIMITER $$
+CREATE TRIGGER `NullTo100` BEFORE INSERT ON `fightdata` FOR EACH ROW SET NEW.HealthPoints = IFNULL(NEW.HealthPoints, 100)
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `image`
+--
+
+DROP TABLE IF EXISTS `image`;
+CREATE TABLE IF NOT EXISTS `image` (
+  `UserId` int(11) NOT NULL,
+  `Image` mediumblob,
+  `ImageFormat` varchar(63) COLLATE utf8_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `UserId` (`UserId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `image`:
 --   `UserId`
 --       `user` -> `UserId`
 --
@@ -149,6 +209,19 @@ ALTER TABLE `character`
   ADD CONSTRAINT `character_user_fk` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
+-- Constraints for table `fightdata`
+--
+ALTER TABLE `fightdata`
+  ADD CONSTRAINT `fightdata_result_fk` FOREIGN KEY (`FightId`) REFERENCES `result` (`FightId`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fightdata_userfk` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`) ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `image`
+--
+ALTER TABLE `image`
+  ADD CONSTRAINT `image_user_fk` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
 -- Constraints for table `log`
 --
 ALTER TABLE `log`
@@ -170,7 +243,7 @@ DELIMITER $$
 -- Events
 --
 DROP EVENT `Delete logs older than 1 month`$$
-CREATE DEFINER=`Kolia`@`%` EVENT `Delete logs older than 1 month` ON SCHEDULE EVERY 1 DAY STARTS '2018-06-29 03:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM log WHERE Date < (NOW() - INTERVAL 1 MONTH)$$
+CREATE DEFINER=`Kolia`@`%` EVENT `Delete logs older than 1 month` ON SCHEDULE EVERY 1 DAY STARTS '2018-07-03 03:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM log WHERE Date < (NOW() - INTERVAL 1 MONTH)$$
 
 DROP EVENT `Delete results where both users checked out`$$
 CREATE DEFINER=`root`@`localhost` EVENT `Delete results where both users checked out` ON SCHEDULE EVERY 1 MONTH STARTS '2018-07-01 04:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM result WHERE result.Win = NULL AND result.Loss = NULL AND result.TieUser1 = NULL AND result.TieUser2 = NULL$$

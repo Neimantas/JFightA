@@ -1,8 +1,14 @@
 package services.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,8 +36,8 @@ public class CRUDImpl implements ICRUD {
 	}
 
 	/**
-	 * Takes all values of a DAL and inserts as a row into database table.
-	 * Returns DTO with DAL inside which represents created row in a database.
+	 * Takes all values of a DAL and inserts as a row into database table. Returns
+	 * DTO with DAL inside which represents created row in a database.
 	 */
 	@Override
 	public <T> ObjectDTO<T> create(T dal) {
@@ -68,7 +74,7 @@ public class CRUDImpl implements ICRUD {
 			}
 
 			dalClassFields[0].set(returnDAL, dalId);
-			returnDAL = read(returnDAL).transferDataList.get(0);
+			returnDAL = read(returnDAL, false).transferDataList.get(0);
 
 			objectDTO.transferData = returnDAL;
 			objectDTO.success = true;
@@ -84,19 +90,25 @@ public class CRUDImpl implements ICRUD {
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
+		} finally {
+			closeConnection();
 		}
 	}
 
 	/**
-	 * Makes a search in a database by input DAL and reads data.
-	 * Returns DTO with list of DALs which represent all database table rows. If the
-	 * first field of an input DAL (should represent PK or FK key in a database
-	 * table) is not NULL and greater than 0 will be selected and returned only one
-	 * row by input DAL Id. If there are no row with such Id in a database table,
-	 * will be returned DTO with an empty list.
+	 * Makes a search in a database by input DAL and reads data. Returns DTO with
+	 * list of DALs which represent all database table rows. If the first field of
+	 * an input DAL (should represent PK or FK key in a database table) is not NULL
+	 * and greater than 0 will be selected and returned only one row by input DAL
+	 * Id. If there are no row with such Id in a database table, will be returned
+	 * DTO with an empty list.
 	 */
 	@Override
 	public <T> ListDTO<T> read(T dal) {
+		return read(dal, true);
+	}
+
+	private <T> ListDTO<T> read(T dal, boolean setCloseConnection) {
 		try {
 			ListDTO<T> listDTO = new ListDTO<>();
 
@@ -111,7 +123,6 @@ public class CRUDImpl implements ICRUD {
 
 			String readQuery = "SELECT * FROM " + tableName + whereCondition;
 
-			setConnection();
 			ResultSet resultSet = statement.executeQuery(readQuery);
 
 			List<T> dalList = new ArrayList<>();
@@ -134,11 +145,10 @@ public class CRUDImpl implements ICRUD {
 			listDTO.transferDataList = dalList;
 			listDTO.success = true;
 			listDTO.message = !dalList.isEmpty() ? "Read successful."
-					: (firstFieldValue != null && firstFieldValue > 0 ? "There are now data in a table with such ID."
+					: (firstFieldValue != null && firstFieldValue > 0 ? "There are now data in a table with such Id."
 							: "The database table is empty.");
 
 			return listDTO;
-			// connection setted in a try block so it closes autmatically (since Java7)
 		} catch (SQLException e) {
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
@@ -148,13 +158,16 @@ public class CRUDImpl implements ICRUD {
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = e.getMessage() + ".";
 			return listDTO;
+		} finally {
+			if (setCloseConnection) {
+				closeConnection();
+			}
 		}
 	}
 
 	/**
-	 * Reads results in a database result table by input userId.
-	 * Returns DTO with List of ResultDALs inside, which represent only one user
-	 * results.
+	 * Reads results in a database result table by input userId. Returns DTO with
+	 * List of ResultDALs inside, which represent only one user results.
 	 */
 	@Override
 	public ListDTO<ResultDAL> readUserResults(int userId) {
@@ -192,12 +205,13 @@ public class CRUDImpl implements ICRUD {
 			listDTO.message = !resultDALLis.isEmpty() ? "Read successful."
 					: "There are now data in a result table with such Id (" + userId + ").";
 
-			System.out.println("Database connection was closed.");
 			return listDTO;
 		} catch (SQLException e) {
 			ListDTO<ResultDAL> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
 			return listDTO;
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -224,7 +238,7 @@ public class CRUDImpl implements ICRUD {
 
 			setConnection();
 
-			ListDTO<T> readDTO = read(dal);
+			ListDTO<T> readDTO = read(dal, false);
 
 			if (readDTO.transferDataList.isEmpty()) {
 				dto.message = "Update failed. There are now row in a table with such Id (" + firstFieldValue + ").";
@@ -260,6 +274,8 @@ public class CRUDImpl implements ICRUD {
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -285,7 +301,7 @@ public class CRUDImpl implements ICRUD {
 
 			setConnection();
 
-			ListDTO<T> readDTO = read(dal);
+			ListDTO<T> readDTO = read(dal, false);
 
 			if (readDTO.transferDataList.isEmpty()) {
 				dto.message = "Delete failed. There are now row in a table with such Id (" + firstFieldValue + ").";
@@ -310,6 +326,134 @@ public class CRUDImpl implements ICRUD {
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
+		} finally {
+			closeConnection();
+		}
+	}
+
+	/**
+	 * Upload an image from the Web image path to database.
+	 */
+	@Override
+	public DTO uploadImage(int userId, String fileName) {
+		try (Connection imageConnection = database.connect();) {
+
+			String imageFormat = fileName.substring(fileName.lastIndexOf('.'));
+
+			File file = new File("src\\main\\webapp\\resources\\images\\charecters\\" + fileName);
+			FileInputStream fileInputStream = new FileInputStream(file);
+
+			PreparedStatement preparedStatement = imageConnection
+					.prepareStatement("INSERT INTO `image` (UserId, Image, ImageFormat) VALUES (?, ?, ?)");
+			preparedStatement.setInt(1, userId);
+			preparedStatement.setBinaryStream(2, fileInputStream, file.length());
+			preparedStatement.setString(3, imageFormat);
+
+			preparedStatement.executeUpdate();
+
+			preparedStatement.close();
+			fileInputStream.close();
+
+			DTO dto = new DTO();
+			dto.success = true;
+			dto.message = "File uploaded to database successfully.";
+
+			System.out.println("Database connection was closed.");
+			return dto;
+		} catch (SQLException e) {
+			DTO dto = new DTO();
+			dto.message = "Database error. " + e.getMessage() + ".";
+			return dto;
+		} catch (IOException e) {
+			DTO dto = new DTO();
+			dto.message = e.getMessage() + ".";
+			return dto;
+		}
+	}
+
+	/**
+	 * Downloads image from database to the Web image path.
+	 */
+	@Override
+	public DTO getImage(int userId) {
+		try (Connection imageConnection = database.connect();) {
+
+			DTO dto = new DTO();
+
+			PreparedStatement preparedStatement = imageConnection
+					.prepareStatement("SELECT * FROM `image` WHERE UserId = " + userId + ";");
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (resultSet.next()) {
+
+				byte[] bytes;
+				Blob blob;
+
+				String imageFormat = resultSet.getString(3);
+
+				File file = new File("src\\main\\webapp\\resources\\images\\charecters\\" + userId + imageFormat);
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+				blob = resultSet.getBlob("image");
+				bytes = blob.getBytes(1, (int) blob.length());
+				fileOutputStream.write(bytes);
+
+				fileOutputStream.close();
+
+			} else {
+				preparedStatement.close();
+				dto.message = "There are now image in a database with such Id.";
+				return dto;
+			}
+
+			preparedStatement.close();
+
+			dto.success = true;
+			dto.message = "File downloaded from the database successfully.";
+
+			System.out.println("Database connection was closed.");
+			return dto;
+		} catch (SQLException e) {
+			DTO dto = new DTO();
+			dto.message = "Database error. " + e.getMessage() + ".";
+			return dto;
+		} catch (IOException e) {
+			DTO dto = new DTO();
+			dto.message = e.getMessage() + ".";
+			return dto;
+		}
+	}
+
+	/**
+	 * Deletes image from the database by userId.
+	 */
+	@Override
+	public DTO deleteImage(int userId) {
+		try {
+			DTO dto = new DTO();
+
+			setConnection();
+			ResultSet resultSet = statement.executeQuery("SELECT UserId FROM `image` WHERE UserId = " + userId + ";");
+
+			if (resultSet.next()) {
+
+				statement.executeUpdate("DELETE FROM `image` WHERE UserId = " + userId + ";");
+
+			} else {
+				dto.message = "There are now image in a database with such Id.";
+				return dto;
+			}
+
+			dto.success = true;
+			dto.message = "Image deleted successfully.";
+
+			return dto;
+		} catch (SQLException e) {
+			DTO dto = new DTO();
+			dto.message = "Database error. " + e.getMessage() + ".";
+			return dto;
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -317,6 +461,17 @@ public class CRUDImpl implements ICRUD {
 		if (connection == null || connection.isClosed()) {
 			connection = database.connect();
 			statement = connection.createStatement();
+		}
+	}
+
+	private void closeConnection() {
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+			database.closeConnection();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
