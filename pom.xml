@@ -8,24 +8,62 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>JFight Maven Webapp</name>
 	<url>http://maven.apache.org</url>
+	<!--Parent dependencies -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.0.1</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>3.8.1</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>8.0.11</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.lestard</groupId>
+				<artifactId>easy-di</artifactId>
+				<version>0.3.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<!--Child dependencies -->
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-    <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
-	<dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-    	<version>3.0.1</version>
 			<scope>provided</scope>
-	</dependency>
-    
-    <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>jstl</artifactId> 	
-   	</dependency>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>eu.lestard</groupId>
+			<artifactId>easy-di</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -41,23 +79,5 @@
 		</plugins>
 		<finalName>JFight</finalName>
 	</build>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>javax.servlet-api</artifactId>
-				<version>3.0.1</version>
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>3.8.1</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>javax.servlet</groupId>
-  			<artifactId>jstl</artifactId>
-  			<version>1.2</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+
 </project>
