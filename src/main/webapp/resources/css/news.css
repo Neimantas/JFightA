@@ -2,6 +2,7 @@
 .leftcolumn{
 	
 position: absolute;
+text-align:center;
     left: 0px;
     top: 30px;
     width: 50%;
@@ -9,6 +10,7 @@ position: absolute;
 }
 .rightcolumn{
     position: absolute;
+    text-align:center;
     right: 0px;
     top:30px;
     width: 50%;
@@ -19,4 +21,8 @@ position: absolute;
 	top:0px;
 	width: 100%;
 	height: 30px;
+}
+.textField{
+	position: relative;
+	margin: auto;
 }

@@ -26,15 +26,17 @@
 </head>
 <body>
 <div class = "logoutMenu">
+		<button>Play</button>
+		<button>Ready</button>
 		<button>Logout</button>
 </div>
 <div>
 	<div class = "leftcolumn">
-	pirmas columnas
+Info about player. Get it somehow.
 	
 	</div>
 	<div class = "rightcolumn">
-	antras Columnas
+		<div class="textField">put here some text rom admin</div>
 	</div>
 </div>
 
