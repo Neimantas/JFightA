@@ -1,0 +1,22 @@
+@CHARSET "UTF-8";
+.leftcolumn{
+	
+position: absolute;
+    left: 0px;
+    top: 30px;
+    width: 50%;
+
+}
+.rightcolumn{
+    position: absolute;
+    right: 0px;
+    top:30px;
+    width: 50%;
+}
+.logoutMenu{
+	position: absolute;
+	text-align:right;
+	top:0px;
+	width: 100%;
+	height: 30px;
+}
