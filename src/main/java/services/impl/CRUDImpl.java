@@ -123,6 +123,10 @@ public class CRUDImpl implements ICRUD {
 
 			String readQuery = "SELECT * FROM " + tableName + whereCondition;
 
+			if (setCloseConnection) {
+				setConnection();
+			}
+
 			ResultSet resultSet = statement.executeQuery(readQuery);
 
 			List<T> dalList = new ArrayList<>();

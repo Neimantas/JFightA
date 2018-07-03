@@ -19,11 +19,12 @@ public class DatabaseImpl implements IDatabase {
 	 */
 	public Connection connect() {
 		try {
+			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 			connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
 					"Student_java2");
 			System.out.println("Connection to database has been established.");
 			return connection;
-		} catch (SQLException e) {
+		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
 		return null;

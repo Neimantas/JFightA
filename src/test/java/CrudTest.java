@@ -3,6 +3,7 @@
 import models.dal.FightDataDAL;
 import models.dal.ResultDAL;
 import models.dto.DTO;
+import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.impl.CRUDImpl;
 import services.impl.DatabaseImpl;
@@ -34,6 +35,13 @@ public class CrudTest {
 		
 //		DTO deleteDTO = crud.deleteImage(1);
 //		System.out.println(deleteDTO.message);
+		
+
+		FightDataDAL fightDataDAL = new FightDataDAL();
+		fightDataDAL.fightId = 1;
+		ListDTO<FightDataDAL> dto = crud.read(fightDataDAL);
+		System.out.println(dto.message);
+		System.out.println(dto.transferDataList.size());
 		
 	}
 
