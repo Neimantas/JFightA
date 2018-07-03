@@ -52,7 +52,7 @@
 			
 			</div>
 			<div class="col-sm-4">
-				Actions
+				<div>Actions</div>
 				<form method="post" action="/JFight/fight">
 					<div class="row">
 
