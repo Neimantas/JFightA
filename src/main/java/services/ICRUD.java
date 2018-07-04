@@ -2,7 +2,6 @@ package services;
 
 import models.dal.ImageDAL;
 import models.dal.ResultDAL;
-import models.dal.UserDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
@@ -10,10 +9,6 @@ import models.dto.ObjectDTO;
 public interface ICRUD {
 
 	public <T> ObjectDTO<T> create(T dal);
-
-	public ObjectDTO<UserDAL> createNewUser(UserDAL userDAL);
-
-	public ObjectDTO<UserDAL> loginUser(UserDAL userDAL);
 
 	public <T> ListDTO<T> read(T dal);
 
