@@ -26,13 +26,16 @@
 </head>
 <body>
 <div class = "logoutMenu">
+
 		<button>Play</button>
 		<button>Ready</button>
-		<button type="submit" name="button" value="button1">Logout</button>
+		<form action="/JFight/" method="GET">
+		<button type="submit" id="id3">Logout</button>
+		</form>
 </div>
 <div>
 	<div class = "leftcolumn">
-Info about player. Get it somehow.
+Online players. Get it somehow
 	
 	</div>
 	<div class = "rightcolumn">

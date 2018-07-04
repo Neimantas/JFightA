@@ -25,20 +25,22 @@ public class NewsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
-		request.getRequestDispatcher("News.jsp").forward(request, response);
+	
+		String button = request.getParameter("btn3");
+//		if ("btn3".equals(button)) {
+//			 request.getRequestDispatcher("/JFight/aaa").forward(request, response);
+//			 }
+//		else {
+			request.getRequestDispatcher("News.jsp").forward(request, response);
+//		}
 		doPost(request, response);
 		
 	}
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String button = request.getParameter("button1");
-		if ("button".equals(button)) {
-			 request.getRequestDispatcher("/JFight/index.jsp").forward(request, response);
-			
-		}
+
 		// TODO Auto-generated method stub
 		//doGet(request, response);
 
