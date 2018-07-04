@@ -28,7 +28,7 @@
 <div class = "logoutMenu">
 		<button>Play</button>
 		<button>Ready</button>
-		<button>Logout</button>
+		<button type="submit" name="button" value="button1">Logout</button>
 </div>
 <div>
 	<div class = "leftcolumn">
