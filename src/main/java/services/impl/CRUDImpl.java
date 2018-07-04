@@ -14,7 +14,6 @@ import javax.inject.Singleton;
 
 import models.dal.ImageDAL;
 import models.dal.ResultDAL;
-import models.dal.UserDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
@@ -39,10 +38,6 @@ public class CRUDImpl implements ICRUD {
 	 */
 	@Override
 	public <T> ObjectDTO<T> create(T dal) {
-		return create(dal, true);
-	}
-
-	private <T> ObjectDTO<T> create(T dal, boolean setCloseConnection) {
 		try {
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 
@@ -61,9 +56,7 @@ public class CRUDImpl implements ICRUD {
 			columnValues = columnValues.substring(0, columnValues.length() - 1);
 			String createQuery = "INSERT INTO " + tableName + " VALUES (" + columnValues + ");";
 
-			if (setCloseConnection) {
-				setConnection();
-			}
+			setConnection();
 
 			statement.executeUpdate(createQuery);
 
@@ -96,87 +89,16 @@ public class CRUDImpl implements ICRUD {
 			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
 		} finally {
-			if (setCloseConnection) {
-				closeConnection();
-			}
-		}
-	}
-
-	/**
-	 * Checks if user with the same name exist. If not, creates new. Return DTO with
-	 * created userDAL inside, which contains new user Id.
-	 */
-	@Override
-	public ObjectDTO<UserDAL> createNewUser(UserDAL userDAL) {
-		try {
-			String readQuery = "SELECT * FROM `user` WHERE Name = \'" + userDAL.name + "\';";
-			setConnection();
-			ResultSet resultSet = statement.executeQuery(readQuery);
-			if (resultSet.next()) {
-				ObjectDTO<UserDAL> objectDTO = new ObjectDTO<>();
-				objectDTO.message = "User " + userDAL.name + " already exists.";
-				return objectDTO;
-			}
-			return create(userDAL, false);
-		} catch (SQLException e) {
-			ObjectDTO<UserDAL> objectDTO = new ObjectDTO<>();
-			objectDTO.message = "Database error. " + e.getMessage() + ".";
-			return objectDTO;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			ObjectDTO<UserDAL> objectDTO = new ObjectDTO<>();
-			objectDTO.message = "Database error. " + e.getMessage() + ".";
-			return objectDTO;
-		} finally {
-			closeConnection();
-		}
-	}
-
-	/**
-	 * Checks if user name and password is correct. If so returns UserDAL with UserId
-	 * and other data.
-	 */
-	@Override
-	public ObjectDTO<UserDAL> loginUser(UserDAL userDAL) {
-		try {
-			String readQuery = "SELECT * FROM `user` WHERE Name = \'" + userDAL.name + "\' AND Password = \'"
-					+ userDAL.password + "\';";
-			setConnection();
-			ResultSet resultSet = statement.executeQuery(readQuery);
-			ObjectDTO<UserDAL> objectDTO = new ObjectDTO<>();
-			if (resultSet.next()) {
-				UserDAL updatedUserDAL = new UserDAL();
-				updatedUserDAL.userId = resultSet.getInt(1);
-				updatedUserDAL.name = resultSet.getString(2);
-				updatedUserDAL.password = resultSet.getString(3);
-				updatedUserDAL.eMail = resultSet.getString(4);
-				updatedUserDAL.accessLevel = resultSet.getInt(5);
-				objectDTO.transferData = updatedUserDAL;
-				objectDTO.success = true;
-				objectDTO.message = "Login successful.";
-				return objectDTO;
-			}
-			objectDTO.message = "Login failed.";
-			return objectDTO;
-		} catch (SQLException e) {
-			ObjectDTO<UserDAL> objectDTO = new ObjectDTO<>();
-			objectDTO.message = "Database error. " + e.getMessage() + ".";
-			return objectDTO;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			ObjectDTO<UserDAL> objectDTO = new ObjectDTO<>();
-			objectDTO.message = "Database error. " + e.getMessage() + ".";
-			return objectDTO;
-		} finally {
 			closeConnection();
 		}
 	}
 
 	/**
 	 * Makes a search in a database by input DAL and reads data. Returns DTO with
-	 * list of DALs which represent all database table rows. If the first field of
-	 * an input DAL (should represent PK or FK key in a database table) is not NULL
-	 * and greater than 0 will be selected and returned only one row by input DAL
-	 * Id. If there are no row with such Id in a database table, will be returned
-	 * DTO with an empty list.
+	 * list of DALs which represent database table rows. If input DAL fields is not
+	 * NULL will be selected and returned only rows that contains columns with such
+	 * values. If there are no rows with such values in a database table or database
+	 * table is empty, will be returned DTO with an empty list.
 	 */
 	@Override
 	public <T> ListDTO<T> read(T dal) {
@@ -191,10 +113,24 @@ public class CRUDImpl implements ICRUD {
 			Field[] dalClassFields = dalClass.getFields();
 			String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 
-			Integer firstFieldValue = (Integer) dalClassFields[0].get(dal);
+			String whereCondition = "";
+			Boolean isCondition = false;
+			for (int i = 0; i < dalClassFields.length; i++) {
 
-			String whereCondition = firstFieldValue == null || firstFieldValue < 1 ? ";"
-					: " WHERE " + dalClassFields[0].getName() + " = " + firstFieldValue + ";";
+				if (dalClassFields[i].get(dal) != null) {
+
+					Class<?> dalField = dalClassFields[i].getType();
+					whereCondition += (!isCondition ? " WHERE " : " AND ") + dalClassFields[i].getName() + " = "
+							+ (dalField == Integer.class ? "" : "\'") + dalClassFields[i].get(dal)
+							+ (dalField == Integer.class ? "" : "\'");
+
+					if (!isCondition) {
+						isCondition = true;
+					}
+				}
+			}
+
+			whereCondition += ";";
 
 			String readQuery = "SELECT * FROM " + tableName + whereCondition;
 
@@ -210,10 +146,10 @@ public class CRUDImpl implements ICRUD {
 
 				T returnDAL = (T) Class.forName(dalClass.getName()).getConstructor().newInstance();
 
-				for (int i = 0; i < dalClassFields.length; i++) {
+				for (int j = 0; j < dalClassFields.length; j++) {
 
-					Class<?> dalField = dalClassFields[i].getType();
-					dalClassFields[i].set(returnDAL, (dalField.cast(resultSet.getObject(i + 1))));
+					Class<?> dalField = dalClassFields[j].getType();
+					dalClassFields[j].set(returnDAL, (dalField.cast(resultSet.getObject(j + 1))));
 
 				}
 
@@ -224,7 +160,7 @@ public class CRUDImpl implements ICRUD {
 			listDTO.transferDataList = dalList;
 			listDTO.success = true;
 			listDTO.message = !dalList.isEmpty() ? "Read successful."
-					: (firstFieldValue != null && firstFieldValue > 0 ? "There are now data in a table with such Id."
+					: (isCondition == true ? "There are now data in a table with such values."
 							: "The database table is empty.");
 
 			return listDTO;
@@ -458,7 +394,7 @@ public class CRUDImpl implements ICRUD {
 			preparedStatement = connection.prepareStatement("SELECT * FROM `image` WHERE UserId = " + userId + ";");
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO();
+			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
 			ImageDAL imageDAL = new ImageDAL();
 
 			if (resultSet.next()) {
@@ -478,7 +414,7 @@ public class CRUDImpl implements ICRUD {
 
 			return objectDTO;
 		} catch (SQLException e) {
-			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO();
+			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
 			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
 		}
