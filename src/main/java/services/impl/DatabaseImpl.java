@@ -16,27 +16,25 @@ public class DatabaseImpl implements IDatabase {
 	/**
 	 * Before changing a database please look at the database requirements and
 	 * tables structure in a project documentation.
+	 * 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	public Connection connect() {
-		try {
-			connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
-					"Student_java2");
-			System.out.println("Connection to database has been established.");
-			return connection;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
+	public Connection connect()
+			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+		connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
+				"Student_java2");
+		System.out.println("Connection to database has been established.");
+		return connection;
 	}
 
-	public void closeConnection() {
-		if (connection != null) {
-			try {
-				connection.close();
-				System.out.println("Database connection was closed.");
-			} catch (SQLException e) {
-				System.out.println(e.getMessage());
-			}
+	public void closeConnection() throws SQLException {
+		if (connection != null && !connection.isClosed()) {
+			connection.close();
+			System.out.println("Database connection was closed.");
 		}
 	}
 

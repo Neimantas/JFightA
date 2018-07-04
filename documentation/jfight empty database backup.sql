@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 02, 2018 at 11:23 PM
+-- Generation Time: Jul 03, 2018 at 10:35 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -56,8 +56,9 @@ CREATE TABLE IF NOT EXISTS `character` (
 DROP TABLE IF EXISTS `fightdata`;
 CREATE TABLE IF NOT EXISTS `fightdata` (
   `FightId` int(11) NOT NULL,
+  `Round` int(11) NOT NULL DEFAULT '0' COMMENT 'Trigger created. Null input values automatically changes to default 0.',
   `UserId` int(11) NOT NULL,
-  `HealthPoints` int(11) NOT NULL DEFAULT '100' COMMENT 'Trigger created. Null input value is automatically changing to default 100.',
+  `HealthPoints` int(11) NOT NULL DEFAULT '100' COMMENT 'Trigger created. Null input values automatically changes to default 100.',
   `Damage` int(11) DEFAULT NULL,
   `AttackHead` int(11) DEFAULT NULL,
   `AttackBody` int(11) DEFAULT NULL,
@@ -82,9 +83,9 @@ CREATE TABLE IF NOT EXISTS `fightdata` (
 --
 -- Triggers `fightdata`
 --
-DROP TRIGGER IF EXISTS `NullTo100`;
+DROP TRIGGER IF EXISTS `Fightdata trigers`;
 DELIMITER $$
-CREATE TRIGGER `NullTo100` BEFORE INSERT ON `fightdata` FOR EACH ROW SET NEW.HealthPoints = IFNULL(NEW.HealthPoints, 100)
+CREATE TRIGGER `Fightdata trigers` BEFORE INSERT ON `fightdata` FOR EACH ROW SET NEW.HealthPoints = IFNULL(NEW.HealthPoints, 100), NEW.Round = IFNULL(NEW.Round, 0)
 $$
 DELIMITER ;
 
@@ -98,7 +99,7 @@ DROP TABLE IF EXISTS `image`;
 CREATE TABLE IF NOT EXISTS `image` (
   `UserId` int(11) NOT NULL,
   `Image` mediumblob,
-  `ImageFormat` varchar(63) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ImageName` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `UserId` (`UserId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -181,7 +182,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `Name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `Password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `eMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `AccessLevel` int(11) NOT NULL DEFAULT '1' COMMENT 'Trigger created. Null input value is automatically changing to default 1.',
+  `AccessLevel` int(11) NOT NULL DEFAULT '1' COMMENT 'Trigger created. Null input values automatically changes to default 1.',
   PRIMARY KEY (`UserId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
