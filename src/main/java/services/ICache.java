@@ -1,20 +1,18 @@
 package services;
 
-import java.util.Date;
+import java.util.Set;
+
+import models.business.Player;
 
 public interface ICache {
 
-	public void put(String key, Object data);
+	public void put(String userName, Player player);
 
-	public Object get(String key);
+	public Player get(String userName);
 
-	public void remove(String key);
+	public void remove(String userName);
 
-	public void setUserIsRead(String userName, boolean userIsReady);
-
-	public Date getLastUserActivityTime(String userName);
-
-	public boolean getUserIsReady(String userName);
+	public Set<Player> getReadyUsersList();
 
 	public boolean containsUser(String userName);
 
