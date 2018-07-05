@@ -17,42 +17,38 @@ public class CacheImpl implements ICache {
 	private Map<String, Player> players;
 	private Set<Player> readyPlayers;
 
+	public static ICache cache;
+
 	public CacheImpl() {
 		players = new ConcurrentHashMap<>();
 		readyPlayers = Collections.synchronizedSet(new HashSet());
+		cache = this;
 	}
 
 	@Override
 	public void put(String userName, Player player) {
-		// TODO Auto-generated method stub
-		
+		players.put(userName, player);
+
 	}
 
 	@Override
 	public Player get(String userName) {
-		// TODO Auto-generated method stub
-		return null;
+		return players.get(userName);
 	}
 
 	@Override
 	public void remove(String userName) {
-		// TODO Auto-generated method stub
-		
+		players.remove(userName);
 	}
 
 	@Override
 	public Set<Player> getReadyUsersList() {
-		// TODO Auto-generated method stub
-		return null;
+		return readyPlayers;
 	}
 
 	@Override
 	public boolean containsUser(String userName) {
-		// TODO Auto-generated method stub
-		return false;
+		return players.containsKey(userName);
 	}
-	
-	
-
 
 }
