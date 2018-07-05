@@ -32,22 +32,12 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// String pass=request.getParameter("pass");
-		// String userName=request.getParameter("username");
-		// doGet(request, response);
-		//
-		// System.out.println("User name "+userName+" paswordas:"+pass);
-		// LoginService login=new LoginService();
-		//
-		// if(login.login(userName, pass)==true) {
-		//
-		// }
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * This one takes, user login info from index.jsp form and sends it to login server that gives response
+	 *  if user User Name and password is valid if they are valid refers to Users page(now to test.jsp) with user id data
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -62,15 +52,15 @@ public class LoginServlet extends HttpServlet {
 
 		// System.out.println("User name "+userName+" paswordas:"+pass);
 		// request.setAttribute("userName",userName);
-		if (login.login(userName, pass) == true) {
-			System.out.println("pateko i true");
-			request.getRequestDispatcher("test.jsp").forward(request, response);
-		}
-		if (login.login(userName, pass) != true) {
-			System.out.println("pateko i false");
-			request.getRequestDispatcher("index.jsp");
+//		if (login.login(userName, pass) == true) {
+//			System.out.println("pateko i true");
+//			request.getRequestDispatcher("test.jsp").forward(request, response);
+//		}
+//		if (login.login(userName, pass) != true) {
+//			System.out.println("pateko i false");
+//			request.getRequestDispatcher("index.jsp");
 
-		}
+//		}
 
 	}
 

@@ -1,5 +1,8 @@
 package services;
 
+import models.dal.UserDAL;
+import models.dto.UserDTO;
+
 public interface IHigherLoginService {
-	public boolean login(String userName, String pass);
+	UserDTO login(UserDAL userDal);
 }

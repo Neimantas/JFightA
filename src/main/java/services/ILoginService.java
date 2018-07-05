@@ -1,5 +1,8 @@
 package services;
 
+import models.business.User;
+import models.dto.UserFrontDTO;
+
 public interface ILoginService {
-	public boolean login(String userName, String pass);
+	UserFrontDTO login(User user);
 }
