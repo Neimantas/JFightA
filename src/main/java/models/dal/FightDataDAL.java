@@ -3,6 +3,7 @@ package models.dal;
 public class FightDataDAL {
 	
 	public Integer fightId;
+	public Integer round;
 	public Integer userId;
 	public Integer healthPoints;
 	public Integer damage;

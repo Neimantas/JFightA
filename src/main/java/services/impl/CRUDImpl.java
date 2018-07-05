@@ -122,7 +122,9 @@ public class CRUDImpl implements ICRUD {
 					: " WHERE " + dalClassFields[0].getName() + " = " + firstFieldValue + ";";
 
 			String readQuery = "SELECT * FROM " + tableName + whereCondition;
-
+			
+			setConnection();
+			
 			ResultSet resultSet = statement.executeQuery(readQuery);
 
 			List<T> dalList = new ArrayList<>();

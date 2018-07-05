@@ -2,6 +2,7 @@ package servlets;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import services.IFightEngine;
 import services.impl.FightEngineImpl;
+import models.dto.ActionsDTO;
+import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.dal.FightDataDAL;
 
@@ -25,6 +28,8 @@ public class FightServlet extends HttpServlet {
 	private String _playerBName;
 	private String _fightId;
 	private IFightEngine _engine;
+	private int _round = 0;
+	private int _health = 100; //hardcoded
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -45,7 +50,6 @@ public class FightServlet extends HttpServlet {
 	
 //		playerBName = request.getParameter("nameB");
 		_fightId = request.getParameter("fightId");
-		System.out.println("NameA " + _playerAName + " _fightId " + _fightId);
 		
 		doPost(request, response);
 		
@@ -67,6 +71,18 @@ public class FightServlet extends HttpServlet {
 		String defenceArms = request.getParameter("defenceArms");
 		String defenceLegs = request.getParameter("defenceLegs");
 		
+		ActionsDTO action = new ActionsDTO();
+		
+		action.attackArms = attackArms == null?0:1;
+		action.attackBody = attackBody == null?0:1;
+		action.attackHead = attackHead == null?0:1;
+		action.attackLegs = attackLegs == null?0:1;
+		
+		action.defenceArms = defenceArms == null?0:1;
+		action.defenceBody = defenceBody == null?0:1;
+		action.defenceHead = defenceHead == null?0:1;
+		action.defenceLegs = defenceLegs == null?0:1;
+		
 //		response.getWriter()
 //		.append("attackHead: " + attackHead)
 //		.append("attackBody: " + attackBody)
@@ -76,17 +92,34 @@ public class FightServlet extends HttpServlet {
 //		.append("defenceBody: " + defenceBody)
 //		.append("defenceArms: " + defenceArms)
 //		.append("defenceLegs: " + defenceLegs);
+		//instead of calling getOpponentData, use _engine.engine n
+//		ObjectDTO<FightDataDAL> dto = _engine.getOpponentData(Integer.parseInt(_fightId), _playerAName);
 		
-		ObjectDTO<FightDataDAL> dto = _engine.getOpponentName(Integer.parseInt(_fightId), _playerAName);
+		
+		
+		
+		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(_fightId), _round, _health, _playerAName, action);
+		
 		if(!dto.success) {
 			response.getWriter().append("Error occurred. " + dto.message);
 		} else {
-			FightDataDAL dal = dto.transferData;
-			_playerBName = dal.userId + "";
+			//first sent round param 0, then get heatl results from figth table
+			//engine - returns healhtA and healthB
+			//
+			_round++;
+			List<FightDataDAL> dals = dto.transferDataList; //0-you, 1-opponent
+			
+			
+			int playerAHealth = dals.get(0).healthPoints;
+			_health = playerAHealth;
+			_playerBName = dals.get(1).userId + "";
+			int _playerBHealth = dals.get(1).healthPoints;
+			
 			request.setAttribute("playerAName", _playerAName);
 			request.setAttribute("playerBName", _playerBName);
-			request.setAttribute("healthA", 100);
-			request.setAttribute("healthB", 100);
+			request.setAttribute("healthA", playerAHealth);
+			request.setAttribute("healthB", _playerBHealth);
+			//avatar id
 			request.setAttribute("id", 1);
 			
 			
