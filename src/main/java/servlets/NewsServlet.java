@@ -26,7 +26,7 @@ public class NewsServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 	
-		String button = request.getParameter("btn3");
+//		String button = request.getParameter("btn3");
 //		if ("btn3".equals(button)) {
 //			 request.getRequestDispatcher("/JFight/aaa").forward(request, response);
 //			 }

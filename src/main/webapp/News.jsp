@@ -29,9 +29,9 @@
 
 		<button>Play</button>
 		<button>Ready</button>
-		<form action="/JFight/" method="GET">
-		<button type="submit" id="id3">Logout</button>
-		</form>
+	<!-- 	<form action="/JFight/" method="GET">-->
+	 	<button type="submit" id="id3">Logout</button>
+	<!-- 	</form> -->
 </div>
 <div>
 	<div class = "leftcolumn">
