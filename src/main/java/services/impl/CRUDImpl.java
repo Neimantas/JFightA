@@ -12,6 +12,9 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import models.dal.ImageDAL;
 import models.dal.ResultDAL;
 import models.dto.DTO;
@@ -27,6 +30,7 @@ public class CRUDImpl implements ICRUD {
 	private Connection connection;
 	private Statement statement;
 	private PreparedStatement preparedStatement;
+	private static Logger logger = LogManager.getLogger(CRUDImpl.class);
 
 	public CRUDImpl(DatabaseImpl databaseImpl) {
 		database = databaseImpl;
@@ -167,11 +171,13 @@ public class CRUDImpl implements ICRUD {
 		} catch (SQLException e) {
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
+			logger.error(e.getMessage());
 			return listDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = e.getMessage() + ".";
+			
 			return listDTO;
 		} finally {
 			if (setCloseConnection) {

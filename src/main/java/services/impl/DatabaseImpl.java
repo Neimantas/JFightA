@@ -25,7 +25,7 @@ public class DatabaseImpl implements IDatabase {
 	public Connection connect()
 			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-		connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
+		connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava201",
 				"Student_java2");
 		System.out.println("Connection to database has been established.");
 		return connection;
