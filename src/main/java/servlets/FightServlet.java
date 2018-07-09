@@ -115,6 +115,8 @@ public class FightServlet extends HttpServlet {
 			_playerBName = dals.get(1).userId + "";
 			int _playerBHealth = dals.get(1).healthPoints;
 			
+			
+			
 			request.setAttribute("playerAName", _playerAName);
 			request.setAttribute("playerBName", _playerBName);
 			request.setAttribute("healthA", playerAHealth);
@@ -122,7 +124,13 @@ public class FightServlet extends HttpServlet {
 			//avatar id
 			request.setAttribute("id", 1);
 			
-			
+			if(_playerBHealth<=0 && playerAHealth <= 0) {
+				request.getRequestDispatcher("draw.jsp").forward(request, response);
+			} else if(_playerBHealth<=0) {
+				request.getRequestDispatcher("win.jsp").forward(request, response);
+			} else if(playerAHealth<=0) {
+				request.getRequestDispatcher("lost.jsp").forward(request, response);
+			}
 			
 			request.getRequestDispatcher("fight.jsp").forward(request, response);
 //			request.getRequestDispatcher("NewFile.jsp").forward(request, response);
