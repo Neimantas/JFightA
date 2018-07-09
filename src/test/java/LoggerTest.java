@@ -6,7 +6,7 @@ public class LoggerTest {
 		LoggerImpl log = new LoggerImpl();
 		
 //		log.logFightData(2);
-		log.showLogs(1, 2);
+		log.getLogs(1, 2);
 
 	}
 
