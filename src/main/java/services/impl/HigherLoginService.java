@@ -1,6 +1,5 @@
 package services.impl;
 
-
 import models.business.UserLoginData;
 import models.dal.UserDAL;
 import models.dto.UserDTO;
@@ -9,24 +8,19 @@ import services.IHigherLoginService;
 public class HigherLoginService implements IHigherLoginService {
 
 	CRUDImpl crud;
-	public HigherLoginService() {
-		crud =new CRUDImpl(new DatabaseImpl());
-	}
-	
 
-	
+	public HigherLoginService() {
+		crud = new CRUDImpl(new DatabaseImpl());
+	}
+
 	@Override
 	public UserDTO login(UserLoginData userIn) {
-		System.out.println("Pateko");
-		UserDAL user2=new UserDAL();
-		user2.name=userIn.name;
-		user2.password=userIn.password;
-		Object user1=crud.read(user2).transferDataList.get(0);
-		UserDAL userDal=new UserDAL();
-		userDal=(UserDAL)user1;
-		
-//		System.out.println("pavyko gauti id = "+userDal.userId);
-		
+		UserDAL userInDal = new UserDAL();
+		userInDal.name = userIn.name;
+		userInDal.password = userIn.password;
+		UserDAL userDal = crud.read(userInDal).transferDataList.get(0);
+//		UserDAL userDal = new UserDAL();
+//		userDal = (UserDAL) userOut;
 
 		return new UserDTO(true, "success", userDal);
 	}

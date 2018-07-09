@@ -58,7 +58,8 @@ public class LoginServlet extends HttpServlet {
 		user.password = pass;
 		LoginService log=new LoginService();
 		if(log.login(user)._success) {
-			request.getRequestDispatcher("test.jsp");
+			System.out.println("atejo atgal");
+			request.getRequestDispatcher("test.jsp").forward(request, response);
 		}
 //		System.out.println(log.login(user)._message);
 //		System.out.println(log.login(user)._user.name);
