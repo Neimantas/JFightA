@@ -6,20 +6,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Singleton;
-
 import models.business.Player;
 import services.ICache;
 
-@Singleton
 public class CacheImpl implements ICache {
 
 	private Map<String, Player> players;
 	private Set<Player> readyPlayers;
 
-	public static ICache cache;
+	private static ICache cache;
 
-	public CacheImpl() {
+	private CacheImpl() {
 		players = new ConcurrentHashMap<>();
 		readyPlayers = Collections.synchronizedSet(new HashSet());
 		cache = this;
@@ -49,6 +46,13 @@ public class CacheImpl implements ICache {
 	@Override
 	public boolean containsUser(String userName) {
 		return players.containsKey(userName);
+	}
+
+	public static ICache getInstance() {
+		if (cache == null) {
+			cache = new CacheImpl();
+		}
+		return cache;
 	}
 
 }

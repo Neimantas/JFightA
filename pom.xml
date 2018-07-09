@@ -37,16 +37,6 @@
 				<artifactId>easy-di</artifactId>
 				<version>0.3.0</version>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-api</artifactId>
-				<version>2.11.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-core</artifactId>
-				<version>2.11.0</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<!--Child dependencies -->
@@ -73,14 +63,6 @@
 		<dependency>
 			<groupId>eu.lestard</groupId>
 			<artifactId>easy-di</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

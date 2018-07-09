@@ -12,9 +12,6 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import models.dal.ImageDAL;
 import models.dal.ResultDAL;
 import models.dto.DTO;
@@ -22,6 +19,7 @@ import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
 import services.IDatabase;
+import services.ILog;
 
 @Singleton
 public class CRUDImpl implements ICRUD {
@@ -30,10 +28,11 @@ public class CRUDImpl implements ICRUD {
 	private Connection connection;
 	private Statement statement;
 	private PreparedStatement preparedStatement;
-	private static Logger logger = LogManager.getLogger(CRUDImpl.class);
+	private ILog log;
 
 	public CRUDImpl(DatabaseImpl databaseImpl) {
 		database = databaseImpl;
+		log = LogImpl.getInstance();
 	}
 
 	/**
@@ -84,11 +83,13 @@ public class CRUDImpl implements ICRUD {
 
 			return objectDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
@@ -169,15 +170,15 @@ public class CRUDImpl implements ICRUD {
 
 			return listDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
-			logger.error(e.getMessage());
 			return listDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = e.getMessage() + ".";
-			
 			return listDTO;
 		} finally {
 			if (setCloseConnection) {
@@ -229,10 +230,12 @@ public class CRUDImpl implements ICRUD {
 
 			return listDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<ResultDAL> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
 			return listDTO;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<ResultDAL> listDTO = new ListDTO<>();
 			listDTO.message = e.getMessage() + ".";
 			return listDTO;
@@ -293,11 +296,13 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | ClassNotFoundException | IllegalArgumentException
 				| IllegalAccessException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -346,11 +351,13 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | ClassNotFoundException | IllegalArgumentException
 				| IllegalAccessException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -382,6 +389,7 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
@@ -420,6 +428,7 @@ public class CRUDImpl implements ICRUD {
 
 			return objectDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
 			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
@@ -451,10 +460,12 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -477,10 +488,12 @@ public class CRUDImpl implements ICRUD {
 			dto.message = "Connection to database has been established.";
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -502,6 +515,7 @@ public class CRUDImpl implements ICRUD {
 			dto.message = "Database connection was closed.";
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
@@ -523,7 +537,7 @@ public class CRUDImpl implements ICRUD {
 			}
 			database.closeConnection();
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			log.writeErrorMessage(e, true);
 		}
 	}
 
