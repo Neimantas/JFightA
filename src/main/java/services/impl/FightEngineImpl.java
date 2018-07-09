@@ -65,6 +65,8 @@ public class FightEngineImpl implements IFightEngine {
 		
 	}
 	
+	
+	
 	public ObjectDTO<FightDataDAL> getOpponentData(int fightId, int round, String userID) {
 		
 		//temporary solution, only for testing purposes

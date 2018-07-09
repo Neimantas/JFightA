@@ -58,3 +58,8 @@ function noMoreThanTwoSelectedClass(type) {
 	}
 	
 }
+
+$('#actionForm').submit(function() {
+	$('#submitButton').attr('disabled', true);
+    $('#wait').css('visibility', 'visible');
+});

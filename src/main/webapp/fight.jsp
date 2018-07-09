@@ -53,7 +53,7 @@
 			</div>
 			<div class="col-sm-4">
 				<div>Actions</div>
-				<form method="post" action="/JFight/fight">
+				<form id="actionForm" method="post" action="/JFight/fight">
 					<div class="row">
 
 						<div class="col-sm-6">
@@ -117,7 +117,7 @@
 						<div class="col-sm-4"></div>
 						<div class="col-sm-4">
 							
-							<input type="submit" value="Attack!">
+							<input id="submitButton" type="submit" value="Attack!">
 							
 						</div>
 						<div class="col-sm-4"></div>
@@ -125,6 +125,8 @@
 					
 					
 				</form>
+				
+				<div class="col-sm-offset-3" id="wait" style="visibility: hidden;"> WAITING </div>
 
 			</div>
 			<div class="col-sm-4">
