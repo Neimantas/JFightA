@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import models.business.User;
+import models.business.UserLoginData;
+import services.impl.HigherLoginService;
 import services.impl.LoginService;
 
 /**
@@ -21,10 +23,16 @@ public class LoginServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
+	LoginService logService;
+
 	public LoginServlet() {
-		super();
-		// TODO Auto-generated constructor stub
+		// super();
+		// logService = StartupContainer.easyDI.getInstance(LoginService.class);
 	}
+
+	// public LoginServlet(LoginService logServiceImpl) {
+	// logService = logServiceImpl;
+	// }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -36,31 +44,39 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	/**
-	 * This one takes, user login info from index.jsp form and sends it to login server that gives response
-	 *  if user User Name and password is valid if they are valid refers to Users page(now to test.jsp) with user id data
+	 * This one takes, user login info from index.jsp form and sends it to login
+	 * server that gives response if user User Name and password is valid if they
+	 * are valid refers to Users page(now to test.jsp) with user id data
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String userName = request.getParameter("username");
 		String pass = request.getParameter("pass");
 
-		User user = new User();
-		user.name = request.getParameter("username");
-		user.password = request.getParameter("pass");
-
-		LoginService login = new LoginService();
+		UserLoginData user = new UserLoginData();
+		user.name = userName;
+		user.password = pass;
+		LoginService log=new LoginService();
+		if(log.login(user)._success) {
+			request.getRequestDispatcher("test.jsp");
+		}
+//		System.out.println(log.login(user)._message);
+//		System.out.println(log.login(user)._user.name);
+//		System.out.println(log.login(user)._user.userId);
+		// logService.arVeikia();
+		// logService.login(user);
 
 		// System.out.println("User name "+userName+" paswordas:"+pass);
 		// request.setAttribute("userName",userName);
-//		if (login.login(userName, pass) == true) {
-//			System.out.println("pateko i true");
-//			request.getRequestDispatcher("test.jsp").forward(request, response);
-//		}
-//		if (login.login(userName, pass) != true) {
-//			System.out.println("pateko i false");
-//			request.getRequestDispatcher("index.jsp");
+		// if (login.login(userName, pass) == true) {
+		// System.out.println("pateko i true");
+		// request.getRequestDispatcher("test.jsp").forward(request, response);
+		// }
+		// if (login.login(userName, pass) != true) {
+		// System.out.println("pateko i false");
+		// request.getRequestDispatcher("index.jsp");
 
-//		}
+		// }
 
 	}
 

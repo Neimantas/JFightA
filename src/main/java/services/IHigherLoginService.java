@@ -1,8 +1,8 @@
 package services;
 
-import models.dal.UserDAL;
+import models.business.UserLoginData;
 import models.dto.UserDTO;
 
 public interface IHigherLoginService {
-	UserDTO login(UserDAL userDal);
+	UserDTO login(UserLoginData user);
 }
