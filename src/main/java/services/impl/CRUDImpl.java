@@ -1,12 +1,7 @@
 package services.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,12 +12,14 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
+import models.dal.ImageDAL;
 import models.dal.ResultDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
 import services.IDatabase;
+import services.ILog;
 
 @Singleton
 public class CRUDImpl implements ICRUD {
@@ -30,9 +27,12 @@ public class CRUDImpl implements ICRUD {
 	private IDatabase database;
 	private Connection connection;
 	private Statement statement;
+	private PreparedStatement preparedStatement;
+	private ILog log;
 
 	public CRUDImpl(DatabaseImpl databaseImpl) {
 		database = databaseImpl;
+		log = LogImpl.getInstance();
 	}
 
 	/**
@@ -60,6 +60,7 @@ public class CRUDImpl implements ICRUD {
 			String createQuery = "INSERT INTO " + tableName + " VALUES (" + columnValues + ");";
 
 			setConnection();
+
 			statement.executeUpdate(createQuery);
 
 			T returnDAL = (T) Class.forName(dalClass.getName()).getConstructor().newInstance();
@@ -82,11 +83,13 @@ public class CRUDImpl implements ICRUD {
 
 			return objectDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
@@ -97,11 +100,10 @@ public class CRUDImpl implements ICRUD {
 
 	/**
 	 * Makes a search in a database by input DAL and reads data. Returns DTO with
-	 * list of DALs which represent all database table rows. If the first field of
-	 * an input DAL (should represent PK or FK key in a database table) is not NULL
-	 * and greater than 0 will be selected and returned only one row by input DAL
-	 * Id. If there are no row with such Id in a database table, will be returned
-	 * DTO with an empty list.
+	 * list of DALs which represent database table rows. If input DAL fields is not
+	 * NULL will be selected and returned only rows that contains columns with such
+	 * values. If there are no rows with such values in a database table or database
+	 * table is empty, will be returned DTO with an empty list.
 	 */
 	@Override
 	public <T> ListDTO<T> read(T dal) {
@@ -116,15 +118,31 @@ public class CRUDImpl implements ICRUD {
 			Field[] dalClassFields = dalClass.getFields();
 			String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 
-			Integer firstFieldValue = (Integer) dalClassFields[0].get(dal);
+			String whereCondition = "";
+			Boolean isCondition = false;
+			for (int i = 0; i < dalClassFields.length; i++) {
 
-			String whereCondition = firstFieldValue == null || firstFieldValue < 1 ? ";"
-					: " WHERE " + dalClassFields[0].getName() + " = " + firstFieldValue + ";";
+				if (dalClassFields[i].get(dal) != null) {
+
+					Class<?> dalField = dalClassFields[i].getType();
+					whereCondition += (!isCondition ? " WHERE " : " AND ") + dalClassFields[i].getName() + " = "
+							+ (dalField == Integer.class ? "" : "\'") + dalClassFields[i].get(dal)
+							+ (dalField == Integer.class ? "" : "\'");
+
+					if (!isCondition) {
+						isCondition = true;
+					}
+				}
+			}
+
+			whereCondition += ";";
 
 			String readQuery = "SELECT * FROM " + tableName + whereCondition;
 			
-			setConnection();
-			
+			if (setCloseConnection) {
+				setConnection();
+			}
+
 			ResultSet resultSet = statement.executeQuery(readQuery);
 
 			List<T> dalList = new ArrayList<>();
@@ -133,10 +151,10 @@ public class CRUDImpl implements ICRUD {
 
 				T returnDAL = (T) Class.forName(dalClass.getName()).getConstructor().newInstance();
 
-				for (int i = 0; i < dalClassFields.length; i++) {
+				for (int j = 0; j < dalClassFields.length; j++) {
 
-					Class<?> dalField = dalClassFields[i].getType();
-					dalClassFields[i].set(returnDAL, (dalField.cast(resultSet.getObject(i + 1))));
+					Class<?> dalField = dalClassFields[j].getType();
+					dalClassFields[j].set(returnDAL, (dalField.cast(resultSet.getObject(j + 1))));
 
 				}
 
@@ -147,16 +165,18 @@ public class CRUDImpl implements ICRUD {
 			listDTO.transferDataList = dalList;
 			listDTO.success = true;
 			listDTO.message = !dalList.isEmpty() ? "Read successful."
-					: (firstFieldValue != null && firstFieldValue > 0 ? "There are now data in a table with such Id."
+					: (isCondition == true ? "There are now data in a table with such values."
 							: "The database table is empty.");
 
 			return listDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
 			return listDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = e.getMessage() + ".";
 			return listDTO;
@@ -184,6 +204,7 @@ public class CRUDImpl implements ICRUD {
 					+ " OR TieUser1Id = " + userId + " OR TieUser2Id = " + userId + ";";
 
 			setConnection();
+
 			ResultSet resultSet = statement.executeQuery(readQuery);
 
 			List<ResultDAL> resultDALLis = new ArrayList<>();
@@ -209,8 +230,14 @@ public class CRUDImpl implements ICRUD {
 
 			return listDTO;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			ListDTO<ResultDAL> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
+			return listDTO;
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
+			ListDTO<ResultDAL> listDTO = new ListDTO<>();
+			listDTO.message = e.getMessage() + ".";
 			return listDTO;
 		} finally {
 			closeConnection();
@@ -269,10 +296,13 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
-		} catch (IllegalArgumentException | IllegalAccessException e) {
+		} catch (InstantiationException | ClassNotFoundException | IllegalArgumentException
+				| IllegalAccessException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -321,10 +351,13 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
-		} catch (IllegalArgumentException | IllegalAccessException e) {
+		} catch (InstantiationException | ClassNotFoundException | IllegalArgumentException
+				| IllegalAccessException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -334,95 +367,71 @@ public class CRUDImpl implements ICRUD {
 	}
 
 	/**
-	 * Upload an image from the Web image path to database.
+	 * Uploads an image to the database. startImageTransferSession(); should be
+	 * executed before calling this method. endImageTransferSession(); should be
+	 * executed after image transfer.
 	 */
 	@Override
-	public DTO uploadImage(int userId, String fileName) {
-		try (Connection imageConnection = database.connect();) {
+	public DTO uploadImage(ImageDAL imageDAL) {
+		try {
 
-			String imageFormat = fileName.substring(fileName.lastIndexOf('.'));
-
-			File file = new File("src\\main\\webapp\\resources\\images\\charecters\\" + fileName);
-			FileInputStream fileInputStream = new FileInputStream(file);
-
-			PreparedStatement preparedStatement = imageConnection
-					.prepareStatement("INSERT INTO `image` (UserId, Image, ImageFormat) VALUES (?, ?, ?)");
-			preparedStatement.setInt(1, userId);
-			preparedStatement.setBinaryStream(2, fileInputStream, file.length());
-			preparedStatement.setString(3, imageFormat);
+			preparedStatement = connection
+					.prepareStatement("INSERT INTO `image` (UserId, Image, ImageName) VALUES (?, ?, ?)");
+			preparedStatement.setInt(1, imageDAL.userId);
+			preparedStatement.setBinaryStream(2, imageDAL.imageStream);
+			preparedStatement.setString(3, imageDAL.imageName);
 
 			preparedStatement.executeUpdate();
 
-			preparedStatement.close();
-			fileInputStream.close();
-
 			DTO dto = new DTO();
 			dto.success = true;
-			dto.message = "File uploaded to database successfully.";
+			dto.message = "Image uploaded to database successfully.";
 
-			System.out.println("Database connection was closed.");
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
-			return dto;
-		} catch (IOException e) {
-			DTO dto = new DTO();
-			dto.message = e.getMessage() + ".";
 			return dto;
 		}
 	}
 
 	/**
-	 * Downloads image from database to the Web image path.
+	 * Downloads image from the database. startImageTransferSession(); should be
+	 * executed before calling this method. endImageTransferSession(); should be
+	 * executed after image transfer.
 	 */
 	@Override
-	public DTO getImage(int userId) {
-		try (Connection imageConnection = database.connect();) {
+	public ObjectDTO<ImageDAL> getImage(int userId) {
+		try {
 
-			DTO dto = new DTO();
-
-			PreparedStatement preparedStatement = imageConnection
-					.prepareStatement("SELECT * FROM `image` WHERE UserId = " + userId + ";");
+			preparedStatement = connection.prepareStatement("SELECT * FROM `image` WHERE UserId = " + userId + ";");
 			ResultSet resultSet = preparedStatement.executeQuery();
+
+			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
+			ImageDAL imageDAL = new ImageDAL();
 
 			if (resultSet.next()) {
 
-				byte[] bytes;
-				Blob blob;
-
-				String imageFormat = resultSet.getString(3);
-
-				File file = new File("src\\main\\webapp\\resources\\images\\charecters\\" + userId + imageFormat);
-				FileOutputStream fileOutputStream = new FileOutputStream(file);
-
-				blob = resultSet.getBlob("image");
-				bytes = blob.getBytes(1, (int) blob.length());
-				fileOutputStream.write(bytes);
-
-				fileOutputStream.close();
+				imageDAL.userId = userId;
+				imageDAL.imageStream = resultSet.getAsciiStream("Image");
+				imageDAL.imageName = resultSet.getString("ImageName");
 
 			} else {
-				preparedStatement.close();
-				dto.message = "There are now image in a database with such Id.";
-				return dto;
+				objectDTO.message = "There are now image in a database with such Id.";
+				return objectDTO;
 			}
 
-			preparedStatement.close();
+			objectDTO.transferData = imageDAL;
+			objectDTO.success = true;
+			objectDTO.message = "Image downloaded from the database successfully.";
 
-			dto.success = true;
-			dto.message = "File downloaded from the database successfully.";
-
-			System.out.println("Database connection was closed.");
-			return dto;
+			return objectDTO;
 		} catch (SQLException e) {
-			DTO dto = new DTO();
-			dto.message = "Database error. " + e.getMessage() + ".";
-			return dto;
-		} catch (IOException e) {
-			DTO dto = new DTO();
-			dto.message = e.getMessage() + ".";
-			return dto;
+			log.writeErrorMessage(e, true);
+			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
+			objectDTO.message = "Database error. " + e.getMessage() + ".";
+			return objectDTO;
 		}
 	}
 
@@ -447,19 +456,74 @@ public class CRUDImpl implements ICRUD {
 			}
 
 			dto.success = true;
-			dto.message = "Image deleted successfully.";
+			dto.message = "Image deleted from the database successfully.";
 
 			return dto;
 		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
+			return dto;
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
+			DTO dto = new DTO();
+			dto.message = e.getMessage() + ".";
 			return dto;
 		} finally {
 			closeConnection();
 		}
 	}
 
-	private void setConnection() throws SQLException {
+	/**
+	 * Should be executed before calling image transfer method.
+	 */
+	@Override
+	public DTO startImageTransferSession() {
+		try {
+			if (connection == null || connection.isClosed()) {
+				connection = database.connect();
+			}
+			DTO dto = new DTO();
+			dto.success = true;
+			dto.message = "Connection to database has been established.";
+			return dto;
+		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
+			DTO dto = new DTO();
+			dto.message = "Database error. " + e.getMessage() + ".";
+			return dto;
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			log.writeErrorMessage(e, true);
+			DTO dto = new DTO();
+			dto.message = e.getMessage() + ".";
+			return dto;
+		}
+	}
+
+	/**
+	 * Should be executed after image transfer method.
+	 */
+	@Override
+	public DTO endImageTransferSession() {
+		try {
+			if (preparedStatement != null && !preparedStatement.isClosed()) {
+				preparedStatement.close();
+			}
+			database.closeConnection();
+			DTO dto = new DTO();
+			dto.success = true;
+			dto.message = "Database connection was closed.";
+			return dto;
+		} catch (SQLException e) {
+			log.writeErrorMessage(e, true);
+			DTO dto = new DTO();
+			dto.message = "Database error. " + e.getMessage() + ".";
+			return dto;
+		}
+	}
+
+	private void setConnection()
+			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		if (connection == null || connection.isClosed()) {
 			connection = database.connect();
 			statement = connection.createStatement();
@@ -468,12 +532,12 @@ public class CRUDImpl implements ICRUD {
 
 	private void closeConnection() {
 		try {
-			if (statement != null) {
+			if (statement != null && !statement.isClosed()) {
 				statement.close();
 			}
 			database.closeConnection();
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			log.writeErrorMessage(e, true);
 		}
 	}
 

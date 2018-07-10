@@ -1,5 +1,6 @@
 package services;
 
+import models.dal.ImageDAL;
 import models.dal.ResultDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
@@ -17,10 +18,14 @@ public interface ICRUD {
 
 	public <T> DTO delete(T dal);
 
-	public DTO uploadImage(int userId, String fileName);
+	public DTO uploadImage(ImageDAL imageDAL);
 
-	public DTO getImage(int userId);
+	public ObjectDTO<ImageDAL> getImage(int userId);
 
 	public DTO deleteImage(int userId);
+
+	public DTO startImageTransferSession();
+
+	public DTO endImageTransferSession();
 
 }
