@@ -27,15 +27,25 @@ public class NewsServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
-
+		System.out.println("news servelt click");
 		String param = request.getParameter("button");
 
 		if (param != null) {
 
 			if (param.equals("logout")) {
 
-				request.setAttribute("button", param);
+				// request.setAttribute("button", param);
 				request.getRequestDispatcher("index.jsp").forward(request, response);
+			}
+			if (param.equals("ready")) {
+				
+				System.out.println("Ready btn click");
+				request.setAttribute("ReadyMessage", "YOU ARE READY");
+				request.getRequestDispatcher("News.jsp").forward(request, response);
+			//	request.getRequestDispatcher("fight.jsp").forward(request, response);
+			}
+			if (param.equals("play")) {
+				request.getRequestDispatcher("fight.jsp").forward(request, response);
 			}
 
 		} else {
@@ -54,9 +64,25 @@ public class NewsServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// TODO Auto-generated method stub
-		// doGet(request, response);
+		System.out.println("news servelt click");
+		
+		String param = request.getParameter("button");
+		if (param.equals("ready")) {
+			
+			System.out.println("Ready btn click");
+			request.setAttribute("ReadyMessage", "You are ready");
+			request.getRequestDispatcher("fight.jsp").forward(request, response);
+		}
+		else if (param.equals("logout")) {
 
+			request.setAttribute("button", param);
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+		} else {
+			request.getRequestDispatcher("News.jsp").forward(request, response);
+		}
 	}
+
+	// TODO Auto-generated method stub
+	// doGet(request, response);
 
 }
