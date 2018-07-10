@@ -27,11 +27,19 @@
 <body>
 <div class = "logoutMenu">
 
-		<button>Play</button>
-		<button>Ready</button>
-		<form action="/JFight/" method="GET">
-		<button type="submit" id="id3">Logout</button>
-		</form>
+<form class = "forms" action="/JFight/News">
+	<input type="hidden" name="button" value="play"><input type="submit" value="Play"></input>
+</form>
+
+<form class = "forms" action="/JFight/News">
+	<input type="hidden" name="button" value="ready"><input type="submit" value="Ready"></input>
+</form>
+
+<form class = "forms" action="/JFight/News">
+	<input type="hidden" name="button" value="logout"></input><input type="submit" value="Logout"></input>
+</form>
+
+
 </div>
 <div>
 	<div class = "leftcolumn">
@@ -39,7 +47,7 @@ Online players. Get it somehow
 	
 	</div>
 	<div class = "rightcolumn">
-		<div class="textField">put here some text rom admin</div>
+		<div class="textField">put here some text from admin</div>
 	</div>
 </div>
 
