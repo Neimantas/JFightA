@@ -52,33 +52,14 @@ public class LoginServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String userName = request.getParameter("username");
 		String pass = request.getParameter("pass");
-
 		UserLoginData user = new UserLoginData();
 		user.name = userName;
 		user.password = pass;
-		LoginService log=new LoginService();
-		if(log.login(user)._success) {
+		LoginService log = new LoginService();
+		if (log.login(user)._success) {
 			System.out.println("atejo atgal");
 			request.getRequestDispatcher("test.jsp").forward(request, response);
 		}
-//		System.out.println(log.login(user)._message);
-//		System.out.println(log.login(user)._user.name);
-//		System.out.println(log.login(user)._user.userId);
-		// logService.arVeikia();
-		// logService.login(user);
-
-		// System.out.println("User name "+userName+" paswordas:"+pass);
-		// request.setAttribute("userName",userName);
-		// if (login.login(userName, pass) == true) {
-		// System.out.println("pateko i true");
-		// request.getRequestDispatcher("test.jsp").forward(request, response);
-		// }
-		// if (login.login(userName, pass) != true) {
-		// System.out.println("pateko i false");
-		// request.getRequestDispatcher("index.jsp");
-
-		// }
-
 	}
 
 }
