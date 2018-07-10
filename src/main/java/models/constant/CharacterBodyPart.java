@@ -2,7 +2,7 @@ package models.constant;
 
 public enum CharacterBodyPart {
 
-	HEAD(1, "Head", 6), BODY(2, "Body", 5), HANDS(3, "Hands", 4), LEGS(4, "Legs", 4);
+	HEAD(1, "Head", 20), BODY(2, "Body", 10), HANDS(3, "Hands", 5), LEGS(4, "Legs", 5);
 
 	private int bodyPartId;
 	private String bodyPartName;

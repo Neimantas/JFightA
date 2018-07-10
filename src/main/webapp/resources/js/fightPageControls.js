@@ -14,7 +14,8 @@ window.onload = function() {
 	
 	noMoreThanTwoSelectedClass('attack');
 	noMoreThanTwoSelectedClass('defence');
-	
+	blockSubmit();
+	actionTimer();
 }
 // type - attack/defence
 //function noMoreThanTwoSelected(type) {
@@ -58,3 +59,31 @@ function noMoreThanTwoSelectedClass(type) {
 	}
 	
 }
+//block submit button and show wait message while waiting for response
+function blockSubmit() {
+	$('#actionForm').submit(function() {
+		$('#submitButton').attr('disabled', true);
+	    $('#wait').css('visibility', 'visible');
+	});
+}
+
+function actionTimer() {
+	let timer = 30;
+	let countdown = setInterval(function () {
+
+	    document.getElementById("timer").innerHTML = --timer;
+	    
+	    if(timer <= 0) {
+	    	autoSubmit();
+	        clearInterval(countdown);
+	    }
+
+	}, 1000);
+}
+
+function autoSubmit() {
+	$('#actionForm').submit();
+}
+
+
+
