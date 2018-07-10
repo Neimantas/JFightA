@@ -127,6 +127,8 @@
 				</form>
 				
 				<div class="col-sm-offset-3" id="wait" style="visibility: hidden;"> WAITING </div>
+				<div class="col-sm-offset-3" id="timer">30</div>
+				
 
 			</div>
 			<div class="col-sm-4">
