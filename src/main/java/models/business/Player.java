@@ -47,9 +47,9 @@ public class Player {
 		userStatus = newUserStatus;
 		lastActivityTime = new Date();
 		if (newUserStatus == UserStatus.READY) {
-			CacheImpl.cache.getReadyUsersList().add(this);
+			CacheImpl.getInstance().getReadyUsersList().add(this);
 		} else {
-			CacheImpl.cache.getReadyUsersList().remove(this);
+			CacheImpl.getInstance().getReadyUsersList().remove(this);
 		}
 	}
 
