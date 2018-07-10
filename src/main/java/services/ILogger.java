@@ -8,6 +8,6 @@ import models.dto.ObjectDTO;
 public interface ILogger {
 	
 	ObjectDTO<FightDataDAL> logFightData(int fightId, int userIdA, int userIdB);
-	ObjectDTO<FightDataDAL> getLogs(int userIdA, int userIdB);
+	ListDTO<FightDataDAL> getLogs(int userIdA, int userIdB);
 
 }

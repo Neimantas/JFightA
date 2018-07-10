@@ -34,18 +34,22 @@ public class LoggerImpl implements ILogger {
 			for (FightDataDAL d : list) {
 				JSONObject jsonOb = new JSONObject();
 
-				jsonOb.put("UserId", d.userId);
-				jsonOb.put("Round", d.round);
-				jsonOb.put("HealthPoints", d.healthPoints);
-				jsonOb.put("Damage", d.damage);
-				jsonOb.put("AttackHead", d.attackHead);
-				jsonOb.put("AttackBody", d.attackBody);
-				jsonOb.put("AttackHands", d.attackHands);
-				jsonOb.put("AttackLegs", d.attackLegs);
-				jsonOb.put("DefenceHead", d.defenceHead);
-				jsonOb.put("DefenceBody", d.defenceBody);
-				jsonOb.put("DefenceHands", d.defenceHands);
-				jsonOb.put("DefenceLegs", d.defenceLegs);
+				jsonOb.put("u", d.userId);
+				jsonOb.put("r", d.round);
+				jsonOb.put("hp", d.healthPoints);
+				if (d.damage == null) {
+					jsonOb.put("d", 0);
+				} else {
+					jsonOb.put("d", d.damage);
+				}
+				jsonOb.put("ah", d.attackHead);
+				jsonOb.put("ab", d.attackBody);
+				jsonOb.put("ahn", d.attackHands);
+				jsonOb.put("al", d.attackLegs);
+				jsonOb.put("dh", d.defenceHead);
+				jsonOb.put("db", d.defenceBody);
+				jsonOb.put("dhn", d.defenceHands);
+				jsonOb.put("dl", d.defenceLegs);
 
 				json.put(jsonOb);
 			}
@@ -76,7 +80,7 @@ public class LoggerImpl implements ILogger {
 	}
 
 	@Override
-	public ObjectDTO<FightDataDAL> getLogs(int userIdA, int userIdB) {
+	public ListDTO<FightDataDAL> getLogs(int userIdA, int userIdB) {
 
 		LogDAL dalL = new LogDAL();
 
@@ -85,29 +89,45 @@ public class LoggerImpl implements ILogger {
 
 		ListDTO<LogDAL> dtoL = crud.<LogDAL>read(dalL);
 		if (dtoL.success) {
+			List<FightDataDAL> returnList = new ArrayList<>();
 			List<LogDAL> list = dtoL.transferDataList;
 			for (LogDAL l : list) {
 				JSONArray json = new JSONArray(l.log);
+
 				for (int i = 0; i < json.length(); i++) {
 					JSONObject jsonObj = (JSONObject) json.get(i);
-					
-					//Reikalingas tolimesnis suskaidymas
+					FightDataDAL returnDAL = new FightDataDAL();
 
-					System.out.println(jsonObj.get("Round").toString());
+					returnDAL.round = (Integer) jsonObj.get("r");
+					returnDAL.userId = (Integer) jsonObj.get("u");
+					returnDAL.healthPoints = (Integer) jsonObj.get("hp");
+					returnDAL.damage = (Integer) jsonObj.get("d");
+					returnDAL.attackHead = (Integer) jsonObj.get("ah");
+					returnDAL.attackBody = (Integer) jsonObj.get("ab");
+					returnDAL.attackHands = (Integer) jsonObj.get("ahn");
+					returnDAL.attackLegs = (Integer) jsonObj.get("al");
+					returnDAL.defenceHead = (Integer) jsonObj.get("dh");
+					returnDAL.defenceBody = (Integer) jsonObj.get("db");
+					returnDAL.defenceHands = (Integer) jsonObj.get("dhn");
+					returnDAL.defenceLegs = (Integer) jsonObj.get("dl");
+
+					returnList.add(returnDAL);
 				}
 			}
 
-			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO();
+			ListDTO<FightDataDAL> retSuccess = new ListDTO();
 			retSuccess.success = true;
 			retSuccess.message = "Correct given users.";
-			// retSuccess.transferDataList = ;
+			retSuccess.transferDataList = returnList;
 
 			return retSuccess;
 		}
 
-		ObjectDTO<FightDataDAL> retFailure = new ObjectDTO();
+		ListDTO<FightDataDAL> retFailure = new ListDTO();
 		retFailure.success = false;
 		retFailure.message = "Error! No such users.";
+
+		System.out.println("Failure");
 
 		return retFailure;
 	}
