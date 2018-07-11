@@ -36,12 +36,12 @@ public class CrudTest {
 		// DTO deleteResultDTO = crud.delete(dto.transferData);
 		// System.out.println(deleteFightDTO.message);
 
-		 FightDataDAL fightDataDAL = new FightDataDAL();
-		 fightDataDAL.fightId = 1;
-		 ListDTO<FightDataDAL> dto = crud.read(fightDataDAL);
+		FightDataDAL fightDataDAL = new FightDataDAL();
+		fightDataDAL.fightId = 1;
+		ListDTO<FightDataDAL> dto = crud.read(fightDataDAL);
 
-		 System.out.println(dto.message);
-		 System.out.println(dto.transferDataList.size());
+		System.out.println(dto.message);
+		System.out.println(dto.transferDataList.size());
 
 		// FightDataDAL fightDataDAL = new FightDataDAL();
 		// fightDataDAL.fightId = 1;

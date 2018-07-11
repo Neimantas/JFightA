@@ -3,7 +3,7 @@ package services.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.constant.CharacterBodyPart;
+import models.constant.DefaultDamagePoints;
 import models.dal.FightDataDAL;
 import models.dto.ActionsDTO;
 import models.dto.ListDTO;
@@ -216,16 +216,16 @@ public class FightEngineImpl implements IFightEngine {
 //						+ (opponentActions.defenceLegs - yourActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
 		
 		if(yourActions.attackHead > 0) {
-			givenDamage += (opponentActions.defenceHead - yourActions.attackHead) * CharacterBodyPart.HEAD.getDamagePoints();
+			givenDamage += (opponentActions.defenceHead - yourActions.attackHead) * DefaultDamagePoints.HEAD.getDamagePoints();
 		}
 		if(yourActions.attackBody > 0) {
-			givenDamage += (opponentActions.defenceBody - yourActions.attackBody) * CharacterBodyPart.BODY.getDamagePoints();
+			givenDamage += (opponentActions.defenceBody - yourActions.attackBody) * DefaultDamagePoints.BODY.getDamagePoints();
 		}
 		if(yourActions.attackArms > 0) {
-			givenDamage += (opponentActions.defenceArms - yourActions.attackArms) * CharacterBodyPart.HANDS.getDamagePoints();
+			givenDamage += (opponentActions.defenceArms - yourActions.attackArms) * DefaultDamagePoints.HANDS.getDamagePoints();
 		}
 		if(yourActions.attackLegs > 0) {
-			givenDamage += (opponentActions.defenceLegs - yourActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
+			givenDamage += (opponentActions.defenceLegs - yourActions.attackLegs) * DefaultDamagePoints.LEGS.getDamagePoints();
 		}
 		
 		int takenDamage = 0;
@@ -236,16 +236,16 @@ public class FightEngineImpl implements IFightEngine {
 //						+ (yourActions.defenceLegs - opponentActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
 		
 		if(opponentActions.attackHead > 0) {
-			takenDamage += (yourActions.defenceHead - opponentActions.attackHead) * CharacterBodyPart.HEAD.getDamagePoints();
+			takenDamage += (yourActions.defenceHead - opponentActions.attackHead) * DefaultDamagePoints.HEAD.getDamagePoints();
 		}
 		if(opponentActions.attackBody > 0) {
-			takenDamage += (yourActions.defenceBody - opponentActions.attackBody) * CharacterBodyPart.BODY.getDamagePoints();
+			takenDamage += (yourActions.defenceBody - opponentActions.attackBody) * DefaultDamagePoints.BODY.getDamagePoints();
 		}
 		if(opponentActions.attackArms > 0) {
-			takenDamage += (yourActions.defenceArms - opponentActions.attackArms) * CharacterBodyPart.HANDS.getDamagePoints();
+			takenDamage += (yourActions.defenceArms - opponentActions.attackArms) * DefaultDamagePoints.HANDS.getDamagePoints();
 		}
 		if(opponentActions.attackLegs > 0) {
-			takenDamage += (yourActions.defenceLegs - opponentActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
+			takenDamage += (yourActions.defenceLegs - opponentActions.attackLegs) * DefaultDamagePoints.LEGS.getDamagePoints();
 		}
 		System.out.println(givenDamage);
 		System.out.println(takenDamage);
