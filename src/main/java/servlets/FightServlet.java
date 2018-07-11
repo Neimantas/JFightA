@@ -83,21 +83,7 @@ public class FightServlet extends HttpServlet {
 		action.defenceHead = defenceHead == null?0:1;
 		action.defenceLegs = defenceLegs == null?0:1;
 		
-//		response.getWriter()
-//		.append("attackHead: " + attackHead)
-//		.append("attackBody: " + attackBody)
-//		.append("attackArms: " + attackArms)
-//		.append("attackLegs: " + attackLegs)
-//		.append("defenceHead: " + defenceHead)
-//		.append("defenceBody: " + defenceBody)
-//		.append("defenceArms: " + defenceArms)
-//		.append("defenceLegs: " + defenceLegs);
-		//instead of calling getOpponentData, use _engine.engine n
-//		ObjectDTO<FightDataDAL> dto = _engine.getOpponentData(Integer.parseInt(_fightId), _playerAName);
-		
-		
-		
-		
+
 		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(_fightId), _round, _health, _playerAName, action);
 		
 		if(!dto.success) {

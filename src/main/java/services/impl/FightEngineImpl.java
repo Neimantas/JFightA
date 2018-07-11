@@ -130,6 +130,7 @@ public class FightEngineImpl implements IFightEngine {
 		insertDAL.defenceLegs = yourAction.defenceLegs;
 		
 		crud.<FightDataDAL>create(insertDAL);
+		
 		int counter = 0;
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userId);
 		while(counter < 1000) {
