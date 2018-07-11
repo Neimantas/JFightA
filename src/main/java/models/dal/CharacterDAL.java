@@ -7,5 +7,7 @@ public class CharacterDAL {
 	public Integer strenght;
 	public Integer experience;
 	public Integer level;
+	public Integer attackItemId;
+	public Integer defenceItemId;
 
 }

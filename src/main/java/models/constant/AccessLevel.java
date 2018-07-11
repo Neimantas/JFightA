@@ -3,7 +3,7 @@ package models.constant;
 public enum AccessLevel {
 
 	USER(1, "User", true, true, false, false, false, false),
-	ADVANCEDUSER(2, "AdvancedUser", true, true, true, false, false, false),
+	ADVANCED_USER(2, "AdvancedUser", true, true, true, false, false, false),
 	MODERATOR(3, "Moderator", true, true, true, true, true, false),
 	ADMINISTRATOR(4, "Administrator", true, true, true, true, true, true);
 

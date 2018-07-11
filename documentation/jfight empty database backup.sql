@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 03, 2018 at 10:35 PM
+-- Generation Time: Jul 10, 2018 at 10:11 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -37,12 +37,21 @@ CREATE TABLE IF NOT EXISTS `character` (
   `Strength` int(11) NOT NULL,
   `Experience` int(11) NOT NULL,
   `Level` int(11) NOT NULL,
+  `AttackItemId` int(11) DEFAULT NULL,
+  `DefenceItemId` int(11) DEFAULT NULL,
   UNIQUE KEY `UserId_2` (`UserId`),
-  KEY `UserId` (`UserId`)
+  KEY `UserId` (`UserId`),
+  KEY `DefenceItemId` (`DefenceItemId`),
+  KEY `AttackItemId` (`AttackItemId`),
+  KEY `DefenceItemId_2` (`DefenceItemId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- RELATIONSHIPS FOR TABLE `character`:
+--   `AttackItemId`
+--       `item` -> `ItemId`
+--   `DefenceItemId`
+--       `item` -> `ItemId`
 --   `UserId`
 --       `user` -> `UserId`
 --
@@ -112,6 +121,38 @@ CREATE TABLE IF NOT EXISTS `image` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `item`
+--
+
+DROP TABLE IF EXISTS `item`;
+CREATE TABLE IF NOT EXISTS `item` (
+  `ItemId` int(11) NOT NULL AUTO_INCREMENT,
+  `ItemName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ItemImage` blob NOT NULL COMMENT 'Max 64 kB',
+  `ImageFormat` varchar(7) COLLATE utf8_unicode_ci NOT NULL,
+  `ItemType` enum('ATTACK','DEFENCE') COLLATE utf8_unicode_ci NOT NULL,
+  `AttackPoints` int(11) DEFAULT NULL,
+  `DefencePoints` int(11) DEFAULT NULL,
+  `MinCharacterLevel` int(11) NOT NULL DEFAULT '2' COMMENT 'Trigger created. Null input values automatically changes to default 2.',
+  PRIMARY KEY (`ItemId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `item`:
+--
+
+--
+-- Triggers `item`
+--
+DROP TRIGGER IF EXISTS `Item_MinCharacterLevel_InputNullTo2`;
+DELIMITER $$
+CREATE TRIGGER `Item_MinCharacterLevel_InputNullTo2` BEFORE INSERT ON `item` FOR EACH ROW SET NEW.MinCharacterLevel = IFNULL(NEW.MinCharacterLevel, 2)
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `log`
 --
 
@@ -121,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Event created. Logs older than one month are deleting automatically.',
   `User1Id` int(11) DEFAULT NULL,
   `User2Id` int(11) DEFAULT NULL,
-  `Log` varchar(1027) COLLATE utf8_unicode_ci NOT NULL,
+  `Log` text COLLATE utf8_unicode_ci NOT NULL,
   UNIQUE KEY `FightId_2` (`FightId`),
   KEY `FightId` (`FightId`),
   KEY `User2Id` (`User2Id`),
@@ -183,7 +224,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `Password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `eMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `AccessLevel` int(11) NOT NULL DEFAULT '1' COMMENT 'Trigger created. Null input values automatically changes to default 1.',
-  PRIMARY KEY (`UserId`)
+  PRIMARY KEY (`UserId`),
+  UNIQUE KEY `Name` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -207,6 +249,8 @@ DELIMITER ;
 -- Constraints for table `character`
 --
 ALTER TABLE `character`
+  ADD CONSTRAINT `character_itemAttack_fk` FOREIGN KEY (`AttackItemId`) REFERENCES `item` (`ItemId`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  ADD CONSTRAINT `character_itemDefence_fk` FOREIGN KEY (`DefenceItemId`) REFERENCES `item` (`ItemId`) ON DELETE SET NULL ON UPDATE NO ACTION,
   ADD CONSTRAINT `character_user_fk` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
