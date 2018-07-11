@@ -64,13 +64,21 @@ function blockSubmit() {
 	$('#actionForm').submit(function() {
 		$('#submitButton').attr('disabled', true);
 	    $('#wait').css('visibility', 'visible');
+	    stopTimer = true;
+	    $('#timer').css('visibility', 'hidden');
 	});
 }
+//global variable to control timer behavior.
+stopTimer = false;
 
-function actionTimer() {
+function actionTimer(forceCancel) {
 	let timer = 30;
-	let countdown = setInterval(function () {
-
+	countdown = setInterval(function () {
+		
+		if(stopTimer) {
+			clearInterval(countdown);
+		}
+		
 	    document.getElementById("timer").innerHTML = --timer;
 	    
 	    if(timer <= 0) {
@@ -84,6 +92,10 @@ function actionTimer() {
 function autoSubmit() {
 	$('#actionForm').submit();
 }
+
+//function autoSubmitStopper(){
+//	stopTimer = true;
+//}
 
 
 
