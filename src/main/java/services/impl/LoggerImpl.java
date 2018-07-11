@@ -18,7 +18,7 @@ public class LoggerImpl implements ILogger {
 	private ICRUD crud;
 
 	public LoggerImpl() {
-		crud = new CRUDImpl(new DatabaseImpl());
+		crud = CRUDImpl.getInstance();
 	}
 
 	@Override

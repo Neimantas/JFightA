@@ -4,14 +4,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import javax.inject.Singleton;
-
 import services.IDatabase;
 
-@Singleton
 public class DatabaseImpl implements IDatabase {
 
 	private Connection connection;
+	private static IDatabase database;
+
+	private DatabaseImpl() {
+		database = this;
+	}
 
 	/**
 	 * Before changing a database please look at the database requirements and
@@ -36,6 +38,13 @@ public class DatabaseImpl implements IDatabase {
 			connection.close();
 			System.out.println("Database connection was closed.");
 		}
+	}
+
+	public static IDatabase getInstance() {
+		if (database == null) {
+			database = new DatabaseImpl();
+		}
+		return database;
 	}
 
 }
