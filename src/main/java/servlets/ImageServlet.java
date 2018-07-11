@@ -35,6 +35,7 @@ public class ImageServlet extends HttpServlet {
         if(id!=null && "1".equalsIgnoreCase(id)){
              response.setContentType("image/jpeg");
 //             response.getOutputStream().write( Files.readAllBytes(new File(getServletContext().getRealPath("test.jpg")).toPath()));
+//																	"src\\main\\webapp\\resources\\images\\characters\\fighter.jpg" doesn't work? 
              response.getOutputStream().write( Files.readAllBytes(new File("C:\\Users\\Marek\\Desktop\\JFight\\JFightA\\fighter.jpg").toPath()));
              response.getOutputStream().close();
         }else {

@@ -2,6 +2,7 @@ import models.dal.FightDataDAL;
 import models.dto.ActionsDTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
+import services.ICRUD;
 import services.impl.CRUDImpl;
 import services.impl.DatabaseImpl;
 import services.impl.FightEngineImpl;
@@ -20,7 +21,7 @@ public class FightEngineTest {
 //		actions.attackLegs = 1;
 //		fe.engine(1, 2, 100, "2", actions);
 		
-		CRUDImpl crud = new CRUDImpl(new DatabaseImpl());
+		ICRUD crud = CRUDImpl.getInstance();
 		FightDataDAL dal = new FightDataDAL();
 		
 		ListDTO<FightDataDAL> ret = crud.<FightDataDAL>read(dal);

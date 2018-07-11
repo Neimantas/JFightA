@@ -18,7 +18,7 @@ public class ImageTest {
 
 		try {
 			// upload
-			File file = new File("src\\main\\webapp\\resources\\images\\charecters\\Alex.png");
+			File file = new File("src\\main\\webapp\\resources\\images\\characters\\Alex.png");
 			FileInputStream fileInputStream = new FileInputStream(file);
 
 			DTO dto = image.startImageTransferSession();
@@ -38,7 +38,7 @@ public class ImageTest {
 			ObjectDTO<ImageDAL> objectDTO = image.getImage(1);
 			String fileName = objectDTO.transferData.imageName;
 
-			File newFile = new File("src\\main\\webapp\\resources\\images\\charecters\\Downloaded image. " + fileName);
+			File newFile = new File("src\\main\\webapp\\resources\\images\\characters\\Downloaded image. " + fileName);
 			FileOutputStream fileOutputStream = new FileOutputStream(newFile);
 			long fileSize = copyStream(objectDTO.transferData.imageStream, fileOutputStream);
 
