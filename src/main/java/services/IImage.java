@@ -12,8 +12,4 @@ public interface IImage {
 
 	public DTO deleteImage(int userId);
 
-	public DTO startImageTransferSession();
-
-	public DTO endImageTransferSession();
-
 }

@@ -34,11 +34,11 @@ public class ImageImpl implements IImage {
 	@Override
 	public DTO uploadImage(ImageDAL imageDAL) {
 		try {
-
+			setConnection();
 			preparedStatement = connection
 					.prepareStatement("INSERT INTO `image` (UserId, Image, ImageName) VALUES (?, ?, ?)");
 			preparedStatement.setInt(1, imageDAL.userId);
-			preparedStatement.setBinaryStream(2, imageDAL.imageStream);
+			preparedStatement.setBinaryStream(2, imageDAL.inputStream);
 			preparedStatement.setString(3, imageDAL.imageName);
 
 			preparedStatement.executeUpdate();
@@ -48,11 +48,13 @@ public class ImageImpl implements IImage {
 			dto.message = "Image uploaded to database successfully.";
 
 			return dto;
-		} catch (SQLException e) {
+		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
-			dto.message = "Database error. " + e.getMessage() + ".";
+			dto.message = e.toString() + ".";
 			return dto;
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -62,10 +64,10 @@ public class ImageImpl implements IImage {
 	 * executed after image transfer.
 	 */
 	@Override
-	public ObjectDTO<ImageDAL> getImage(int userId) {
+	public ObjectDTO<ImageDAL> getImage(int imageId) {
 		try {
-
-			preparedStatement = connection.prepareStatement("SELECT * FROM `image` WHERE UserId = " + userId + ";");
+			setConnection();
+			preparedStatement = connection.prepareStatement("SELECT * FROM `image` WHERE ImageId = " + imageId + ";");
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
@@ -73,25 +75,29 @@ public class ImageImpl implements IImage {
 
 			if (resultSet.next()) {
 
-				imageDAL.userId = userId;
-				imageDAL.imageStream = resultSet.getAsciiStream("Image");
+				imageDAL.imageId = imageId;
+				imageDAL.userId =  (Integer)resultSet.getObject("UserId");
+				imageDAL.inputStream = resultSet.getBinaryStream("Image");
 				imageDAL.imageName = resultSet.getString("ImageName");
 
 			} else {
 				objectDTO.message = "There are now image in a database with such Id.";
+				objectDTO.success = true;
 				return objectDTO;
 			}
 
 			objectDTO.transferData = imageDAL;
 			objectDTO.success = true;
 			objectDTO.message = "Image downloaded from the database successfully.";
-
+			
 			return objectDTO;
-		} catch (SQLException e) {
+		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			log.writeErrorMessage(e, true);
 			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
-			objectDTO.message = "Database error. " + e.getMessage() + ".";
+			objectDTO.message = e.toString() + ".";
 			return objectDTO;
+		} finally {
+			closeConnection();
 		}
 	}
 
@@ -133,50 +139,6 @@ public class ImageImpl implements IImage {
 			return dto;
 		} finally {
 			closeConnection();
-		}
-	}
-
-	/**
-	 * Should be executed before calling image transfer method.
-	 */
-	@Override
-	public DTO startImageTransferSession() {
-		try {
-			setConnection();
-			DTO dto = new DTO();
-			dto.success = true;
-			dto.message = "Connection to database has been established.";
-			return dto;
-		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
-			DTO dto = new DTO();
-			dto.message = "Database error. " + e.getMessage() + ".";
-			return dto;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
-			DTO dto = new DTO();
-			dto.message = e.getMessage() + ".";
-			return dto;
-		}
-	}
-
-	/**
-	 * Should be executed after image transfer method.
-	 */
-	@Override
-	public DTO endImageTransferSession() {
-
-		String message = closeConnection();
-
-		if (message == null) {
-			DTO dto = new DTO();
-			dto.success = true;
-			dto.message = "Database connection was closed.";
-			return dto;
-		} else {
-			DTO dto = new DTO();
-			dto.message = "Database error. " + message + ".";
-			return dto;
 		}
 	}
 

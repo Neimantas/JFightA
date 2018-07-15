@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 11, 2018 at 08:17 PM
+-- Generation Time: Jul 15, 2018 at 10:49 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -99,9 +99,10 @@ DELIMITER ;
 
 DROP TABLE IF EXISTS `image`;
 CREATE TABLE `image` (
-  `UserId` int(11) NOT NULL,
-  `Image` mediumblob,
-  `ImageName` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
+  `ImageId` int(11) NOT NULL,
+  `UserId` int(11) DEFAULT NULL COMMENT 'Should be not null for non default image.',
+  `Image` mediumblob NOT NULL,
+  `ImageName` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name should contain  filename extension (e.g. default.jpg).'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -206,11 +207,14 @@ CREATE TABLE `user` (
   `Name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `Password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `eMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ImageId` int(11) DEFAULT NULL,
   `AccessLevel` int(11) NOT NULL DEFAULT '1' COMMENT 'Trigger created. Null input values automatically changes to default 1.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- RELATIONSHIPS FOR TABLE `user`:
+--   `ImageId`
+--       `image` -> `ImageId`
 --
 
 --
@@ -247,6 +251,7 @@ ALTER TABLE `fightdata`
 -- Indexes for table `image`
 --
 ALTER TABLE `image`
+  ADD PRIMARY KEY (`ImageId`),
   ADD UNIQUE KEY `UserId` (`UserId`);
 
 --
@@ -279,11 +284,18 @@ ALTER TABLE `result`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`UserId`),
-  ADD UNIQUE KEY `Name` (`Name`);
+  ADD UNIQUE KEY `Name` (`Name`),
+  ADD KEY `ImageId` (`ImageId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `image`
+--
+ALTER TABLE `image`
+  MODIFY `ImageId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `item`
@@ -345,17 +357,11 @@ ALTER TABLE `result`
   ADD CONSTRAINT `resultLoss_user_fk` FOREIGN KEY (`LossUserId`) REFERENCES `user` (`UserId`) ON DELETE SET NULL ON UPDATE NO ACTION,
   ADD CONSTRAINT `resultWin_user_fk` FOREIGN KEY (`WinUserId`) REFERENCES `user` (`UserId`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
-DELIMITER $$
 --
--- Events
+-- Constraints for table `user`
 --
-DROP EVENT `Delete logs older than 1 month`$$
-CREATE DEFINER=`Kolia`@`%` EVENT `Delete logs older than 1 month` ON SCHEDULE EVERY 1 DAY STARTS '2018-07-03 03:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM log WHERE Date < (NOW() - INTERVAL 1 MONTH)$$
-
-DROP EVENT `Delete results where both users checked out`$$
-CREATE DEFINER=`root`@`localhost` EVENT `Delete results where both users checked out` ON SCHEDULE EVERY 1 MONTH STARTS '2018-07-01 04:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM result WHERE result.Win = NULL AND result.Loss = NULL AND result.TieUser1 = NULL AND result.TieUser2 = NULL$$
-
-DELIMITER ;
+ALTER TABLE `user`
+  ADD CONSTRAINT `user_image_fk` FOREIGN KEY (`ImageId`) REFERENCES `image` (`ImageId`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

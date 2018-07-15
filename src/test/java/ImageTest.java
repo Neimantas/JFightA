@@ -17,34 +17,31 @@ public class ImageTest {
 		IImage image = ImageImpl.getInstance();
 
 		try {
-			// upload
-			File file = new File("src\\main\\webapp\\resources\\images\\characters\\Alex.png");
-			FileInputStream fileInputStream = new FileInputStream(file);
-
-			DTO dto = image.startImageTransferSession();
-			ImageDAL imageDAL = new ImageDAL();
-			imageDAL.imageName = "Alex.png";
-			imageDAL.imageStream = fileInputStream;
-			imageDAL.userId = 1;
-
-			image.startImageTransferSession();
-			DTO dto2 = image.uploadImage(imageDAL);
-			fileInputStream.close();
-			image.endImageTransferSession();
-			System.out.println(dto2.message);
+//			// upload
+//			File file = new File("src\\main\\webapp\\resources\\images\\characters\\Alex.png");
+//			FileInputStream fileInputStream = new FileInputStream(file);
+//
+//			DTO dto = image.startImageTransferSession();
+//			ImageDAL imageDAL = new ImageDAL();
+//			imageDAL.imageName = "Alex.png";
+//			imageDAL.inputStream = fileInputStream;
+//			imageDAL.userId = 1;
+//
+//			DTO dto2 = image.uploadImage(imageDAL);
+//			fileInputStream.close();
+//			System.out.println(dto2.message);
 
 			// download
-			image.startImageTransferSession();
+
 			ObjectDTO<ImageDAL> objectDTO = image.getImage(1);
 			String fileName = objectDTO.transferData.imageName;
 
 			File newFile = new File("src\\main\\webapp\\resources\\images\\characters\\Downloaded image. " + fileName);
 			FileOutputStream fileOutputStream = new FileOutputStream(newFile);
-			long fileSize = copyStream(objectDTO.transferData.imageStream, fileOutputStream);
+			long fileSize = copyStream(objectDTO.transferData.inputStream, fileOutputStream);
 
 			fileOutputStream.close();
-			objectDTO.transferData.imageStream.close();
-			image.endImageTransferSession();
+			objectDTO.transferData.inputStream.close();
 
 			System.out.println(objectDTO.message);
 			System.out.println("File size: " + fileSize + " bytes.");
@@ -53,7 +50,7 @@ public class ImageTest {
 		}
 
 		// Delete image
-		System.out.println(image.deleteImage(1).message);
+//		System.out.println(image.deleteImage(3).message);
 
 	}
 
