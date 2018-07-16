@@ -6,6 +6,7 @@ public class UserDAL {
 	public String name;
 	public String password;
 	public String eMail;
+	public Integer imageId;
 	public Integer accessLevel;
 
 }

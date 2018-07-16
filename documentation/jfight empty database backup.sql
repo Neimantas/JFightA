@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 10, 2018 at 10:11 PM
+-- Generation Time: Jul 15, 2018 at 10:49 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -31,19 +31,14 @@ USE `jfight`;
 --
 
 DROP TABLE IF EXISTS `character`;
-CREATE TABLE IF NOT EXISTS `character` (
+CREATE TABLE `character` (
   `UserId` int(11) NOT NULL,
   `HealthPoints` int(11) NOT NULL,
   `Strength` int(11) NOT NULL,
   `Experience` int(11) NOT NULL,
   `Level` int(11) NOT NULL,
   `AttackItemId` int(11) DEFAULT NULL,
-  `DefenceItemId` int(11) DEFAULT NULL,
-  UNIQUE KEY `UserId_2` (`UserId`),
-  KEY `UserId` (`UserId`),
-  KEY `DefenceItemId` (`DefenceItemId`),
-  KEY `AttackItemId` (`AttackItemId`),
-  KEY `DefenceItemId_2` (`DefenceItemId`)
+  `DefenceItemId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -63,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `character` (
 --
 
 DROP TABLE IF EXISTS `fightdata`;
-CREATE TABLE IF NOT EXISTS `fightdata` (
+CREATE TABLE `fightdata` (
   `FightId` int(11) NOT NULL,
   `Round` int(11) NOT NULL DEFAULT '0' COMMENT 'Trigger created. Null input values automatically changes to default 0.',
   `UserId` int(11) NOT NULL,
@@ -76,9 +71,7 @@ CREATE TABLE IF NOT EXISTS `fightdata` (
   `DefenceHead` int(11) DEFAULT NULL,
   `DefenceBody` int(11) DEFAULT NULL,
   `DefenceHands` int(11) DEFAULT NULL,
-  `DefenceLegs` int(11) DEFAULT NULL,
-  KEY `FightId` (`FightId`),
-  KEY `UserId` (`UserId`)
+  `DefenceLegs` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -105,11 +98,11 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `image`;
-CREATE TABLE IF NOT EXISTS `image` (
-  `UserId` int(11) NOT NULL,
-  `Image` mediumblob,
-  `ImageName` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `UserId` (`UserId`)
+CREATE TABLE `image` (
+  `ImageId` int(11) NOT NULL,
+  `UserId` int(11) DEFAULT NULL COMMENT 'Should be not null for non default image.',
+  `Image` mediumblob NOT NULL,
+  `ImageName` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name should contain  filename extension (e.g. default.jpg).'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -125,16 +118,16 @@ CREATE TABLE IF NOT EXISTS `image` (
 --
 
 DROP TABLE IF EXISTS `item`;
-CREATE TABLE IF NOT EXISTS `item` (
-  `ItemId` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `item` (
+  `ItemId` int(11) NOT NULL,
   `ItemName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `ItemImage` blob NOT NULL COMMENT 'Max 64 kB',
   `ImageFormat` varchar(7) COLLATE utf8_unicode_ci NOT NULL,
   `ItemType` enum('ATTACK','DEFENCE') COLLATE utf8_unicode_ci NOT NULL,
-  `AttackPoints` int(11) DEFAULT NULL,
-  `DefencePoints` int(11) DEFAULT NULL,
+  `Description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `MinCharacterLevel` int(11) NOT NULL DEFAULT '2' COMMENT 'Trigger created. Null input values automatically changes to default 2.',
-  PRIMARY KEY (`ItemId`)
+  `AttackPoints` int(11) DEFAULT NULL,
+  `DefencePoints` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -157,16 +150,12 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `log`;
-CREATE TABLE IF NOT EXISTS `log` (
+CREATE TABLE `log` (
   `FightId` int(11) NOT NULL,
   `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Event created. Logs older than one month are deleting automatically.',
   `User1Id` int(11) DEFAULT NULL,
   `User2Id` int(11) DEFAULT NULL,
-  `Log` text COLLATE utf8_unicode_ci NOT NULL,
-  UNIQUE KEY `FightId_2` (`FightId`),
-  KEY `FightId` (`FightId`),
-  KEY `User2Id` (`User2Id`),
-  KEY `User1Id` (`User1Id`) USING BTREE
+  `Log` text COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -186,17 +175,12 @@ CREATE TABLE IF NOT EXISTS `log` (
 --
 
 DROP TABLE IF EXISTS `result`;
-CREATE TABLE IF NOT EXISTS `result` (
-  `FightId` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `result` (
+  `FightId` int(11) NOT NULL,
   `WinUserId` int(11) DEFAULT NULL COMMENT 'Event created. Once a month rows with all empty UserIds are deleting automatically.',
   `LossUserId` int(11) DEFAULT NULL,
   `TieUser1Id` int(11) DEFAULT NULL,
-  `TieUser2Id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`FightId`),
-  KEY `Win` (`WinUserId`),
-  KEY `Loss` (`LossUserId`),
-  KEY `TieUser2` (`TieUser2Id`),
-  KEY `TieUser1` (`TieUser1Id`) USING BTREE
+  `TieUser2Id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -218,18 +202,19 @@ CREATE TABLE IF NOT EXISTS `result` (
 --
 
 DROP TABLE IF EXISTS `user`;
-CREATE TABLE IF NOT EXISTS `user` (
-  `UserId` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `user` (
+  `UserId` int(11) NOT NULL,
   `Name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `Password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `eMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `AccessLevel` int(11) NOT NULL DEFAULT '1' COMMENT 'Trigger created. Null input values automatically changes to default 1.',
-  PRIMARY KEY (`UserId`),
-  UNIQUE KEY `Name` (`Name`)
+  `ImageId` int(11) DEFAULT NULL,
+  `AccessLevel` int(11) NOT NULL DEFAULT '1' COMMENT 'Trigger created. Null input values automatically changes to default 1.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- RELATIONSHIPS FOR TABLE `user`:
+--   `ImageId`
+--       `image` -> `ImageId`
 --
 
 --
@@ -240,6 +225,95 @@ DELIMITER $$
 CREATE TRIGGER `NullTo1` BEFORE INSERT ON `user` FOR EACH ROW SET NEW.AccessLevel = IFNULL(NEW.AccessLevel, 1)
 $$
 DELIMITER ;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `character`
+--
+ALTER TABLE `character`
+  ADD UNIQUE KEY `UserId_2` (`UserId`),
+  ADD KEY `UserId` (`UserId`),
+  ADD KEY `DefenceItemId` (`DefenceItemId`),
+  ADD KEY `AttackItemId` (`AttackItemId`),
+  ADD KEY `DefenceItemId_2` (`DefenceItemId`);
+
+--
+-- Indexes for table `fightdata`
+--
+ALTER TABLE `fightdata`
+  ADD KEY `FightId` (`FightId`),
+  ADD KEY `UserId` (`UserId`);
+
+--
+-- Indexes for table `image`
+--
+ALTER TABLE `image`
+  ADD PRIMARY KEY (`ImageId`),
+  ADD UNIQUE KEY `UserId` (`UserId`);
+
+--
+-- Indexes for table `item`
+--
+ALTER TABLE `item`
+  ADD PRIMARY KEY (`ItemId`);
+
+--
+-- Indexes for table `log`
+--
+ALTER TABLE `log`
+  ADD UNIQUE KEY `FightId_2` (`FightId`),
+  ADD KEY `FightId` (`FightId`),
+  ADD KEY `User2Id` (`User2Id`),
+  ADD KEY `User1Id` (`User1Id`) USING BTREE;
+
+--
+-- Indexes for table `result`
+--
+ALTER TABLE `result`
+  ADD PRIMARY KEY (`FightId`),
+  ADD KEY `Win` (`WinUserId`),
+  ADD KEY `Loss` (`LossUserId`),
+  ADD KEY `TieUser2` (`TieUser2Id`),
+  ADD KEY `TieUser1` (`TieUser1Id`) USING BTREE;
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`UserId`),
+  ADD UNIQUE KEY `Name` (`Name`),
+  ADD KEY `ImageId` (`ImageId`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `image`
+--
+ALTER TABLE `image`
+  MODIFY `ImageId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `item`
+--
+ALTER TABLE `item`
+  MODIFY `ItemId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `result`
+--
+ALTER TABLE `result`
+  MODIFY `FightId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -283,17 +357,11 @@ ALTER TABLE `result`
   ADD CONSTRAINT `resultLoss_user_fk` FOREIGN KEY (`LossUserId`) REFERENCES `user` (`UserId`) ON DELETE SET NULL ON UPDATE NO ACTION,
   ADD CONSTRAINT `resultWin_user_fk` FOREIGN KEY (`WinUserId`) REFERENCES `user` (`UserId`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
-DELIMITER $$
 --
--- Events
+-- Constraints for table `user`
 --
-DROP EVENT `Delete logs older than 1 month`$$
-CREATE DEFINER=`Kolia`@`%` EVENT `Delete logs older than 1 month` ON SCHEDULE EVERY 1 DAY STARTS '2018-07-03 03:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM log WHERE Date < (NOW() - INTERVAL 1 MONTH)$$
-
-DROP EVENT `Delete results where both users checked out`$$
-CREATE DEFINER=`root`@`localhost` EVENT `Delete results where both users checked out` ON SCHEDULE EVERY 1 MONTH STARTS '2018-07-01 04:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM result WHERE result.Win = NULL AND result.Loss = NULL AND result.TieUser1 = NULL AND result.TieUser2 = NULL$$
-
-DELIMITER ;
+ALTER TABLE `user`
+  ADD CONSTRAINT `user_image_fk` FOREIGN KEY (`ImageId`) REFERENCES `image` (`ImageId`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

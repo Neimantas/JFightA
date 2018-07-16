@@ -83,21 +83,7 @@ public class FightServlet extends HttpServlet {
 		action.defenceHead = defenceHead == null?0:1;
 		action.defenceLegs = defenceLegs == null?0:1;
 		
-//		response.getWriter()
-//		.append("attackHead: " + attackHead)
-//		.append("attackBody: " + attackBody)
-//		.append("attackArms: " + attackArms)
-//		.append("attackLegs: " + attackLegs)
-//		.append("defenceHead: " + defenceHead)
-//		.append("defenceBody: " + defenceBody)
-//		.append("defenceArms: " + defenceArms)
-//		.append("defenceLegs: " + defenceLegs);
-		//instead of calling getOpponentData, use _engine.engine n
-//		ObjectDTO<FightDataDAL> dto = _engine.getOpponentData(Integer.parseInt(_fightId), _playerAName);
-		
-		
-		
-		
+
 		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(_fightId), _round, _health, _playerAName, action);
 		
 		if(!dto.success) {
@@ -125,10 +111,13 @@ public class FightServlet extends HttpServlet {
 			request.setAttribute("id", 1);
 			
 			if(_playerBHealth<=0 && playerAHealth <= 0) {
+				_round = 0;
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(_playerBHealth<=0) {
+				_round = 0;
 				request.getRequestDispatcher("win.jsp").forward(request, response);
 			} else if(playerAHealth<=0) {
+				_round = 0;
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
 			}
 			
