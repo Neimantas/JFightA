@@ -2,18 +2,18 @@ package models.dto;
 
 import models.business.User;
 
-
 public class UserFrontDTO {
-	public boolean _success;
-	public String _message;
-	public User _user;
-	
+
+	public boolean success;
+	public String message;
+	public User user;
+
 	public UserFrontDTO() {
 	}
 
-	public UserFrontDTO(boolean success, String message, User user) {
-		_success = success;
-		_message = message;
-		_user = user;
+	public UserFrontDTO(boolean inputSuccess, String inputMessage, User inputUser) {
+		success = inputSuccess;
+		message = inputMessage;
+		user = inputUser;
 	}
 }

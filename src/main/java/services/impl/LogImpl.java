@@ -13,15 +13,14 @@ import java.util.Date;
 import services.ILog;
 
 public class LogImpl implements ILog {
+	private static ILog _log = new LogImpl();
 
-	private SimpleDateFormat simpleDateFormat;
-	private SimpleDateFormat simpleDateAndTimeFormat;
-	private static ILog log;
+	private SimpleDateFormat _simpleDateFormat;
+	private SimpleDateFormat _simpleDateAndTimeFormat;
 
 	private LogImpl() {
-		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		simpleDateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		log = this;
+		_simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		_simpleDateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	}
 
 	@Override
@@ -29,13 +28,13 @@ public class LogImpl implements ILog {
 		if (alsoWriteToConsole) {
 			System.out.println(e.toString());
 		}
-		String fileName = "log\\" + simpleDateFormat.format(new Date()) + ".log";
+		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
 		try (FileWriter fw = new FileWriter(fileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
 					+ "------------------------------------------------------------------------------------------------------------------------------------------------------");
-			out.println("[ERROR] " + simpleDateAndTimeFormat.format(new Date()) + " " + e.toString()
+			out.println("[ERROR] " + _simpleDateAndTimeFormat.format(new Date()) + " " + e.toString()
 					+ System.getProperty("line.separator"));
 			out.print("Details:");
 			e.printStackTrace(out);
@@ -56,13 +55,13 @@ public class LogImpl implements ILog {
 		if (alsoWriteToConsole) {
 			System.out.println("[WARNING] " + message);
 		}
-		String fileName = "log\\" + simpleDateFormat.format(new Date()) + ".log";
+		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
 		try (FileWriter fw = new FileWriter(fileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
 					+ "------------------------------------------------------------------------------------------------------------------------------------------------------");
-			out.println("[WARNING] " + simpleDateAndTimeFormat.format(new Date()) + " " + message);
+			out.println("[WARNING] " + _simpleDateAndTimeFormat.format(new Date()) + " " + message);
 			if (additionalMessages.length != 0) {
 				out.println(createAdditionalMessage(additionalMessages));
 			}
@@ -76,7 +75,7 @@ public class LogImpl implements ILog {
 
 	@Override
 	public String getLog(Date date) {
-		String fileName = "log\\" + simpleDateFormat.format(date) + ".log";
+		String fileName = "log\\" + _simpleDateFormat.format(date) + ".log";
 		File file = new File(fileName);
 		if (file.exists()) {
 			String returnString = "";
@@ -106,10 +105,7 @@ public class LogImpl implements ILog {
 	}
 
 	public static ILog getInstance() {
-		if (log == null) {
-			log = new LogImpl();
-		}
-		return log;
+		return _log;
 	}
 
 }

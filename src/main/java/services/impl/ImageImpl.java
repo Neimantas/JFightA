@@ -13,17 +13,16 @@ import services.IImage;
 import services.ILog;
 
 public class ImageImpl implements IImage {
+	private static IImage _image = new ImageImpl();
 
-	private IDatabase database;
-	private Connection connection;
-	private PreparedStatement preparedStatement;
-	private ILog log;
-	private static IImage image;
+	private IDatabase _database;
+	private Connection _connection;
+	private PreparedStatement _preparedStatement;
+	private ILog _log;
 
 	private ImageImpl() {
-		database = DatabaseImpl.getInstance();
-		log = LogImpl.getInstance();
-		image = this;
+		_database = DatabaseImpl.getInstance();
+		_log = LogImpl.getInstance();
 	}
 
 	/**
@@ -35,13 +34,13 @@ public class ImageImpl implements IImage {
 	public DTO uploadImage(ImageDAL imageDAL) {
 		try {
 			setConnection();
-			preparedStatement = connection
+			_preparedStatement = _connection
 					.prepareStatement("INSERT INTO `image` (UserId, Image, ImageName) VALUES (?, ?, ?)");
-			preparedStatement.setInt(1, imageDAL.userId);
-			preparedStatement.setBinaryStream(2, imageDAL.inputStream);
-			preparedStatement.setString(3, imageDAL.imageName);
+			_preparedStatement.setInt(1, imageDAL.userId);
+			_preparedStatement.setBinaryStream(2, imageDAL.inputStream);
+			_preparedStatement.setString(3, imageDAL.imageName);
 
-			preparedStatement.executeUpdate();
+			_preparedStatement.executeUpdate();
 
 			DTO dto = new DTO();
 			dto.success = true;
@@ -49,7 +48,7 @@ public class ImageImpl implements IImage {
 
 			return dto;
 		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.toString() + ".";
 			return dto;
@@ -67,8 +66,8 @@ public class ImageImpl implements IImage {
 	public ObjectDTO<ImageDAL> getImage(int imageId) {
 		try {
 			setConnection();
-			preparedStatement = connection.prepareStatement("SELECT * FROM `image` WHERE ImageId = " + imageId + ";");
-			ResultSet resultSet = preparedStatement.executeQuery();
+			_preparedStatement = _connection.prepareStatement("SELECT * FROM `image` WHERE ImageId = " + imageId + ";");
+			ResultSet resultSet = _preparedStatement.executeQuery();
 
 			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
 			ImageDAL imageDAL = new ImageDAL();
@@ -76,7 +75,7 @@ public class ImageImpl implements IImage {
 			if (resultSet.next()) {
 
 				imageDAL.imageId = imageId;
-				imageDAL.userId =  (Integer)resultSet.getObject("UserId");
+				imageDAL.userId = (Integer) resultSet.getObject("UserId");
 				imageDAL.inputStream = resultSet.getBinaryStream("Image");
 				imageDAL.imageName = resultSet.getString("ImageName");
 
@@ -89,10 +88,10 @@ public class ImageImpl implements IImage {
 			objectDTO.transferData = imageDAL;
 			objectDTO.success = true;
 			objectDTO.message = "Image downloaded from the database successfully.";
-			
+
 			return objectDTO;
 		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			ObjectDTO<ImageDAL> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.toString() + ".";
 			return objectDTO;
@@ -110,14 +109,14 @@ public class ImageImpl implements IImage {
 			DTO dto = new DTO();
 
 			setConnection();
-			preparedStatement = connection
+			_preparedStatement = _connection
 					.prepareStatement("SELECT UserId FROM `image` WHERE UserId = " + userId + ";");
-			ResultSet resultSet = preparedStatement.executeQuery();
+			ResultSet resultSet = _preparedStatement.executeQuery();
 
 			if (resultSet.next()) {
-				preparedStatement.close();
-				preparedStatement = connection.prepareStatement("DELETE FROM `image` WHERE UserId = " + userId + ";");
-				preparedStatement.executeUpdate();
+				_preparedStatement.close();
+				_preparedStatement = _connection.prepareStatement("DELETE FROM `image` WHERE UserId = " + userId + ";");
+				_preparedStatement.executeUpdate();
 			} else {
 				dto.message = "There are now image in a database with such Id.";
 				return dto;
@@ -128,12 +127,12 @@ public class ImageImpl implements IImage {
 
 			return dto;
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -144,29 +143,26 @@ public class ImageImpl implements IImage {
 
 	private void setConnection()
 			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		if (connection == null || connection.isClosed()) {
-			connection = database.connect();
+		if (_connection == null || _connection.isClosed()) {
+			_connection = _database.connect();
 		}
 	}
 
 	private String closeConnection() {
 		try {
-			if (preparedStatement != null && !preparedStatement.isClosed()) {
-				preparedStatement.close();
+			if (_preparedStatement != null && !_preparedStatement.isClosed()) {
+				_preparedStatement.close();
 			}
-			database.closeConnection();
+			_database.closeConnection();
 			return null;
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			return e.getMessage();
 		}
 	}
 
 	public static IImage getInstance() {
-		if (image == null) {
-			image = new ImageImpl();
-		}
-		return image;
+		return _image;
 	}
 
 }

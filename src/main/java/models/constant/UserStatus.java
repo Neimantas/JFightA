@@ -6,12 +6,12 @@ public enum UserStatus {
 	READY(2, "Ready"),
 	PLAYING(3, "Playing");
 
-	private int statusValue;
-	private String statusName;
+	private int _statusValue;
+	private String _statusName;
 
 	private UserStatus(int userStatusValue, String userStatusName) {
-		statusValue = userStatusValue;
-		statusName = userStatusName;
+		_statusValue = userStatusValue;
+		_statusName = userStatusName;
 	}
 
 	public static UserStatus getByStatusValue(int userStatusValue) {
@@ -33,11 +33,11 @@ public enum UserStatus {
 	}
 
 	public int getStatusValue() {
-		return statusValue;
+		return _statusValue;
 	}
 
 	public String getStatusName() {
-		return statusName;
+		return _statusName;
 	}
 
 }

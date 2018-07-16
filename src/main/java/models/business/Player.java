@@ -7,45 +7,45 @@ import services.impl.CacheImpl;
 
 public class Player {
 
-	private User user;
-	private Character character;
-	private UserStatus userStatus;
-	private Date lastActivityTime;
+	private User _user;
+	private Character _character;
+	private UserStatus _userStatus;
+	private Date _lastActivityTime;
 
 	public Player() {
-		userStatus = UserStatus.NOT_READY;
-		lastActivityTime = new Date();
+		_userStatus = UserStatus.NOT_READY;
+		_lastActivityTime = new Date();
 	}
 
 	public Player(User loggedInUser, Character userCharacter) {
 		this();
-		user = loggedInUser;
-		character = userCharacter;
+		_user = loggedInUser;
+		_character = userCharacter;
 	}
 
 	public User getUser() {
-		return user;
+		return _user;
 	}
 
 	public void setUser(User loggedInUser) {
-		user = loggedInUser;
+		_user = loggedInUser;
 	}
 
 	public Character getCharacter() {
-		return character;
+		return _character;
 	}
 
 	public void setCharacter(Character userCharacter) {
-		character = userCharacter;
+		_character = userCharacter;
 	}
 
 	public UserStatus getUserStatus() {
-		return userStatus;
+		return _userStatus;
 	}
 
 	public void setUserStatus(UserStatus newUserStatus) {
-		userStatus = newUserStatus;
-		lastActivityTime = new Date();
+		_userStatus = newUserStatus;
+		_lastActivityTime = new Date();
 		if (newUserStatus == UserStatus.READY) {
 			CacheImpl.getInstance().getReadyUsersList().add(this);
 		} else {
@@ -54,7 +54,7 @@ public class Player {
 	}
 
 	public Date getLastActivityTime() {
-		return lastActivityTime;
+		return _lastActivityTime;
 	}
 
 }

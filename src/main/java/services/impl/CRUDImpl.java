@@ -18,17 +18,16 @@ import services.IDatabase;
 import services.ILog;
 
 public class CRUDImpl implements ICRUD {
+	private static ICRUD _crud = new CRUDImpl();
 
-	private IDatabase database;
-	private Connection connection;
-	private Statement statement;
-	private ILog log;
-	private static ICRUD crud;
+	private IDatabase _database;
+	private Connection _connection;
+	private Statement _statement;
+	private ILog _log;
 
 	private CRUDImpl() {
-		database = DatabaseImpl.getInstance();
-		log = LogImpl.getInstance();
-		crud = this;
+		_database = DatabaseImpl.getInstance();
+		_log = LogImpl.getInstance();
 	}
 
 	/**
@@ -57,13 +56,13 @@ public class CRUDImpl implements ICRUD {
 
 			setConnection();
 
-			statement.executeUpdate(createQuery);
+			_statement.executeUpdate(createQuery);
 
 			T returnDAL = (T) Class.forName(dalClass.getName()).getConstructor().newInstance();
 			Integer dalId;
 
 			if (dalClassFields[0].get(dal) == null) {
-				ResultSet resultSet = statement.executeQuery("SELECT LAST_INSERT_ID()");
+				ResultSet resultSet = _statement.executeQuery("SELECT LAST_INSERT_ID()");
 				resultSet.next();
 				dalId = resultSet.getInt(1);
 			} else {
@@ -79,13 +78,13 @@ public class CRUDImpl implements ICRUD {
 
 			return objectDTO;
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
@@ -112,34 +111,18 @@ public class CRUDImpl implements ICRUD {
 
 			Class<?> dalClass = dal.getClass();
 			Field[] dalClassFields = dalClass.getFields();
-			String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 
-			String whereCondition = "";
-			Boolean isCondition = false;
-			for (int i = 0; i < dalClassFields.length; i++) {
+			String readQuery = createReadQuery(dal, dalClass, dalClassFields);
 
-				if (dalClassFields[i].get(dal) != null) {
+			System.out.println(readQuery);
 
-					Class<?> dalField = dalClassFields[i].getType();
-					whereCondition += (!isCondition ? " WHERE " : " AND ") + dalClassFields[i].getName() + " = "
-							+ (dalField == Integer.class ? "" : "\'") + dalClassFields[i].get(dal)
-							+ (dalField == Integer.class ? "" : "\'");
-
-					if (!isCondition) {
-						isCondition = true;
-					}
-				}
-			}
-
-			whereCondition += ";";
-
-			String readQuery = "SELECT * FROM " + tableName + whereCondition;
+			Boolean hasCondition = readQuery.contains("WHERE");
 
 			if (setCloseConnection) {
 				setConnection();
 			}
 
-			ResultSet resultSet = statement.executeQuery(readQuery);
+			ResultSet resultSet = _statement.executeQuery(readQuery);
 
 			List<T> dalList = new ArrayList<>();
 
@@ -161,18 +144,18 @@ public class CRUDImpl implements ICRUD {
 			listDTO.transferDataList = dalList;
 			listDTO.success = true;
 			listDTO.message = !dalList.isEmpty() ? "Read successful."
-					: (isCondition == true ? "There are now data in a table with such values."
+					: (hasCondition == true ? "There are now data in a table with such values."
 							: "The database table is empty.");
 
 			return listDTO;
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = "Database error. " + e.getMessage() + ".";
 			return listDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | ClassCastException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = e.getMessage() + ".";
 			return listDTO;
@@ -228,20 +211,20 @@ public class CRUDImpl implements ICRUD {
 			String whereCondition = " WHERE " + dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 			String updateQuery = "UPDATE " + tableName + " SET " + columnValues + whereCondition;
 
-			statement.executeUpdate(updateQuery);
+			_statement.executeUpdate(updateQuery);
 
 			dto.success = true;
 			dto.message = "Update successful.";
 
 			return dto;
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | ClassNotFoundException | IllegalArgumentException
 				| IllegalAccessException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -283,20 +266,20 @@ public class CRUDImpl implements ICRUD {
 			String columnValue = dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 			String deleteQuery = "DELETE FROM " + tableName + " WHERE " + columnValue;
 
-			statement.executeUpdate(deleteQuery);
+			_statement.executeUpdate(deleteQuery);
 
 			dto.success = true;
 			dto.message = "Row deleted successfully.";
 
 			return dto;
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = "Database error. " + e.getMessage() + ".";
 			return dto;
 		} catch (InstantiationException | ClassNotFoundException | IllegalArgumentException
 				| IllegalAccessException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 			DTO dto = new DTO();
 			dto.message = e.getMessage() + ".";
 			return dto;
@@ -305,87 +288,89 @@ public class CRUDImpl implements ICRUD {
 		}
 	}
 
-	/**
-	 * Reads results in a database result table by input userId. Returns DTO with
-	 * List of ResultDALs inside, which represent only one user results.
-	 */
-	@Override
-	public ListDTO<ResultDAL> readUserResults(int userId) {
-		try {
-			ListDTO<ResultDAL> listDTO = new ListDTO<>();
-			if (userId < 1) {
-				listDTO.message = "Wrong user Id.";
-				return listDTO;
-			}
-
-			String readQuery = "SELECT * FROM `Result` WHERE WinUserId = " + userId + " OR LossUserId = " + userId
-					+ " OR TieUser1Id = " + userId + " OR TieUser2Id = " + userId + ";";
-
-			setConnection();
-
-			ResultSet resultSet = statement.executeQuery(readQuery);
-
-			List<ResultDAL> resultDALLis = new ArrayList<>();
-
-			while (resultSet.next()) {
-
-				ResultDAL resultDAL = new ResultDAL();
-
-				resultDAL.fightId = (Integer) resultSet.getObject("FightId");
-				resultDAL.winUserId = (Integer) resultSet.getObject("WinUserId");
-				resultDAL.lossUserId = (Integer) resultSet.getObject("LossUserId");
-				resultDAL.tieUser1Id = (Integer) resultSet.getObject("TieUser1Id");
-				resultDAL.tieUser2Id = (Integer) resultSet.getObject("TieUser2Id");
-
-				resultDALLis.add(resultDAL);
-
-			}
-
-			listDTO.transferDataList = resultDALLis;
-			listDTO.success = true;
-			listDTO.message = !resultDALLis.isEmpty() ? "Read successful."
-					: "There are now data in a result table with such Id (" + userId + ").";
-
-			return listDTO;
-		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
-			ListDTO<ResultDAL> listDTO = new ListDTO<>();
-			listDTO.message = "Database error. " + e.getMessage() + ".";
-			return listDTO;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			log.writeErrorMessage(e, true);
-			ListDTO<ResultDAL> listDTO = new ListDTO<>();
-			listDTO.message = e.getMessage() + ".";
-			return listDTO;
-		} finally {
-			closeConnection();
-		}
+	public static ICRUD getInstance() {
+		return _crud;
 	}
 
 	private void setConnection()
 			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		if (connection == null || connection.isClosed()) {
-			connection = database.connect();
-			statement = connection.createStatement();
+		if (_connection == null || _connection.isClosed()) {
+			_connection = _database.connect();
+			_statement = _connection.createStatement();
 		}
 	}
 
 	private void closeConnection() {
 		try {
-			if (statement != null && !statement.isClosed()) {
-				statement.close();
+			if (_statement != null && !_statement.isClosed()) {
+				_statement.close();
 			}
-			database.closeConnection();
+			_database.closeConnection();
 		} catch (SQLException e) {
-			log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e, true);
 		}
 	}
 
-	public static ICRUD getInstance() {
-		if (crud == null) {
-			crud = new CRUDImpl();
+	private <T> String createReadQuery(T dal, Class<?> dalClass, Field[] dalClassFields)
+			throws IllegalArgumentException, IllegalAccessException {
+
+		String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
+
+		if (tableName.equalsIgnoreCase("`Result`")
+				&& (dalClassFields[1].get(dal) != null || dalClassFields[2].get(dal) != null
+						|| dalClassFields[3].get(dal) != null || dalClassFields[4].get(dal) != null)) {
+			return createResultTableQuery(dal, dalClassFields);
 		}
-		return crud;
+
+		String readQuery = "";
+		String whereCondition = "";
+		Boolean isCondition = false;
+		for (int i = 0; i < dalClassFields.length; i++) {
+
+			if (dalClassFields[i].get(dal) != null) {
+
+				Class<?> dalField = dalClassFields[i].getType();
+				whereCondition += (!isCondition ? " WHERE " : " AND ") + dalClassFields[i].getName() + " = "
+						+ (dalField == Integer.class ? "" : "\'") + dalClassFields[i].get(dal)
+						+ (dalField == Integer.class ? "" : "\'");
+
+				if (!isCondition) {
+					isCondition = true;
+				}
+			}
+		}
+
+		whereCondition += ";";
+
+		readQuery = "SELECT * FROM " + tableName + whereCondition;
+
+		return readQuery;
+	}
+
+	/**
+	 * If FightId is not null, will be created read query for a row with such
+	 * FightId. Otherwise the first found userId will be taken and will be created
+	 * read query for all result with such userId (no matter win or lose)
+	 */
+	private <T> String createResultTableQuery(T dal, Field[] dalClassFields)
+			throws IllegalArgumentException, IllegalAccessException {
+		String readQuery = "SELECT * FROM Result WHERE ";
+
+		if (dalClassFields[0].get(dal) != null) {
+			readQuery += "FightId = " + dalClassFields[0].get(dal) + ";";
+		} else {
+
+			for (int i = 1; i < dalClassFields.length; i++) {
+
+				if (dalClassFields[i].get(dal) != null) {
+					int userId = (Integer) dalClassFields[i].get(dal);
+					readQuery += "WinUserId = " + userId + " OR LossUserId = " + userId + " OR TieUser1Id = " + userId
+							+ " OR TieUser2Id = " + userId + ";";
+					break;
+				}
+			}
+		}
+		return readQuery;
 	}
 
 }

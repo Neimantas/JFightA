@@ -13,10 +13,10 @@ import services.IFightEngine;
 
 public class FightEngineImpl implements IFightEngine {
 	
-	private ICRUD crud;
+	private ICRUD _crud;
 
 	public FightEngineImpl() {
-		crud = CRUDImpl.getInstance();
+		_crud = CRUDImpl.getInstance();
 	}
 	
 	@Override
@@ -28,11 +28,11 @@ public class FightEngineImpl implements IFightEngine {
 		//
 		FightDataDAL dal = new FightDataDAL();
 		dal.fightId = fightId;
-		ListDTO<FightDataDAL> ldto = crud.<FightDataDAL>read(dal);
+		ListDTO<FightDataDAL> ldto = _crud.<FightDataDAL>read(dal);
 		if(ldto.success) {
 			int counter = 0;
 			while(ldto.transferDataList.size() < 2 && counter < 10000) {
-				ldto = crud.<FightDataDAL>read(dal);
+				ldto = _crud.<FightDataDAL>read(dal);
 				counter++;
 			}
 			if(ldto.transferDataList.size() == 2) {
@@ -75,7 +75,7 @@ public class FightEngineImpl implements IFightEngine {
 		//
 		FightDataDAL dal = new FightDataDAL();
 		dal.fightId = fightId;
-		ListDTO<FightDataDAL> ldto = crud.<FightDataDAL>read(dal);						//by this DAL search for fight ID made in CRUD
+		ListDTO<FightDataDAL> ldto = _crud.<FightDataDAL>read(dal);						//by this DAL search for fight ID made in CRUD
 		if(ldto.success) {
 //			int counter = 0;
 //			while(ldto.transferDataList.size() < 2 && counter < 10000) {
@@ -130,7 +130,7 @@ public class FightEngineImpl implements IFightEngine {
 		insertDAL.defenceHands = yourAction.defenceArms;
 		insertDAL.defenceLegs = yourAction.defenceLegs;
 		
-		crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
+		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
 		
 		int counter = 0;
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userId);

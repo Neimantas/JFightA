@@ -1,8 +1,6 @@
 package servlets;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -10,8 +8,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.mysql.cj.x.protobuf.MysqlxDatatypes.Object;
 
 import models.dal.ImageDAL;
 import models.dto.ObjectDTO;

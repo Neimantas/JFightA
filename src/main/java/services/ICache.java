@@ -6,14 +6,10 @@ import models.business.Player;
 
 public interface ICache {
 
-	public void put(String userName, Player player);
-
-	public Player get(String userName);
-
-	public void remove(String userName);
-
-	public Set<Player> getReadyUsersList();
-
-	public boolean containsUser(String userName);
+	void put(String userName, Player player);
+	Player get(String userName);
+	void remove(String userName);
+	Set<Player> getReadyUsersList();
+	boolean containsUser(String userName);
 
 }

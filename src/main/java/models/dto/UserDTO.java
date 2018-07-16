@@ -3,16 +3,17 @@ package models.dto;
 import models.dal.UserDAL;
 
 public class UserDTO {
-	public boolean _success;
-	public String _message;
-	public UserDAL _userDal;
+
+	public boolean success;
+	public String message;
+	public UserDAL userDal;
 
 	public UserDTO() {
 	}
 
-	public UserDTO(boolean success, String message, UserDAL userDal) {
-		_success = success;
-		_message = message;
-		_userDal = userDal;
+	public UserDTO(boolean inputSuccess, String inputMessage, UserDAL inputUserDal) {
+		success = inputSuccess;
+		message = inputMessage;
+		userDal = inputUserDal;
 	}
 }

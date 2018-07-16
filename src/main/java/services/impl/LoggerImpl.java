@@ -15,10 +15,10 @@ import services.ILogger;
 
 public class LoggerImpl implements ILogger {
 
-	private ICRUD crud;
+	private ICRUD _crud;
 
 	public LoggerImpl() {
-		crud = CRUDImpl.getInstance();
+		_crud = CRUDImpl.getInstance();
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class LoggerImpl implements ILogger {
 		FightDataDAL dalF = new FightDataDAL();
 
 		dalF.fightId = fightId;
-		ListDTO<FightDataDAL> dtoF = crud.<FightDataDAL>read(dalF);
+		ListDTO<FightDataDAL> dtoF = _crud.<FightDataDAL>read(dalF);
 		if (dtoF.success) {
 			List<FightDataDAL> list = dtoF.transferDataList;
 			for (FightDataDAL d : list) {
@@ -63,7 +63,7 @@ public class LoggerImpl implements ILogger {
 			dalL.user2Id = userIdB;
 			dalL.log = json.toString();
 
-			ObjectDTO<LogDAL> dtoL = crud.<LogDAL>create(dalL);
+			ObjectDTO<LogDAL> dtoL = _crud.<LogDAL>create(dalL);
 
 			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO();
 			retSuccess.success = true;
@@ -87,7 +87,7 @@ public class LoggerImpl implements ILogger {
 		dalL.user1Id = userIdA;
 		dalL.user2Id = userIdB;
 
-		ListDTO<LogDAL> dtoL = crud.<LogDAL>read(dalL);
+		ListDTO<LogDAL> dtoL = _crud.<LogDAL>read(dalL);
 		if (dtoL.success) {
 			List<FightDataDAL> returnList = new ArrayList<>();
 			List<LogDAL> list = dtoL.transferDataList;

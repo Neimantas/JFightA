@@ -4,14 +4,14 @@ public enum DefaultDamagePoints {
 
 	HEAD(20), BODY(10), HANDS(5), LEGS(5);
 
-	private int damagePoints;
+	private int _damagePoints;
 
 	private DefaultDamagePoints(int defaultDamagePoints) {
-		damagePoints = defaultDamagePoints;
+		_damagePoints = defaultDamagePoints;
 	}
 
 	public int getDamagePoints() {
-		return damagePoints;
+		return _damagePoints;
 	}
 
 }
