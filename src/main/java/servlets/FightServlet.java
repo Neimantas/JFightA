@@ -29,7 +29,7 @@ public class FightServlet extends HttpServlet {
 	private String _fightId;
 	private IFightEngine _engine;
 	private int _round = 0;
-	private int _health = 100; //hardcoded
+	private int _health = 100; //hardcoded, let's make it not hardcoded :)
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -84,16 +84,16 @@ public class FightServlet extends HttpServlet {
 		action.defenceLegs = defenceLegs == null?0:1;
 		
 
-		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(_fightId), _round, _health, _playerAName, action);
+		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(_fightId), _round, _health, _playerAName, action); //Sending info to fight engine.
 		
 		if(!dto.success) {
-			response.getWriter().append("Error occurred. " + dto.message);
+			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
 		} else {
 			//first sent round param 0, then get heatl results from figth table
 			//engine - returns healhtA and healthB
 			//
 			_round++;
-			List<FightDataDAL> dals = dto.transferDataList; //0-you, 1-opponent
+			List<FightDataDAL> dals = dto.transferDataList; //index:0-you, index:1-opponent
 			
 			
 			int playerAHealth = dals.get(0).healthPoints;
@@ -103,14 +103,14 @@ public class FightServlet extends HttpServlet {
 			
 			
 			
-			request.setAttribute("playerAName", _playerAName);
+			request.setAttribute("playerAName", _playerAName);								//Sending refreshed info to page.
 			request.setAttribute("playerBName", _playerBName);
 			request.setAttribute("healthA", playerAHealth);
 			request.setAttribute("healthB", _playerBHealth);
 			//avatar id
-			request.setAttribute("id", 1);
+			request.setAttribute("id", 1);													//Picture ID. Still hardcoded.
 			
-			if(_playerBHealth<=0 && playerAHealth <= 0) {
+			if(_playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
 				_round = 0;
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(_playerBHealth<=0) {
@@ -121,7 +121,7 @@ public class FightServlet extends HttpServlet {
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
 			}
 			
-			request.getRequestDispatcher("fight.jsp").forward(request, response);
+			request.getRequestDispatcher("fight.jsp").forward(request, response);			//if fight is not finised - refresh page with new data.
 //			request.getRequestDispatcher("NewFile.jsp").forward(request, response);
 		}
 		
