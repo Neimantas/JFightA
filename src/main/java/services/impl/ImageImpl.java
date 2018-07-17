@@ -37,7 +37,7 @@ public class ImageImpl implements IImage {
 			_preparedStatement = _connection
 					.prepareStatement("INSERT INTO `image` (UserId, Image, ImageName) VALUES (?, ?, ?)");
 			_preparedStatement.setInt(1, imageDAL.userId);
-			_preparedStatement.setBinaryStream(2, imageDAL.inputStream);
+			_preparedStatement.setBinaryStream(2, imageDAL.image);
 			_preparedStatement.setString(3, imageDAL.imageName);
 
 			_preparedStatement.executeUpdate();
@@ -76,7 +76,7 @@ public class ImageImpl implements IImage {
 
 				imageDAL.imageId = imageId;
 				imageDAL.userId = (Integer) resultSet.getObject("UserId");
-				imageDAL.inputStream = resultSet.getBinaryStream("Image");
+				imageDAL.image = resultSet.getBinaryStream("Image");
 				imageDAL.imageName = resultSet.getString("ImageName");
 
 			} else {

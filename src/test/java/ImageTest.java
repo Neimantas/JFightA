@@ -38,10 +38,10 @@ public class ImageTest {
 
 			File newFile = new File("src\\main\\webapp\\resources\\images\\characters\\Downloaded image. " + fileName);
 			FileOutputStream fileOutputStream = new FileOutputStream(newFile);
-			long fileSize = copyStream(objectDTO.transferData.inputStream, fileOutputStream);
+			long fileSize = copyStream(objectDTO.transferData.image, fileOutputStream);
 
 			fileOutputStream.close();
-			objectDTO.transferData.inputStream.close();
+			objectDTO.transferData.image.close();
 
 			System.out.println(objectDTO.message);
 			System.out.println("File size: " + fileSize + " bytes.");

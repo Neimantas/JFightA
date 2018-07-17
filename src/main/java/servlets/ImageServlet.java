@@ -55,7 +55,7 @@ public class ImageServlet extends HttpServlet {
 
 				byte[] buffer = new byte[4096];
 				int n = 0;
-				while (-1 != (n = objectDTO.transferData.inputStream.read(buffer))) {
+				while (-1 != (n = objectDTO.transferData.image.read(buffer))) {
 					servletOutputStream.write(buffer, 0, n);
 				}
 
