@@ -8,7 +8,7 @@ public class DataBaseConnectionTest {
 
 	public static void main(String[] args) {
 
-		IDatabase database = new DatabaseImpl();
+		IDatabase database = DatabaseImpl.getInstance();
 		try {
 			database.connect();
 			database.closeConnection();

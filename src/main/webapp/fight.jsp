@@ -117,7 +117,7 @@
 						<div class="col-sm-4"></div>
 						<div class="col-sm-4">
 							
-							<input id="submitButton" type="submit" value="Attack!">
+							<input id="submitButton" type="submit" value="Attack!" >
 							
 						</div>
 						<div class="col-sm-4"></div>
@@ -160,6 +160,6 @@
 	<script src="resources/js/main.js"></script>
 	<!--===============================================================================================-->
 	<script src="resources/js/fightPageControls.js"></script>
-
+	
 </body>
 </html>

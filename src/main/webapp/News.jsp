@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -25,21 +26,31 @@
 <title>News</title>
 </head>
 <body>
-<div class = "logoutMenu">
 
+<div class= "menuContainer">
+<div class = "logoutMenuLeft">
+<div class="message">${ReadyMessage}</div>
+</div>
+<!-- 
+<div class="logoutMenuCenter">UserName</div>
+ -->
+ 
+<div class = "logoutMenuRight">
+	<button id="play" onclick="clicker(this.id)">Play</button>
+	<button id="ready" onclick="clicker(this.id)">Ready</button>
+	<button id="logout" onclick="clicker(this.id)">Logout</button>
+
+<!-- 
 <form class = "forms" action="/JFight/News">
+
+
 	<input type="hidden" name="button" value="play"><input type="submit" value="Play"></input>
-</form>
-
-<form class = "forms" action="/JFight/News">
 	<input type="hidden" name="button" value="ready"><input type="submit" value="Ready"></input>
-</form>
-
-<form class = "forms" action="/JFight/News">
 	<input type="hidden" name="button" value="logout"></input><input type="submit" value="Logout"></input>
 </form>
+ -->
 
-
+</div>
 </div>
 <div>
 	<div class = "leftcolumn">
@@ -62,5 +73,13 @@ Online players. Get it somehow
 	<script src="resources/vendor/select2/select2.min.js"></script>
 <!--===============================================================================================-->
 	<script src="resources/js/main.js"></script>
+	<script>
+	function clicker(btnName){
+		console.log('vbeikia');
+		
+		url = "News?button=" + btnName;
+		location.href = url;
+	}
+	</script>
 </body>
 </html>

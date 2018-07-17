@@ -15,19 +15,32 @@ text-align:center;
     top:30px;
     width: 50%;
 }
-.logoutMenu{
-	position: absolute;
+.logoutMenuLeft{
+	text-align:left;
+
+}
+.logoutMenuRight{
 	text-align:right;
+	
+}
+.logoutMenuCenter{
+	text-align:center;
+	width: 20%;
+}
+.menuContainer{
 	top:0px;
 	width: 100%;
 	height: 30px;
 }
 .forms{
-	
 	text-align:right;
 
 }
 .textField{
 	position: relative;
 	margin: auto;
+}
+.message{
+	color: green;
+	position: absolute;
 }

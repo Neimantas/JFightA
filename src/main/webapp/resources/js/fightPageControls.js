@@ -12,10 +12,10 @@
 
 window.onload = function() {
 	
-	noMoreThanTwoSelectedClass('attack');
+	noMoreThanTwoSelectedClass('attack');				//cant checkbox more than two.
 	noMoreThanTwoSelectedClass('defence');
-	blockSubmit();
-	actionTimer();
+	blockSubmit();										//waiting for other player submit
+	actionTimer();										//make timer.
 }
 // type - attack/defence
 //function noMoreThanTwoSelected(type) {
@@ -60,30 +60,42 @@ function noMoreThanTwoSelectedClass(type) {
 	
 }
 //block submit button and show wait message while waiting for response
-function blockSubmit() {
-	$('#actionForm').submit(function() {
-		$('#submitButton').attr('disabled', true);
+function blockSubmit() {											//actions when submit is pressed.
+	$('#actionForm').submit(function() {							
+		$('#submitButton').attr('disabled', true);					//disable submit button
 	    $('#wait').css('visibility', 'visible');
+	    stopTimer = true;											//stop autosubmit when time will end.
+	    $('#timer').css('visibility', 'hidden');					//hide timer. (the time stoped for that user)
 	});
 }
+//global variable to control timer behavior.
+stopTimer = false;
 
-function actionTimer() {
+function actionTimer(forceCancel) {
 	let timer = 30;
-	let countdown = setInterval(function () {
-
-	    document.getElementById("timer").innerHTML = --timer;
+	countdown = setInterval(function () {							//make change every second
+		
+		if(stopTimer) {												//stop function (counting)
+			clearInterval(countdown);								//exit from function
+		}
+		
+	    document.getElementById("timer").innerHTML = --timer;		//add number to page.
 	    
-	    if(timer <= 0) {
+	    if(timer <= 0) {											//if time has eded, make autosubmin (with or without actions)
 	    	autoSubmit();
 	        clearInterval(countdown);
 	    }
 
-	}, 1000);
+	}, 1000);														//miliseconds
 }
 
 function autoSubmit() {
 	$('#actionForm').submit();
 }
+
+//function autoSubmitStopper(){
+//	stopTimer = true;
+//}
 
 
 

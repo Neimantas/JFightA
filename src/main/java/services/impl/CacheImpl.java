@@ -10,49 +10,44 @@ import models.business.Player;
 import services.ICache;
 
 public class CacheImpl implements ICache {
+	private static ICache _cache = new CacheImpl();
 
-	private Map<String, Player> players;
-	private Set<Player> readyPlayers;
-
-	private static ICache cache;
+	private Map<String, Player> _players;
+	private Set<Player> _readyPlayers;
 
 	private CacheImpl() {
-		players = new ConcurrentHashMap<>();
-		readyPlayers = Collections.synchronizedSet(new HashSet());
-		cache = this;
+		_players = new ConcurrentHashMap<>();
+		_readyPlayers = Collections.synchronizedSet(new HashSet());
 	}
 
 	@Override
 	public void put(String userName, Player player) {
-		players.put(userName, player);
+		_players.put(userName, player);
 
 	}
 
 	@Override
 	public Player get(String userName) {
-		return players.get(userName);
+		return _players.get(userName);
 	}
 
 	@Override
 	public void remove(String userName) {
-		players.remove(userName);
+		_players.remove(userName);
 	}
 
 	@Override
 	public Set<Player> getReadyUsersList() {
-		return readyPlayers;
+		return _readyPlayers;
 	}
 
 	@Override
 	public boolean containsUser(String userName) {
-		return players.containsKey(userName);
+		return _players.containsKey(userName);
 	}
 
 	public static ICache getInstance() {
-		if (cache == null) {
-			cache = new CacheImpl();
-		}
-		return cache;
+		return _cache;
 	}
 
 }

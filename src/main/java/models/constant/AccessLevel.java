@@ -7,25 +7,25 @@ public enum AccessLevel {
 	MODERATOR(3, "Moderator", true, true, true, true, true, false),
 	ADMINISTRATOR(4, "Administrator", true, true, true, true, true, true);
 
-	private int accessLevelValue;
-	private String accessLevelName;
-	private boolean editOwnAccount;
-	private boolean sendChatMessage;
-	private boolean giveBonusPoints;
-	private boolean sendMessageForAllUsers;
-	private boolean editOtherAccounts;
-	private boolean giveOrRemoveAdminAndModeratorRights;
+	private int _accessLevelValue;
+	private String _accessLevelName;
+	private boolean _editOwnAccount;
+	private boolean _sendChatMessage;
+	private boolean _giveBonusPoints;
+	private boolean _sendMessageForAllUsers;
+	private boolean _editOtherAccounts;
+	private boolean _giveOrRemoveAdminAndModeratorRights;
 
 	private AccessLevel(int value, String name, boolean editMyAccount, boolean sendMessage, boolean givePoinst,
 			boolean sendMessageForAll, boolean editAccounts, boolean giveAdmModRights) {
-		accessLevelValue = value;
-		accessLevelName = name;
-		editOwnAccount = editMyAccount;
-		sendChatMessage = sendMessage;
-		giveBonusPoints = givePoinst;
-		sendMessageForAllUsers = sendMessageForAll;
-		editOtherAccounts = editAccounts;
-		giveOrRemoveAdminAndModeratorRights = giveAdmModRights;
+		_accessLevelValue = value;
+		_accessLevelName = name;
+		_editOwnAccount = editMyAccount;
+		_sendChatMessage = sendMessage;
+		_giveBonusPoints = givePoinst;
+		_sendMessageForAllUsers = sendMessageForAll;
+		_editOtherAccounts = editAccounts;
+		_giveOrRemoveAdminAndModeratorRights = giveAdmModRights;
 	}
 
 	public static AccessLevel getByAccessValue(int accessValue) {
@@ -47,35 +47,35 @@ public enum AccessLevel {
 	}
 
 	public int getValue() {
-		return accessLevelValue;
+		return _accessLevelValue;
 	}
 
 	public String getName() {
-		return accessLevelName;
+		return _accessLevelName;
 	}
 
 	public boolean canEditOwnAccount() {
-		return editOwnAccount;
+		return _editOwnAccount;
 	}
 
 	public boolean canSendChatMessage() {
-		return sendChatMessage;
+		return _sendChatMessage;
 	}
 
 	public boolean canGiveBonusPoints() {
-		return giveBonusPoints;
+		return _giveBonusPoints;
 	}
 
 	public boolean canSendMessageForAllUsers() {
-		return sendMessageForAllUsers;
+		return _sendMessageForAllUsers;
 	}
 
 	public boolean canEditOtherAccounts() {
-		return editOtherAccounts;
+		return _editOtherAccounts;
 	}
 
 	public boolean canGiveOrRemoveAdminAndModeratorRights() {
-		return giveOrRemoveAdminAndModeratorRights;
+		return _giveOrRemoveAdminAndModeratorRights;
 	}
 
 }
