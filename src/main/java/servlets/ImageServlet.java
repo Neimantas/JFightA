@@ -11,78 +11,51 @@ import javax.servlet.http.HttpServletResponse;
 
 import models.dal.ImageDAL;
 import models.dto.ObjectDTO;
-import services.IImage;
-import services.impl.ImageImpl;
+import services.IItem;
+import services.impl.ItemImpl;
 
-/**
- * Servlet implementation class ImageServlet
- */
 @WebServlet(urlPatterns = "/imageServlet")
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private IImage _image = ImageImpl.getInstance();
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public ImageServlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+	private IItem _item = ItemImpl.getInstance();
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		// response.getWriter().append("Served at: ").append(request.getContextPath());
+
 		String id = request.getParameter("id");
 
-		if (id != null) {
+		if (id == null) {
+			id = "0";
+		}
 
-			ObjectDTO<ImageDAL> objectDTO = _image.getImage(Integer.parseInt(id));
+		ObjectDTO<ImageDAL> objectDTO = _item.getUserAImage(Integer.parseInt(id));
 
-			if (objectDTO.success && objectDTO.transferData != null) {
+		if (objectDTO.success && objectDTO.transferData != null) {
 
-				String imageFormat = objectDTO.transferData.imageName
-						.substring(objectDTO.transferData.imageName.lastIndexOf(".") + 1);
+			String imageFormat = objectDTO.transferData.imageName
+					.substring(objectDTO.transferData.imageName.lastIndexOf(".") + 1);
 
-				response.setContentType("image/" + imageFormat);
+			response.setContentType("image/" + imageFormat);
 
-				ServletOutputStream servletOutputStream = response.getOutputStream();
+			ServletOutputStream servletOutputStream = response.getOutputStream();
 
-				byte[] buffer = new byte[4096];
-				int n = 0;
-				while (-1 != (n = objectDTO.transferData.image.read(buffer))) {
-					servletOutputStream.write(buffer, 0, n);
-				}
-
+			byte[] buffer = new byte[4096];
+			int n = 0;
+			while (-1 != (n = objectDTO.transferData.image.read(buffer))) {
+				servletOutputStream.write(buffer, 0, n);
 			}
 
-			// response.getOutputStream().write( Files.readAllBytes(new
-			// File(getServletContext().getRealPath("test.jpg")).toPath()));
-			//
-
-			// response.getOutputStream().write( Files.readAllBytes(new
-			// File("C:\\00.Projektai\\JFightA\\src\\main\\webapp\\resources\\images\\characters\\default1.jpg").toPath()));
 			response.getOutputStream().close();
 		} else {
-			response.getWriter().println("Sample text");
+			response.getWriter().println(objectDTO.message);
 			response.getWriter().close();
 		}
-		// System.out.println(new
-		// File("C:\\Users\\Marek\\Desktop\\JFight\\JFightA\\test.jpg").toPath());
+
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

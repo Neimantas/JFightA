@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import models.constant.ItemType;
 import models.dal.ImageDAL;
+import models.dal.ItemDAL;
 import models.dal.ResultDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
@@ -33,6 +35,41 @@ public class CrudTest {
 		// ListDTO<UserDAL> listDTOu = crud.read(userDAL);
 		// System.out.println(listDTOu.transferDataList.size());
 
+//		testImage(crud);
+		
+//		ImageDAL imageDAL = new ImageDAL();
+//		imageDAL.imageId = 11;
+//		crud.delete(imageDAL);
+
+	}
+	
+	public static void testItem(ICRUD crud) throws FileNotFoundException, IOException {
+
+		//create
+		File file = new File("src\\main\\webapp\\resources\\images\\img-01.jpg");
+		FileInputStream fileInputStream = new FileInputStream(file);
+		
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemName = "test";
+		itemDAL.itemImage = fileInputStream;
+		itemDAL.imageFormat = ".jpg";
+		itemDAL.itemType = ItemType.ATTACK;
+		itemDAL.description = "test";
+		itemDAL.minCharacterLevel = 1;
+		itemDAL.attackPoints = 10;
+		itemDAL.defencePoints = 5;
+		
+		ObjectDTO<ItemDAL> uploadDTO = crud.create(itemDAL);
+
+		//update
+		ItemDAL createdItemDAL = uploadDTO.transferData;
+		createdItemDAL.itemType = ItemType.DEFENCE;
+		DTO updateDTO = crud.update(createdItemDAL);
+
+		
+	}
+
+	public static void testImage(ICRUD crud) throws FileNotFoundException, IOException {
 		// upload image
 		File file = new File("src\\main\\webapp\\resources\\images\\characters\\Alex.png");
 		FileInputStream fileInputStream = new FileInputStream(file);
@@ -42,15 +79,23 @@ public class CrudTest {
 		imageDAL.image = fileInputStream;
 		imageDAL.userId = 1;
 
-		ObjectDTO<ImageDAL> dto2 = crud.create(imageDAL);
+		ObjectDTO<ImageDAL> uploadDTO = crud.create(imageDAL);
 		fileInputStream.close();
 
-		int newImageId = dto2.transferData.imageId;
+		int newImageId = uploadDTO.transferData.imageId;
+
+		// update image
+		File updateFile = new File("src\\main\\webapp\\resources\\images\\characters\\default2.jpg");
+		FileInputStream updateFileInputStream = new FileInputStream(updateFile);
+		ImageDAL updateImageDAL = new ImageDAL();
+		updateImageDAL.imageId = newImageId;
+		updateImageDAL.imageName = "default2.jpg";
+		updateImageDAL.image = updateFileInputStream;
+		updateImageDAL.userId = 2;
+		DTO updateDTO = crud.update(updateImageDAL);
 
 		// download image
-		ImageDAL readImageDAL = new ImageDAL();
-		readImageDAL.imageId = newImageId;
-		ListDTO<ImageDAL> listDTO = crud.read(readImageDAL);
+		ListDTO<ImageDAL> listDTO = crud.read(updateImageDAL);
 		String fileName = listDTO.transferDataList.get(0).imageName;
 		File newFile = new File("src\\main\\webapp\\resources\\images\\characters\\Downloaded image. " + fileName);
 		FileOutputStream fileOutputStream = new FileOutputStream(newFile);
@@ -61,9 +106,8 @@ public class CrudTest {
 		System.out.println("File size: " + fileSize + " bytes.");
 
 		// delete image
-		DTO dto = crud.delete(readImageDAL);
+		DTO dto = crud.delete(updateImageDAL);
 		System.out.println(dto.message);
-
 	}
 
 	private static long copyStream(InputStream input, OutputStream output) throws IOException {

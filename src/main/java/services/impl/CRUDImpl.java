@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.constant.ItemType;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dto.DTO;
@@ -47,8 +48,6 @@ public class CRUDImpl implements ICRUD {
 			String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 
 			String createQuery = createCreateQuery(dal, dalClassFields, tableName);
-
-			System.out.println(createQuery);
 
 			setConnection();
 			_preparedStatement = _connection.prepareStatement(createQuery);
@@ -111,14 +110,14 @@ public class CRUDImpl implements ICRUD {
 		return read(dal, true);
 	}
 
-	private <T> ListDTO<T> read(T dal, boolean setConnection) {
+	private <T> ListDTO<T> read(T dal, boolean setConnection, String... checkQuery) {
 		try {
 			ListDTO<T> listDTO = new ListDTO<>();
 
 			Class<?> dalClass = dal.getClass();
 			Field[] dalClassFields = dalClass.getFields();
 
-			String readQuery = createReadQuery(dal, dalClass, dalClassFields);
+			String readQuery = checkQuery.length == 0 ? createReadQuery(dal, dalClass, dalClassFields) : checkQuery[0];
 
 			Boolean hasCondition = readQuery.contains("WHERE");
 
@@ -135,10 +134,11 @@ public class CRUDImpl implements ICRUD {
 
 				T returnDAL = (T) Class.forName(dalClass.getName()).getConstructor().newInstance();
 
+				boolean itemDALNonStandartFieldsSetted = false;
 				for (int j = 0; j < dalClassFields.length; j++) {
 
 					Class<?> dalField = dalClassFields[j].getType();
-					if (dalField != InputStream.class) {
+					if (dalField != InputStream.class && dalField != ItemType.class) {
 						dalClassFields[j].set(returnDAL, (dalField.cast(resultSet.getObject(j + 1))));
 					} else {
 						if (dalClass == ImageDAL.class) {
@@ -146,9 +146,13 @@ public class CRUDImpl implements ICRUD {
 							imageDAL.image = resultSet.getBinaryStream("Image");
 							returnDAL = (T) imageDAL;
 						} else if (dalClass == ItemDAL.class) {
-							ItemDAL itemDAL = (ItemDAL) returnDAL;
-							itemDAL.itemImage = resultSet.getBinaryStream("ItemImage");
-							returnDAL = (T) itemDAL;
+							if (!itemDALNonStandartFieldsSetted) {
+								ItemDAL itemDAL = (ItemDAL) returnDAL;
+								itemDAL.itemImage = resultSet.getBinaryStream("ItemImage");
+								itemDAL.itemType = ItemType.getByItemTypeTitle(resultSet.getString("ItemType"));
+								returnDAL = (T) itemDAL;
+								itemDALNonStandartFieldsSetted = true;
+							}
 						}
 
 					}
@@ -201,20 +205,32 @@ public class CRUDImpl implements ICRUD {
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
 				dto.message = "Wrong input DAL first field value (should be not null and greater than 0).";
+				_log.writeWarningMessage("CRUD update failed. " + dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
 
-			ListDTO<T> readDTO = read(dal, true);
+			setConnection();
+
+			String checkQuery = createCheckQuery(dal, dalClass, dalClassFields);
+			ListDTO<T> readDTO = read(dal, false, checkQuery);
 
 			if (readDTO.transferDataList.isEmpty()) {
-				dto.message = "Update failed. There are now row in a table with such Id (" + firstFieldValue + ").";
+				dto.message = "CRUD update failed. There are now row in a table with such Id (" + firstFieldValue + ").";
+				_log.writeWarningMessage(dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
 
 			String updateQuery = createUpdateQuery(dal, dalClass, dalClassFields);
 
-			setConnection();
+			_preparedStatement.close();
 			_preparedStatement = _connection.prepareStatement(updateQuery);
+			if (dalClass == ImageDAL.class) {
+				ImageDAL imageDAL = (ImageDAL) dal;
+				_preparedStatement.setBinaryStream(1, imageDAL.image);
+			} else if (dalClass == ItemDAL.class) {
+				ItemDAL itemDAL = (ItemDAL) dal;
+				_preparedStatement.setBinaryStream(1, itemDAL.itemImage);
+			}
 			_preparedStatement.executeUpdate();
 
 			dto.success = true;
@@ -254,14 +270,18 @@ public class CRUDImpl implements ICRUD {
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
 				dto.message = "Wrong input DAL first field value (should be not null and greater than 0).";
+				_log.writeWarningMessage("CRUD delete failed. " + dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
 
 			setConnection();
-			ListDTO<T> readDTO = read(dal, false);
+
+			String checkQuery = createCheckQuery(dal, dalClass, dalClassFields);
+			ListDTO<T> readDTO = read(dal, false, checkQuery);
 
 			if (readDTO.transferDataList.isEmpty()) {
-				dto.message = "Delete failed. There are now row in a table with such Id (" + firstFieldValue + ").";
+				dto.message = "CRUD delete failed. There are now row in a table with such Id (" + firstFieldValue + ").";
+				_log.writeWarningMessage(dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
 
@@ -320,15 +340,16 @@ public class CRUDImpl implements ICRUD {
 		for (int i = 0; i < dalClassFields.length; i++) {
 			if (dalClassFields[i].getType() != InputStream.class) {
 				columnValues += (dalClassFields[i].getType() == Integer.class || dalClassFields[i].get(dal) == null
-						? dalClassFields[i].get(dal) + ","
-						: "\'" + dalClassFields[i].get(dal) + "\',");
+						? dalClassFields[i].get(dal) + ", "
+						: "\'" + dalClassFields[i].get(dal) + "\', ");
 			} else {
-				columnValues += "?,";
+				columnValues += "?, ";
 			}
 		}
 
-		columnValues = columnValues.substring(0, columnValues.length() - 1);
+		columnValues = columnValues.substring(0, columnValues.length() - 2);
 		String createQuery = "INSERT INTO " + tableName + " VALUES (" + columnValues + ");";
+		System.out.println(createQuery + "\n");
 		return createQuery;
 	}
 
@@ -367,18 +388,18 @@ public class CRUDImpl implements ICRUD {
 		whereCondition += ";";
 
 		readQuery = "SELECT * FROM " + tableName + whereCondition;
-
+		System.out.println(readQuery + "\n");
 		return readQuery;
 	}
 
 	/**
 	 * If FightId is not null, will be created read query for a row with such
 	 * FightId. Otherwise the first found userId will be taken and will be created
-	 * read query for all result with such userId (no matter win or lose)
+	 * read query for all result with such userId (no matter win or lose).
 	 */
 	private <T> String createResultTableQuery(T dal, Field[] dalClassFields)
 			throws IllegalArgumentException, IllegalAccessException {
-		String readQuery = "SELECT * FROM Result WHERE ";
+		String readQuery = "SELECT * FROM `Result` WHERE ";
 
 		if (dalClassFields[0].get(dal) != null) {
 			readQuery += "FightId = " + dalClassFields[0].get(dal) + ";";
@@ -394,6 +415,7 @@ public class CRUDImpl implements ICRUD {
 				}
 			}
 		}
+		System.out.println(readQuery + "\n");
 		return readQuery;
 	}
 
@@ -404,15 +426,21 @@ public class CRUDImpl implements ICRUD {
 		String columnValues = "";
 
 		for (int i = 1; i < dalClassFields.length; i++) {
-			columnValues += dalClassFields[i].getName() + " = "
-					+ (dalClassFields[i].getType() == Integer.class || dalClassFields[i].get(dal) == null
-							? dalClassFields[i].get(dal) + " + "
-							: "\'" + dalClassFields[i].get(dal) + "\', ");
+
+			if (dalClassFields[i].getType() != InputStream.class) {
+				columnValues += dalClassFields[i].getName() + " = "
+						+ (dalClassFields[i].getType() == Integer.class || dalClassFields[i].get(dal) == null
+								? dalClassFields[i].get(dal) + ", "
+								: "\'" + dalClassFields[i].get(dal) + "\', ");
+			} else {
+				columnValues += dalClassFields[i].getName() + " = " + "?, ";
+			}
 		}
 
 		columnValues = columnValues.substring(0, columnValues.length() - 2);
 		String whereCondition = " WHERE " + dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String updateQuery = "UPDATE " + tableName + " SET " + columnValues + whereCondition;
+		System.out.println(updateQuery + "\n");
 		return updateQuery;
 	}
 
@@ -421,7 +449,20 @@ public class CRUDImpl implements ICRUD {
 		String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 		String columnValue = dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String deleteQuery = "DELETE FROM " + tableName + " WHERE " + columnValue;
+		System.out.println(deleteQuery + "\n");
 		return deleteQuery;
+	}
+
+	/**
+	 * Checks if row with such Id (PK or FK) exists.
+	 */
+	private <T> String createCheckQuery(T dal, Class<?> dalClass, Field[] dalClassFields)
+			throws IllegalArgumentException, IllegalAccessException {
+		String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
+		String whereCondition = " WHERE " + dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
+		String checkQuery = "SELECT * FROM " + tableName + whereCondition;
+		System.out.println(checkQuery + "\n");
+		return checkQuery;
 	}
 
 }

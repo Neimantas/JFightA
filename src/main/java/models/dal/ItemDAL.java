@@ -14,6 +14,6 @@ public class ItemDAL {
 	public String description;
 	public Integer minCharacterLevel;
 	public Integer attackPoints;
-	public Integer DefencePoints;
+	public Integer defencePoints;
 
 }

@@ -8,7 +8,7 @@ public enum AccessLevel {
 	ADMINISTRATOR(4, "Administrator", true, true, true, true, true, true);
 
 	private int _accessLevelValue;
-	private String _accessLevelName;
+	private String _accessLevelTitle;
 	private boolean _editOwnAccount;
 	private boolean _sendChatMessage;
 	private boolean _giveBonusPoints;
@@ -16,10 +16,10 @@ public enum AccessLevel {
 	private boolean _editOtherAccounts;
 	private boolean _giveOrRemoveAdminAndModeratorRights;
 
-	private AccessLevel(int value, String name, boolean editMyAccount, boolean sendMessage, boolean givePoinst,
+	private AccessLevel(int value, String title, boolean editMyAccount, boolean sendMessage, boolean givePoinst,
 			boolean sendMessageForAll, boolean editAccounts, boolean giveAdmModRights) {
 		_accessLevelValue = value;
-		_accessLevelName = name;
+		_accessLevelTitle = title;
 		_editOwnAccount = editMyAccount;
 		_sendChatMessage = sendMessage;
 		_giveBonusPoints = givePoinst;
@@ -28,30 +28,30 @@ public enum AccessLevel {
 		_giveOrRemoveAdminAndModeratorRights = giveAdmModRights;
 	}
 
-	public static AccessLevel getByAccessValue(int accessValue) {
+	public static AccessLevel getByAccessValue(int accessLevelValue) {
 		for (AccessLevel accessLevel : AccessLevel.values()) {
-			if (accessLevel.getValue() == accessValue) {
+			if (accessLevel.getAccessLevelValue() == accessLevelValue) {
 				return accessLevel;
 			}
 		}
 		return null;
 	}
 
-	public static AccessLevel getByAccessName(String accessName) {
+	public static AccessLevel getByAccessTitle(String accessLevelTitle) {
 		for (AccessLevel accessLevel : AccessLevel.values()) {
-			if (accessLevel.getName().equalsIgnoreCase(accessName)) {
+			if (accessLevel.getAccessLevelTitle().equalsIgnoreCase(accessLevelTitle)) {
 				return accessLevel;
 			}
 		}
 		return null;
 	}
 
-	public int getValue() {
+	public int getAccessLevelValue() {
 		return _accessLevelValue;
 	}
 
-	public String getName() {
-		return _accessLevelName;
+	public String getAccessLevelTitle() {
+		return _accessLevelTitle;
 	}
 
 	public boolean canEditOwnAccount() {
