@@ -26,7 +26,7 @@
 <title>News</title>
 </head>
 <body>
-
+<div class="container">
 <div class= "menuContainer">
 <div class = "logoutMenuLeft">
 <div class="message">${ReadyMessage}</div>
@@ -34,23 +34,14 @@
 <!-- 
 <div class="logoutMenuCenter">UserName</div>
  -->
- 
+
 <div class = "logoutMenuRight">
 	<button id="play" onclick="clicker(this.id)">Play</button>
-	<button id="ready" onclick="clicker(this.id)">Ready</button>
+	<button id="ready" onclick="rdyBtn(this.innerText)">${Ready}</button>
 	<button id="logout" onclick="clicker(this.id)">Logout</button>
 
-<!-- 
-<form class = "forms" action="/JFight/News">
-
-
-	<input type="hidden" name="button" value="play"><input type="submit" value="Play"></input>
-	<input type="hidden" name="button" value="ready"><input type="submit" value="Ready"></input>
-	<input type="hidden" name="button" value="logout"></input><input type="submit" value="Logout"></input>
-</form>
- -->
-
 </div>
+
 </div>
 <div>
 	<div class = "leftcolumn">
@@ -61,9 +52,9 @@ Online players. Get it somehow
 		<div class="textField">put here some text from admin</div>
 	</div>
 </div>
+</div>
 
-
-
+<input id="slaptas" type="hidden" value=${(ready == null) ? false : ready} ></input>
 <!--===============================================================================================-->	
 	<script src="resources/vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -75,11 +66,50 @@ Online players. Get it somehow
 	<script src="resources/js/main.js"></script>
 	<script>
 	function clicker(btnName){
-		console.log('vbeikia');
-		
+	
+		//console.log('veikia');	
 		url = "News?button=" + btnName;
 		location.href = url;
+		//request.setAttribute("Ready", "Not_Ready");
 	}
+	
+	function rdyBtn(text){
+		var tempText = "";
+		if(text == "Ready") tempText = true;
+		else{
+			tempText = false;
+		}
+		console.log(tempText);
+		url = "News?ready=" + tempText;
+		location.href = url;
+	}
+	
+	function readyFunc(){	
+		var url_string = location.href; //window.location.href
+		var url = new URL(url_string);
+		var ready = url.searchParams.get("ready") == null ? false : url.searchParams.get("ready");
+		//var ready = document.getElementById('slaptas').value == "" ? false : document.getElementById('slaptas').value;
+		
+		if(ready == false){
+			//url = "News?button=" + btnName + "&ready=" + getReady;
+			//location.href = url;
+			// request.setAttribute("Ready", "Not_Ready");
+			document.getElementById('ready').innerText= 'Ready';
+			ready = true;
+		}
+		else
+		{
+			//url = "News?button=" //+ btnName;
+			//location.href = url;
+			//request.setAttribute("Ready", "Set_Ready");
+			//ready = false;
+			document.getElementById('ready').innerText= 'Not ready';
+		}
+	}
+	
+	$( document ).ready(function() {
+		readyFunc();
+	});
 	</script>
 </body>
 </html>
