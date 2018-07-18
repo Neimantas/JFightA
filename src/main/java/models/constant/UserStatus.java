@@ -7,14 +7,14 @@ public enum UserStatus {
 	PLAYING(3, "Playing");
 
 	private int _statusValue;
-	private String _statusName;
+	private String _statusTitle;
 
-	private UserStatus(int userStatusValue, String userStatusName) {
+	private UserStatus(int userStatusValue, String userStatusTitle) {
 		_statusValue = userStatusValue;
-		_statusName = userStatusName;
+		_statusTitle = userStatusTitle;
 	}
 
-	public static UserStatus getByStatusValue(int userStatusValue) {
+	public static UserStatus getByUserStatusValue(int userStatusValue) {
 		for (UserStatus userStatus : UserStatus.values()) {
 			if (userStatus.getStatusValue() == userStatusValue) {
 				return userStatus;
@@ -23,9 +23,9 @@ public enum UserStatus {
 		return null;
 	}
 
-	public static UserStatus getByStatusName(String userStatusName) {
+	public static UserStatus getByUserStatusTitle(String userStatusTitle) {
 		for (UserStatus userStatus : UserStatus.values()) {
-			if (userStatus.getStatusName().equalsIgnoreCase(userStatusName)) {
+			if (userStatus.getStatusTitle().equalsIgnoreCase(userStatusTitle)) {
 				return userStatus;
 			}
 		}
@@ -36,8 +36,8 @@ public enum UserStatus {
 		return _statusValue;
 	}
 
-	public String getStatusName() {
-		return _statusName;
+	public String getStatusTitle() {
+		return _statusTitle;
 	}
 
 }

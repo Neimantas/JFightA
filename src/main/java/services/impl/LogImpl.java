@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import models.constant.Settings;
 import services.ILog;
 
 public class LogImpl implements ILog {
@@ -17,15 +18,16 @@ public class LogImpl implements ILog {
 
 	private SimpleDateFormat _simpleDateFormat;
 	private SimpleDateFormat _simpleDateAndTimeFormat;
+	private static Boolean _allowWriteToConsoleGlobal = Settings.WRITE_LOGS_TO_CONSOLE;
 
 	private LogImpl() {
 		_simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		_simpleDateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		_simpleDateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	}
 
 	@Override
-	public synchronized void writeErrorMessage(Exception e, boolean alsoWriteToConsole, String... additionalMessages) {
-		if (alsoWriteToConsole) {
+	public synchronized void writeErrorMessage(Exception e, boolean allowWriteToConsole, String... additionalMessages) {
+		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println(e.toString());
 		}
 		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
@@ -50,9 +52,9 @@ public class LogImpl implements ILog {
 	}
 
 	@Override
-	public synchronized void writeWarningMessage(String message, boolean alsoWriteToConsole,
+	public synchronized void writeWarningMessage(String message, boolean allowWriteToConsole,
 			String... additionalMessages) {
-		if (alsoWriteToConsole) {
+		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println("[WARNING] " + message);
 		}
 		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
