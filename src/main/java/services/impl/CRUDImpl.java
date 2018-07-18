@@ -39,7 +39,7 @@ public class CRUDImpl implements ICRUD {
 	 * DTO with DAL inside which represents created row in a database.
 	 */
 	@Override
-	public <T> ObjectDTO<T> create(T dal) {
+	public synchronized <T> ObjectDTO<T> create(T dal) {
 		try {
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 
@@ -106,7 +106,7 @@ public class CRUDImpl implements ICRUD {
 	 * table is empty, will be returned DTO with an empty list.
 	 */
 	@Override
-	public <T> ListDTO<T> read(T dal) {
+	public synchronized <T> ListDTO<T> read(T dal) {
 		return read(dal, true);
 	}
 
@@ -194,7 +194,7 @@ public class CRUDImpl implements ICRUD {
 	 * by a values on an input DAL.
 	 */
 	@Override
-	public <T> DTO update(T dal) {
+	public synchronized <T> DTO update(T dal) {
 		try {
 			DTO dto = new DTO();
 
@@ -259,7 +259,7 @@ public class CRUDImpl implements ICRUD {
 	 * and should not be a null or less than 1.
 	 */
 	@Override
-	public <T> DTO delete(T dal) {
+	public synchronized <T> DTO delete(T dal) {
 		try {
 			DTO dto = new DTO();
 

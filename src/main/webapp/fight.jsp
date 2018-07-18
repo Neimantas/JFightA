@@ -44,7 +44,7 @@
 			Health:
 			${healthA}
 			<div>
-				<img src="imageServlet?id=${id}" height="300" width="200">
+				<img src="imageServlet?id=${idA}&user=a" height="300" width="200">
 			</div>
 			
 			
@@ -140,7 +140,7 @@
 			
 			
 			<div>
-				<img src="imageServlet?id=${id}" height="300" width="200">
+				<img src="imageServlet?id=${idB}&user=b" height="300" width="200">
 			</div>
 			
 			</div>
