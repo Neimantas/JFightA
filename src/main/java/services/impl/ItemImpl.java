@@ -8,8 +8,7 @@ import services.ICRUD;
 import services.IItem;
 
 public class ItemImpl implements IItem {
-	private static IItem _item = new ItemImpl();
-	
+
 	private ICRUD _crud;
 
 	public ItemImpl() {
@@ -30,10 +29,6 @@ public class ItemImpl implements IItem {
 	@Override
 	public ObjectDTO<ImageDAL> getUserBImage(int userBId) {
 		return getUserImage(userBId, false);
-	}
-	
-	public static IItem getInstance() {
-		return _item;
 	}
 
 	private ObjectDTO<ImageDAL> getUserImage(int userId, boolean userA) {

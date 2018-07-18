@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
 import models.dal.ImageDAL;
 import models.dto.ObjectDTO;
 import services.IItem;
@@ -18,7 +19,11 @@ import services.impl.ItemImpl;
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private IItem _item = ItemImpl.getInstance();
+	private IItem _item;
+
+	public ImageServlet() {
+		_item = StartupContainer.easyDI.getInstance(ItemImpl.class);
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
