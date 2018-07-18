@@ -7,15 +7,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mysql.cj.protocol.Protocol.GetProfilerEventHandlerInstanceFunction;
-
 import models.dal.CharacterDAL;
-import models.dal.ImageDAL;
 import models.dto.ListDTO;
-import models.dto.ObjectDTO;
-import services.IImage;
 import services.IUserInfo;
-import services.impl.ImageImpl;
 import services.impl.UserInfoImpl;
 
 @WebServlet(urlPatterns = "/user")
@@ -25,13 +19,11 @@ public class UserServlet extends HttpServlet {
 	private IUserInfo _userInfo;
 	private String _userId;
 	private CharacterDAL _character;
-	private IImage _image;
 
 	public UserServlet() {
 		super();
 		_userInfo = new UserInfoImpl();
 		_character = new CharacterDAL();
-		_image = ImageImpl.getInstance();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,14 +37,13 @@ public class UserServlet extends HttpServlet {
 			//needs else return
 		}
 		
-		ObjectDTO<ImageDAL> dtoImage = _image.getImage(Integer.parseInt(_userId));
-				
-		request.setAttribute("image", _image.getImage(Integer.parseInt(_userId)));
 		request.setAttribute("userId", _character.userId);
 		request.setAttribute("level", _character.level);
 		request.setAttribute("experience", _character.experience);
 		request.setAttribute("healthPoints", _character.healthPoints);
 		request.setAttribute("strenght", _character.strenght);
+		request.setAttribute("attackItem", _character.attackItemId);
+		request.setAttribute("defenceItem", _character.defenceItemId);
 		
 		request.getRequestDispatcher("user.jsp").forward(request, response);
 	}

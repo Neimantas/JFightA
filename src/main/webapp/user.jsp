@@ -62,18 +62,27 @@
 		</div>
 		<div class="row mb-1">
 			<div class="col border border-dark rounded py-1">
-				<div class="text-center">
-					<img src="..." class="rounded">
-				</div>
+				<%-- <div class="text-center">
+					<img src="imageServlet?id=${userId}" class="rounded" width=100%>
+				</div> --%>
 			</div>
 		</div>
 		<div class="row mb-1">
-			<div class="col-6 border border-dark rounded py-1">Attack Item</div>
-			<div class="col-6 border border-dark rounded py-1">Defense Item</div>
+			<div class="col-6 border border-dark rounded py-1">
+				<div class="text-center">
+					<img src="itemImageServlet?itemId=${attackItem}" class="rounded" width=100%>
+				</div>
+			</div>
+			<div class="col-6 border border-dark rounded py-1">
+				<%-- <div class="text-center">
+					<img src="itemImageServlet?itemId=${defenceItem}" class="rounded" width=100%>
+				</div> --%>
+			</div>
 		</div>
 		<div class="row mb-1">
 			<div class="col p-0">
-				<button type="button" class="btn btn-outline-dark float-right">Log</button>
+				<button type="button" class="btn btn-outline-dark float-right">Fight
+					history</button>
 			</div>
 		</div>
 	</div>

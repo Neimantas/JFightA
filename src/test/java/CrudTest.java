@@ -40,31 +40,33 @@ public class CrudTest {
 //		ImageDAL imageDAL = new ImageDAL();
 //		imageDAL.imageId = 11;
 //		crud.delete(imageDAL);
+		
+		testItem(crud);
 
 	}
 	
 	public static void testItem(ICRUD crud) throws FileNotFoundException, IOException {
 
 		//create
-		File file = new File("src\\main\\webapp\\resources\\images\\img-01.jpg");
+		File file = new File("src\\main\\webapp\\resources\\images\\Item1.jpg");
 		FileInputStream fileInputStream = new FileInputStream(file);
 		
 		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemName = "test";
+		itemDAL.itemName = "fist";
 		itemDAL.itemImage = fileInputStream;
 		itemDAL.imageFormat = ".jpg";
 		itemDAL.itemType = ItemType.ATTACK;
-		itemDAL.description = "test";
+		itemDAL.description = "When you are poor, your only option is fists.";
 		itemDAL.minCharacterLevel = 1;
-		itemDAL.attackPoints = 10;
-		itemDAL.defencePoints = 5;
+		itemDAL.attackPoints = 1;
+		itemDAL.defencePoints = 1;
 		
 		ObjectDTO<ItemDAL> uploadDTO = crud.create(itemDAL);
 
 		//update
-		ItemDAL createdItemDAL = uploadDTO.transferData;
-		createdItemDAL.itemType = ItemType.DEFENCE;
-		DTO updateDTO = crud.update(createdItemDAL);
+//		ItemDAL createdItemDAL = uploadDTO.transferData;
+//		createdItemDAL.itemType = ItemType.DEFENCE;
+//		DTO updateDTO = crud.update(createdItemDAL);
 
 		
 	}
