@@ -6,7 +6,7 @@ public class ImageDAL {
 
 	public Integer imageId;
 	public Integer userId;
-	public InputStream inputStream;
+	public InputStream image;
 	public String imageName;
 
 }
