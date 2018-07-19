@@ -27,15 +27,21 @@ public class NewsServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
-		System.out.println("ready param = "  + request.getAttribute("ready"));
-		boolean ready = request.getAttribute("ready") == null ? false : (boolean) request.getAttribute("ready");
+		String readyString = request.getParameter("ready") == null ? "false" : (String)request.getParameter("ready");
+		Boolean ready = Boolean.valueOf(readyString);
+		//ready = //= readyString.equalsIgnoreCase("false") ? false : true;
 		
-		if (!ready) {	
+		
+		
+		System.out.println("----------");
+		System.out.println(readyString);
+		System.out.println(ready);
+		if (ready == false) {
 			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 
 			}
-		else if (ready) {
+		else{
 				request.setAttribute("ReadyMessage", "YOU ARE READY");
 				request.getRequestDispatcher("News.jsp").forward(request, response);
 
