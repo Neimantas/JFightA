@@ -26,16 +26,11 @@ public class NewsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		// response.getWriter().append("Served at: ").append(request.getContextPath());
-		String readyString = request.getParameter("ready") == null ? "false" : (String)request.getParameter("ready");
-		Boolean ready = Boolean.valueOf(readyString);
-		//ready = //= readyString.equalsIgnoreCase("false") ? false : true;
+		// response.getWriter().append("Served at: ").append(request.getContextPath());	
 		
+		//from url parameter get value and convert it to boolean.
+		Boolean ready =  request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
 		
-		
-		System.out.println("----------");
-		System.out.println(readyString);
-		System.out.println(ready);
 		if (ready == false) {
 			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
 			request.getRequestDispatcher("News.jsp").forward(request, response);
