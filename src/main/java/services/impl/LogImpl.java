@@ -19,6 +19,7 @@ public class LogImpl implements ILog {
 	private SimpleDateFormat _simpleDateFormat;
 	private SimpleDateFormat _simpleDateAndTimeFormat;
 	private static Boolean _allowWriteToConsoleGlobal = Settings.WRITE_LOGS_TO_CONSOLE;
+	private static String _logDirectory = Settings.LOG_DIRECTORY;
 
 	private LogImpl() {
 		_simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -30,8 +31,9 @@ public class LogImpl implements ILog {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println(e.toString());
 		}
-		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
-		try (FileWriter fw = new FileWriter(fileName, true);
+		createDirIfNotExists();
+		String fileName = _simpleDateFormat.format(new Date()) + ".log";
+		try (FileWriter fw = new FileWriter(_logDirectory + fileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
@@ -48,7 +50,6 @@ public class LogImpl implements ILog {
 		} catch (IOException io) {
 			System.out.println(io.toString());
 		}
-
 	}
 
 	@Override
@@ -57,8 +58,9 @@ public class LogImpl implements ILog {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println("[WARNING] " + message);
 		}
-		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
-		try (FileWriter fw = new FileWriter(fileName, true);
+		createDirIfNotExists();
+		String fileName = _simpleDateFormat.format(new Date()) + ".log";
+		try (FileWriter fw = new FileWriter(_logDirectory + fileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
@@ -72,13 +74,12 @@ public class LogImpl implements ILog {
 		} catch (IOException io) {
 			System.out.println(io.toString());
 		}
-
 	}
 
 	@Override
 	public String getLog(Date date) {
-		String fileName = "log\\" + _simpleDateFormat.format(date) + ".log";
-		File file = new File(fileName);
+		String fileName = _simpleDateFormat.format(date) + ".log";
+		File file = new File(_logDirectory + fileName);
 		if (file.exists()) {
 			String returnString = "";
 			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
@@ -98,16 +99,20 @@ public class LogImpl implements ILog {
 		}
 	}
 
+	public static ILog getInstance() {
+		return _log;
+	}
+
+	private void createDirIfNotExists() {
+		new File(_logDirectory).mkdirs();
+	}
+
 	private String createAdditionalMessage(String... additionalMessages) {
 		String additionalMessage = "Additional message: ";
 		for (int i = 0; i < additionalMessages.length; i++) {
 			additionalMessage += additionalMessages[i] + ", ";
 		}
 		return additionalMessage.substring(0, additionalMessage.length() - 2);
-	}
-
-	public static ILog getInstance() {
-		return _log;
 	}
 
 }

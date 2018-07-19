@@ -29,12 +29,18 @@ public class ImageServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		String id = request.getParameter("id");
+		String user = request.getParameter("user");
 
 		if (id == null) {
 			id = "0";
 		}
 
-		ObjectDTO<ImageDAL> objectDTO = _item.getUserAImage(Integer.parseInt(id));
+		ObjectDTO<ImageDAL> objectDTO;
+		if (user != null && user.equalsIgnoreCase("b")) {
+			objectDTO = _item.getUserBImage(Integer.parseInt(id));
+		} else {
+			objectDTO = _item.getUserAImage(Integer.parseInt(id));
+		}
 
 		if (objectDTO.success && objectDTO.transferData != null) {
 

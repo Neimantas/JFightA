@@ -108,7 +108,8 @@ public class FightServlet extends HttpServlet {
 			request.setAttribute("healthA", playerAHealth);
 			request.setAttribute("healthB", _playerBHealth);
 			//avatar id
-			request.setAttribute("id", 1);													//Picture ID. Still hardcoded.
+			request.setAttribute("idA", 1);													//Picture ID. Still hardcoded.
+			request.setAttribute("idB", 2);
 			
 			if(_playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
 				_round = 0;
