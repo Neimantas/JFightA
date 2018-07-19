@@ -36,10 +36,10 @@ public class ImageServlet extends HttpServlet {
 		}
 
 		ObjectDTO<ImageDAL> objectDTO;
-		if (user.equalsIgnoreCase("a")) {
-			objectDTO = _item.getUserAImage(Integer.parseInt(id));
-		} else {
+		if (user != null && user.equalsIgnoreCase("b")) {
 			objectDTO = _item.getUserBImage(Integer.parseInt(id));
+		} else {
+			objectDTO = _item.getUserAImage(Integer.parseInt(id));
 		}
 
 		if (objectDTO.success && objectDTO.transferData != null) {
