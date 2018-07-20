@@ -31,9 +31,7 @@ public class LogImpl implements ILog {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println(e.toString());
 		}
-		createDirIfNotExists();
-		String fileName = _simpleDateFormat.format(new Date()) + ".log";
-		try (FileWriter fw = new FileWriter(_logDirectory + fileName, true);
+		try (FileWriter fw = new FileWriter(createLogLocation(), true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
@@ -58,9 +56,7 @@ public class LogImpl implements ILog {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println("[WARNING] " + message);
 		}
-		createDirIfNotExists();
-		String fileName = _simpleDateFormat.format(new Date()) + ".log";
-		try (FileWriter fw = new FileWriter(_logDirectory + fileName, true);
+		try (FileWriter fw = new FileWriter(createLogLocation(), true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
@@ -78,22 +74,23 @@ public class LogImpl implements ILog {
 
 	@Override
 	public String getLog(Date date) {
-		String fileName = _simpleDateFormat.format(date) + ".log";
-		File file = new File(_logDirectory + fileName);
+		File file = new File(getLogLocationByDate(date));
 		if (file.exists()) {
-			String returnString = "";
+
 			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+				String returnString = "";
 				String line;
 				while ((line = bufferedReader.readLine()) != null) {
 					returnString += line + "\n";
 				}
+				if (returnString.equals("")) {
+					return "Log file is empty.";
+				}
+				return returnString;
 			} catch (IOException e) {
 				return e.toString();
 			}
-			if (returnString.equals("")) {
-				return "Log file is empty.";
-			}
-			return returnString;
+
 		} else {
 			return "There are no logs at a current date.";
 		}
@@ -103,8 +100,13 @@ public class LogImpl implements ILog {
 		return _log;
 	}
 
-	private void createDirIfNotExists() {
+	private String createLogLocation() {
 		new File(_logDirectory).mkdirs();
+		return _logDirectory + _simpleDateFormat.format(new Date()) + ".log";
+	}
+
+	private String getLogLocationByDate(Date date) {
+		return _logDirectory + _simpleDateFormat.format(date) + ".log";
 	}
 
 	private String createAdditionalMessage(String... additionalMessages) {
