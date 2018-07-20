@@ -50,10 +50,12 @@ public class NewsServlet extends HttpServlet {
 		if (ready == false) {
 
 			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
+
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 
 		} else if(ready == true) {
 			request.setAttribute("ReadyMessage", "YOU ARE READY");
+			
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 
 		}
