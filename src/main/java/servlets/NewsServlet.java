@@ -26,39 +26,37 @@ public class NewsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		// response.getWriter().append("Served at: ").append(request.getContextPath());	
-		
-		//from url parameter get value and convert it to boolean.
-		Boolean ready =  request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
-		
+		// response.getWriter().append("Served at: ").append(request.getContextPath());
+
+		String param = request.getParameter("button");
+		if (param != null) {
+
+			if (param.equals("logout")) {
+				System.out.println("doing logout");
+				// request.setAttribute("button", param);
+				request.getRequestDispatcher("index.jsp").forward(request, response);
+			}
+
+			if (param.equals("play")) {
+				System.out.println("doing play");
+				request.getRequestDispatcher("fight.jsp").forward(request, response);
+			}
+
+		}
+
+		// from url parameter get value and convert it to boolean.
+		Boolean ready = request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
+
 		if (ready == false) {
+
 			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 
-			}
-		else{
-				request.setAttribute("ReadyMessage", "YOU ARE READY");
-				request.getRequestDispatcher("News.jsp").forward(request, response);
+		} else if(ready == true) {
+			request.setAttribute("ReadyMessage", "YOU ARE READY");
+			request.getRequestDispatcher("News.jsp").forward(request, response);
 
-			}
-		
-//		String param = request.getParameter("button");
-		
-//		if (param != null) {
-//
-//			if (param.equals("logout")) {
-//
-//				// request.setAttribute("button", param);
-//				request.getRequestDispatcher("index.jsp").forward(request, response);
-//			}		
-//			
-//			if (param.equals("play")) {
-//				request.getRequestDispatcher("fight.jsp").forward(request, response);
-//			}
-//
-//		} else {
-//			request.getRequestDispatcher("News.jsp").forward(request, response);
-//		}
+		}
 
 		// }
 		// doPost(request, response);
@@ -71,8 +69,7 @@ public class NewsServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
-		
+
 		request.getRequestDispatcher("News.jsp").forward(request, response);
 
 	}
