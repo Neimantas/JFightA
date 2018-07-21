@@ -7,5 +7,7 @@ public class Character {
 	public Integer strenght;
 	public Integer experience;
 	public Integer level;
+	public Integer AttackItemId;
+	public Integer DefenceItemId;
 	
 }
