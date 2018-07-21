@@ -37,7 +37,7 @@ public class CRUDImpl implements ICRUD {
 	 * DTO with DAL inside which represents created row in a database.
 	 */
 	@Override
-	public synchronized <T> ObjectDTO<T> create(T dal) {
+	public <T> ObjectDTO<T> create(T dal) {
 		try {
 			ObjectDTO<T> objectDTO = new ObjectDTO<>();
 
@@ -191,7 +191,7 @@ public class CRUDImpl implements ICRUD {
 	 * by a values on an input DAL.
 	 */
 	@Override
-	public synchronized <T> DTO update(T dal) {
+	public <T> DTO update(T dal) {
 		try {
 			DTO dto = new DTO();
 
@@ -256,7 +256,7 @@ public class CRUDImpl implements ICRUD {
 	 * and should not be a null or less than 1.
 	 */
 	@Override
-	public synchronized <T> DTO delete(T dal) {
+	public <T> DTO delete(T dal) {
 		try {
 			DTO dto = new DTO();
 
@@ -343,7 +343,7 @@ public class CRUDImpl implements ICRUD {
 
 		columnValues = columnValues.substring(0, columnValues.length() - 2);
 		String createQuery = "INSERT INTO " + tableName + " VALUES (" + columnValues + ");";
-		System.out.println(createQuery + "\n");
+		System.out.println("\n" + createQuery);
 		return createQuery;
 	}
 
@@ -382,7 +382,7 @@ public class CRUDImpl implements ICRUD {
 		whereCondition += ";";
 
 		readQuery = "SELECT * FROM " + tableName + whereCondition;
-		System.out.println(readQuery + "\n");
+		System.out.println("\n" + readQuery);
 		return readQuery;
 	}
 
@@ -409,7 +409,7 @@ public class CRUDImpl implements ICRUD {
 				}
 			}
 		}
-		System.out.println(readQuery + "\n");
+		System.out.println("\n" + readQuery);
 		return readQuery;
 	}
 
@@ -434,7 +434,7 @@ public class CRUDImpl implements ICRUD {
 		columnValues = columnValues.substring(0, columnValues.length() - 2);
 		String whereCondition = " WHERE " + dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String updateQuery = "UPDATE " + tableName + " SET " + columnValues + whereCondition;
-		System.out.println(updateQuery + "\n");
+		System.out.println("\n" + updateQuery);
 		return updateQuery;
 	}
 
@@ -443,7 +443,7 @@ public class CRUDImpl implements ICRUD {
 		String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 		String columnValue = dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String deleteQuery = "DELETE FROM " + tableName + " WHERE " + columnValue;
-		System.out.println(deleteQuery + "\n");
+		System.out.println("\n" + deleteQuery);
 		return deleteQuery;
 	}
 
@@ -455,7 +455,7 @@ public class CRUDImpl implements ICRUD {
 		String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 		String whereCondition = " WHERE " + dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String checkQuery = "SELECT * FROM " + tableName + whereCondition;
-		System.out.println(checkQuery + "\n");
+		System.out.println("\n" + checkQuery);
 		return checkQuery;
 	}
 
