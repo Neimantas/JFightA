@@ -1,6 +1,7 @@
 package services.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +49,16 @@ public class CacheImpl implements ICache {
 	public Player getPlayer(String userName) {
 		return _players.get(userName);
 	}
+	
+	@Override
+	public Player getPlayer(int userId) {
+		for (Map.Entry<String, Player> player : _players.entrySet()) {
+			if (userId == player.getValue().user.userId) {
+				return player.getValue();
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public void removePlayer(String userName) {
@@ -81,6 +92,11 @@ public class CacheImpl implements ICache {
 
 	public static ICache getInstance() {
 		return _cache;
+	}
+	
+	@Override
+	public Map<String, Player> getLoggedInPlayers() {
+		return new HashMap<>(_players);
 	}
 
 	private void setItem(int itemId) {
@@ -116,5 +132,8 @@ public class CacheImpl implements ICache {
 			}
 		}
 	}
+
+
+
 
 }

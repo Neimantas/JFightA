@@ -1,18 +1,27 @@
 package services.impl;
 
+import java.util.Map;
+
+import models.business.Player;
+import models.business.User;
+import models.constant.ItemType;
 import models.dal.ImageDAL;
+import models.dal.ItemDAL;
 import models.dal.UserDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
+import services.ICache;
 import services.IItem;
 
 public class ItemImpl implements IItem {
 
 	private ICRUD _crud;
+	private ICache _cache;
 
 	public ItemImpl() {
 		_crud = CRUDImpl.getInstance();
+		_cache = CacheImpl.getInstance();
 	}
 
 	/**
@@ -31,31 +40,40 @@ public class ItemImpl implements IItem {
 		return getUserImage(userBId, false);
 	}
 
+	@Override
+	public ObjectDTO<ItemDAL> getItem(int itemId) {
+		// Integer itemId = _cache.getPlayer(userName).character.
+		return null;
+	}
+
+	@Override
+	public Map<ItemType, Integer> getItemPoints(int userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private ObjectDTO<ImageDAL> getUserImage(int userId, boolean userA) {
+		ImageDAL imageDAL = new ImageDAL();
 		ObjectDTO<ImageDAL> imageDTO = new ObjectDTO<>();
-		ListDTO<UserDAL> userListDTO = getUserById(userId);
-		if (userListDTO.success) {
-			ImageDAL imageDAL = new ImageDAL();
-			if (!userListDTO.transferDataList.isEmpty() && userListDTO.transferDataList.get(0).imageId != null) {
-				imageDAL.imageId = userListDTO.transferDataList.get(0).imageId;
+		User user = _cache.getPlayer(userId).user;
+		if (user != null) {
+			if (user.imageId != null) {
+				imageDAL.imageId = user.imageId;
 				ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
 				if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
 					imageListDTOtoImageDTO(imageDTO, imageListDTO);
 					return imageDTO;
-				}
-			} else {
-				imageDAL.imageId = userA ? 1 : 2;
-				ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
-				if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
-					imageListDTOtoImageDTO(imageDTO, imageListDTO);
-					return imageDTO;
-				} else {
-					imageDTO.message = imageListDTO.message;
 				}
 			}
-		}
-		if (imageDTO.message == null) {
-			imageDTO.message = userListDTO.message;
+		} else {
+			imageDAL.imageId = userA ? 1 : 2;
+			ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
+			if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
+				imageListDTOtoImageDTO(imageDTO, imageListDTO);
+				return imageDTO;
+			} else {
+				imageDTO.message = imageListDTO.message;
+			}
 		}
 		return imageDTO;
 	}
@@ -64,13 +82,6 @@ public class ItemImpl implements IItem {
 		imageDTO.transferData = imageListDTO.transferDataList.get(0);
 		imageDTO.message = imageListDTO.message;
 		imageDTO.success = true;
-	}
-
-	private ListDTO<UserDAL> getUserById(int userId) {
-		UserDAL userDAL = new UserDAL();
-		userDAL.userId = userId;
-		ListDTO<UserDAL> listDTO = _crud.read(userDAL);
-		return listDTO;
 	}
 
 }
