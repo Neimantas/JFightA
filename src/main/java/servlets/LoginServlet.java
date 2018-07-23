@@ -8,8 +8,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
 import models.business.User;
 import models.business.UserLoginData;
+import models.dto.PlayerDTO;
+import models.dto.UserDTO;
+import models.dto.UserFrontDTO;
+import services.ILoginService;
 import services.impl.HigherLoginService;
 import services.impl.LoginService;
 
@@ -26,13 +31,13 @@ public class LoginServlet extends HttpServlet {
 	LoginService logService;
 
 	public LoginServlet() {
-		// super();
-		// logService = StartupContainer.easyDI.getInstance(LoginService.class);
+		 super();
+		 logService = StartupContainer.easyDI.getInstance(LoginService.class);
 	}
 
-	// public LoginServlet(LoginService logServiceImpl) {
-	// logService = logServiceImpl;
-	// }
+	 public LoginServlet(LoginService logServiceImpl) {
+	 logService = logServiceImpl;
+	 }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -55,10 +60,14 @@ public class LoginServlet extends HttpServlet {
 		UserLoginData user = new UserLoginData();
 		user.name = userName;
 		user.password = pass;
-		LoginService log = new LoginService();
-		if (log.login(user)._success) {
-			System.out.println("atejo atgal");
-			request.getRequestDispatcher("test.jsp").forward(request, response);
+		PlayerDTO playerDTO=logService.login(response,user);
+		if (playerDTO._success) {
+//			User userWithInfo=userDTO._user;
+//			log.addCookies(response,userWithInfo);
+			request.getRequestDispatcher("News.jsp").forward(request, response);
+		}
+		if(!playerDTO._success) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);	
 		}
 	}
 

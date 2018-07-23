@@ -50,12 +50,12 @@ public class RegistrationServlet extends HttpServlet {
 		userReg.password = pass;
 		userReg.mail = mail;
 		LoginService log = new LoginService();
-		if (log.registration(userReg)._success) {
-			System.out.println("<<<<<<<<<<<<<<<atejo atgal>>>>>>>>>>>>>>>>");
-			System.out.println(userReg.mail);
-			System.out.println(userReg.name);
-			System.out.println("<<<<<<<<<<<<<<<atejo atgal>>>>>>>>>>>>>>>>");
-			request.getRequestDispatcher("test.jsp").forward(request, response);
+		boolean success=log.registration(userReg)._success;
+		if (success) {
+			request.getRequestDispatcher("News.jsp").forward(request, response);
+		}
+		else {
+			request.getRequestDispatcher("registration.jsp").forward(request, response);
 		}
 	}
 

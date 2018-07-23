@@ -1,48 +1,71 @@
 package services.impl;
 
+import javax.servlet.http.Cookie;
+
 import models.business.CharacterInfo;
+import models.business.Player;
 import models.business.User;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.CharacterDAL;
+import models.dal.PlayerDAL;
 import models.dal.UserDAL;
+import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
+import models.dto.PlayerDalDTO;
 import models.dto.UserDTO;
+import services.ICache;
 import services.IHigherLoginService;
 
 public class HigherLoginService implements IHigherLoginService {
 
 	CRUDImpl crud;
+	ICache cashe;
 
 	public HigherLoginService() {
 		crud = new CRUDImpl(new DatabaseImpl());
+		cashe = CacheImpl.getInstance();
 	}
 
 	@Override
-	public UserDTO login(UserLoginData userIn) {
+	public PlayerDalDTO login(UserLoginData userIn) {
 		UserDAL userInDal = new UserDAL();
 		userInDal.name = userIn.name;
 		userInDal.password = userIn.password;
 		ListDTO<UserDAL> userDTO = crud.read(userInDal);
-
-		if (userDTO.success) {
+		// Takes UserDal
+		if (userDTO.success && !userDTO.transferDataList.isEmpty()) {
 			UserDAL userDal = userDTO.transferDataList.get(0);
-			CharacterInfo takeCharacterData = new CharacterInfo();
+			// Makes charDal and fills just userID field, it need to get chat form CRUD
+			CharacterDAL takeCharacterData = new CharacterDAL();
 			takeCharacterData.userId = userDal.userId;
-			return new UserDTO(true, "success", userDal);
+			ListDTO<CharacterDAL> charDTO = crud.read(takeCharacterData);
+			// Takes charDal
+			if (charDTO.success) {
+				CharacterDAL charDal = charDTO.transferDataList.get(0);
+				// Creating PlayerDAL and add char & user
+				PlayerDAL player = new PlayerDAL();
+				player.characterDal = charDal;
+				player.userDal = userDal;
+				return new PlayerDalDTO(true, "success", player);
+			}
+			return new PlayerDalDTO(false, charDTO.message, null);
 		}
-		return new UserDTO(false, userDTO.message, null);
+		return new PlayerDalDTO(false, userDTO.message, null);
 	}
 
 	@Override
-	public UserDTO registration(UserRegIn userRegIn) {
+	public PlayerDalDTO registration(UserRegIn userRegIn) {
+		//Fills new user info
 		UserDAL userInDal = new UserDAL();
 		userInDal.name = userRegIn.name;
 		userInDal.password = userRegIn.password;
 		userInDal.eMail = userRegIn.mail;
+		//Creates new user 
 		ObjectDTO<UserDAL> newUserDto = crud.create(userInDal);
 		if (newUserDto.success) {
+			//Fills new char info
 			UserDAL newUserDal = newUserDto.transferData;
 			CharacterDAL newCharacter = new CharacterDAL();
 			newCharacter.userId = newUserDal.userId;
@@ -50,22 +73,18 @@ public class HigherLoginService implements IHigherLoginService {
 			newCharacter.strenght = 5;
 			newCharacter.experience = 0;
 			newCharacter.level = 1;
-			crud.create(newCharacter);
-			UserLoginData user = new UserLoginData();
-			user.name = userInDal.name;
-			user.password = userInDal.password;
-			UserDTO prilog=login(user);
-			if(prilog._success) {			
-				return new UserDTO(true, "success", prilog._userDal);
+			//Creates mew char
+			ObjectDTO<CharacterDAL> characterCreat = crud.create(newCharacter);
+			if (characterCreat.success) {
+				UserLoginData user = new UserLoginData();
+				user.name = userInDal.name;
+				user.password = userInDal.password;
+				//logins to created user
+				login(user);
+				return new PlayerDalDTO(true, "success",null);
 			}
-			return new UserDTO(false, prilog._message, null);
+			return new PlayerDalDTO(false, characterCreat.message,null);
 		}
-		return new UserDTO(false, newUserDto.message, null);
+		return new PlayerDalDTO(false, newUserDto.message,null);
 	}
-
-	@Override
-	public void logout(User user) {
-		
-	}
-
 }
