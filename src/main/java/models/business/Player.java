@@ -7,7 +7,7 @@ import models.constant.UserStatus;
 public class Player {
 
 	public User user;
-	public Character character;
+	public CharacterInfo character;
 	public UserStatus userStatus;
 	public Date lastActivityTime;
 

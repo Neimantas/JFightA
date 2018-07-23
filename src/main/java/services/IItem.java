@@ -12,6 +12,6 @@ public interface IItem {
 	ObjectDTO<ImageDAL> getUserAImage(int userAId);
 	ObjectDTO<ImageDAL> getUserBImage(int userBId);
 	ObjectDTO<ItemDAL> getItem(int itemId);
-	Map<ItemType, Integer> getItemPoints(int userId);
+	Map<ItemType, ItemDAL> getUserItems(int userId);
 
 }
