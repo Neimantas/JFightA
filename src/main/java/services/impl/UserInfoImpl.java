@@ -28,30 +28,12 @@ public class UserInfoImpl implements IUserInfo {
 
 			_cDAL = dto.transferDataList;
 
-			// List<CharacterDAL> retList = dto.transferDataList;
-			// List<CharacterDAL> list = dto.transferDataList;
-			// for (CharacterDAL c : list) {
-			//
-			// CharacterDAL ret = new CharacterDAL();
-			//
-			// ret.userId = c.userId;
-			// ret.healthPoints = c.healthPoints;
-			// ret.strenght = c.strenght;
-			// ret.experience = c.experience;
-			// ret.level = c.level;
-			// ret.attackItemId = c.attackItemId;
-			// ret.defenceItemId = c.defenceItemId;
-			//
-			// retList.add(ret);
-			// }
-
 			ListDTO<CharacterDAL> retSuccess = new ListDTO();
 			retSuccess.success = true;
 			retSuccess.message = "User exists in DB."; //Needs ENUM
 			retSuccess.transferDataList = _cDAL;
 
 			return retSuccess;
-
 		}
 
 		ListDTO<CharacterDAL> retFailure = new ListDTO();

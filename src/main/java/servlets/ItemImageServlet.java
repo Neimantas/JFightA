@@ -24,7 +24,6 @@ public class ItemImageServlet extends HttpServlet {
 	public ItemImageServlet() {
 		super();
 		 _crud = CRUDImpl.getInstance();
-//		_crud = StartupContainer.easyDI.getInstance(CRUDImpl.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,8 +44,8 @@ public class ItemImageServlet extends HttpServlet {
 			ServletOutputStream servletOutputStream = response.getOutputStream();
 
 			byte[] buffer = new byte[4096];
-			int n = 0;
-			while (-1 != (n = dto.transferDataList.get(0).itemImage.read(buffer, 0, n))) {
+			int n = -1;
+			while ((n = dto.transferDataList.get(0).itemImage.read(buffer)) != -1) {
 				servletOutputStream.write(buffer, 0, n);
 			}
 			response.getOutputStream().close();

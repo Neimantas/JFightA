@@ -19,7 +19,7 @@ public class ItemImageTest {
 		ListDTO<ItemDAL> dto = _crud.read(dal);
 		if(dto.success) {
 			
-			System.out.println(dto.transferDataList.get(0).itemName);
+			System.out.println(dto.transferDataList.get(0).itemImage);
 			
 		}
 		

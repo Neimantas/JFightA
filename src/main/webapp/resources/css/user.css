@@ -1,0 +1,15 @@
+td {
+	text-align: center;
+}
+
+th {
+	text-align: center;
+}
+
+.modal-lg {
+	max-width: 70%;
+}
+
+.modal .modal-body {
+    overflow-x: auto;
+}

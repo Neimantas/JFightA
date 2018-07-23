@@ -28,8 +28,7 @@
 <link rel="stylesheet" type="text/css"
 	href="resources/vendor/select2/select2.min.css">
 <!--===============================================================================================-->
-<link rel="stylesheet" type="text/css" href="resources/css/util.css">
-<link rel="stylesheet" type="text/css" href="resources/css/main.css">
+<link rel="stylesheet" type="text/css" href="resources/css/user.css">
 <!--===============================================================================================-->
 </head>
 <body>
@@ -55,34 +54,74 @@
 			</div>
 		</div>
 		<div class="row mb-1">
-			<div class="col-6 border border-dark rounded text-center py-1">Health
+			<div
+				class="col-md-6 col-sm-12 border border-dark rounded text-center py-1">Health
 				Points: ${healthPoints}</div>
-			<div class="col-6 border border-dark rounded text-center py-1">Strength:
+			<div
+				class="col-md-6 col-sm-12 border border-dark rounded text-center py-1">Strength:
 				${strenght}</div>
 		</div>
 		<div class="row mb-1">
 			<div class="col border border-dark rounded py-1">
-				<%-- <div class="text-center">
-					<img src="imageServlet?id=${userId}" class="rounded" width=100%>
-				</div> --%>
+				<div class="text-center">
+					<img src="imageServlet?id=${userId}&user=a" class="rounded"
+						width=100%>
+				</div>
 			</div>
 		</div>
 		<div class="row mb-1">
 			<div class="col-6 border border-dark rounded py-1">
-				<div class="text-center">
-					<img src="itemImageServlet?itemId=${attackItem}" class="rounded" width=100%>
+				<div class="list-group">
+					<div class="text-center">Attack Item</div>
+					<div class="text-center">
+						<img src="itemImageServlet?itemId=${attackItem}" class="rounded"
+							width=100%>
+					</div>
 				</div>
 			</div>
 			<div class="col-6 border border-dark rounded py-1">
-				<%-- <div class="text-center">
-					<img src="itemImageServlet?itemId=${defenceItem}" class="rounded" width=100%>
-				</div> --%>
+				<div class="list-group">
+					<div class="text-center">Defence Item</div>
+					<div class="text-center">
+						<img src="itemImageServlet?itemId=${defenceItem}" class="rounded"
+							width=100%>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="row mb-1">
 			<div class="col p-0">
-				<button type="button" class="btn btn-outline-dark float-right">Fight
+				<!-- Button trigger modal -->
+				<button type="button" class="btn btn-outline-dark float-right"
+					data-toggle="modal" data-target="#exampleModalLong">Fight
 					history</button>
+
+				<!-- Modal -->
+				<div class="modal fade" id="exampleModalLong" tabindex="-1"
+					role="dialog" aria-labelledby="exampleModalLongTitle"
+					aria-hidden="true">
+					<div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title mx-auto" id="exampleModalLongTitle">UserNameA
+									vs UserNameB</h5>
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<c:forEach items="${tableString}" var="block">
+    								${block}
+								</c:forEach>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -95,9 +134,6 @@
 	<!--===============================================================================================-->
 	<script src="resources/vendor/select2/select2.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="resources/js/main.js"></script>
-	<!--===============================================================================================-->
-	<script src="resources/js/fightPageControls.js"></script>
 
 </body>
 </html>
