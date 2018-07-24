@@ -46,9 +46,6 @@ public class LoginServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		logService.testCashe(request);
-		if(logService.userValidaro(request)) {
-			System.out.println("usersis OK");
-		};
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
