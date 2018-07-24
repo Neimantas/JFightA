@@ -65,18 +65,18 @@ public class HigherLoginService implements IHigherLoginService {
 		userInDal.password = userRegIn.password;
 		userInDal.eMail = userRegIn.mail;
 		//Creates new user 
-		ObjectDTO<UserDAL> newUserDto = crud.create(userInDal);
+		ObjectDTO<Integer> newUserDto = crud.create(userInDal);
 		if (newUserDto.success) {
 			//Fills new char info
-			UserDAL newUserDal = newUserDto.transferData;
+			userInDal.userId = newUserDto.transferData;
 			CharacterDAL newCharacter = new CharacterDAL();
-			newCharacter.userId = newUserDal.userId;
+			newCharacter.userId = newUserDto.transferData;
 			newCharacter.healthPoints = 100;
 			newCharacter.strenght = 5;
 			newCharacter.experience = 0;
 			newCharacter.level = 1;
 			//Creates mew char
-			ObjectDTO<CharacterDAL> characterCreat = crud.create(newCharacter);
+			ObjectDTO<Integer> characterCreat = crud.create(newCharacter);
 			if (characterCreat.success) {
 				UserLoginData user = new UserLoginData();
 				user.name = userInDal.name;

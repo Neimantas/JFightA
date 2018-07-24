@@ -34,13 +34,12 @@ public class CRUDImpl implements ICRUD {
 
 	/**
 	 * Takes all values of a DAL and inserts as a row into database table. Returns
-	 * DTO with DAL inside which represents created row in a database.
+	 * DTO with Integer inside which represents created row PK or FK Id in a
+	 * database.
 	 */
 	@Override
-	public <T> ObjectDTO<T> create(T dal) {
+	public <T> ObjectDTO<Integer> create(T dal) {
 		try {
-			ObjectDTO<T> objectDTO = new ObjectDTO<>();
-
 			Class<?> dalClass = dal.getClass();
 			Field[] dalClassFields = dalClass.getFields();
 			String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
@@ -71,24 +70,24 @@ public class CRUDImpl implements ICRUD {
 				dalId = (Integer) dalClassFields[0].get(dal);
 			}
 
-			dalClassFields[0].set(returnDAL, dalId);
 			preparedStatement.close();
-			returnDAL = read(returnDAL, false).transferDataList.get(0);
 
-			objectDTO.transferData = returnDAL;
+			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
+
+			objectDTO.transferData = dalId;
 			objectDTO.success = true;
 			objectDTO.message = "New " + tableName.replace("`", "") + " row created.";
 
 			return objectDTO;
 		} catch (SQLException e) {
 			_log.writeErrorMessage(e, true);
-			ObjectDTO<T> objectDTO = new ObjectDTO<>();
+			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
 			objectDTO.message = "Database error. " + e.getMessage() + ".";
 			return objectDTO;
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			_log.writeErrorMessage(e, true);
-			ObjectDTO<T> objectDTO = new ObjectDTO<>();
+			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.getMessage() + ".";
 			return objectDTO;
 		} finally {
@@ -122,7 +121,7 @@ public class CRUDImpl implements ICRUD {
 			if (setConnection) {
 				setConnection();
 			}
-			
+
 			PreparedStatement preparedStatement = _connection.prepareStatement(readQuery);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -202,7 +201,8 @@ public class CRUDImpl implements ICRUD {
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
 				dto.message = "Wrong input DAL first field value (should be not null and greater than 0).";
-				_log.writeWarningMessage("CRUD update failed. " + dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
+				_log.writeWarningMessage("CRUD update failed. " + dto.message, true,
+						"Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
 
@@ -211,10 +211,17 @@ public class CRUDImpl implements ICRUD {
 			String checkQuery = createCheckQuery(dal, dalClass, dalClassFields);
 			ListDTO<T> readDTO = read(dal, false, checkQuery);
 
-			if (readDTO.transferDataList.isEmpty()) {
-				dto.message = "CRUD update failed. There are now row in a table with such Id (" + firstFieldValue + ").";
+			if (!readDTO.success) {
+				dto.message = "CRUD update failed on Id check. " + readDTO.message;
 				_log.writeWarningMessage(dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
+			} else {
+				if (readDTO.transferDataList.isEmpty()) {
+					dto.message = "CRUD update failed. There are now row in a table with such Id (" + firstFieldValue
+							+ ").";
+					_log.writeWarningMessage(dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
+					return dto;
+				}
 			}
 
 			String updateQuery = createUpdateQuery(dal, dalClass, dalClassFields);
@@ -229,7 +236,7 @@ public class CRUDImpl implements ICRUD {
 			}
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
-			
+
 			dto.success = true;
 			dto.message = "Update successful.";
 
@@ -267,7 +274,8 @@ public class CRUDImpl implements ICRUD {
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
 				dto.message = "Wrong input DAL first field value (should be not null and greater than 0).";
-				_log.writeWarningMessage("CRUD delete failed. " + dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
+				_log.writeWarningMessage("CRUD delete failed. " + dto.message, true,
+						"Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
 
@@ -277,7 +285,8 @@ public class CRUDImpl implements ICRUD {
 			ListDTO<T> readDTO = read(dal, false, checkQuery);
 
 			if (readDTO.transferDataList.isEmpty()) {
-				dto.message = "CRUD delete failed. There are now row in a table with such Id (" + firstFieldValue + ").";
+				dto.message = "CRUD delete failed. There are now row in a table with such Id (" + firstFieldValue
+						+ ").";
 				_log.writeWarningMessage(dto.message, true, "Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
