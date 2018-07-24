@@ -63,16 +63,16 @@ public class LoggerImpl implements ILogger {
 			dalL.user2Id = userIdB;
 			dalL.log = json.toString();
 
-			ObjectDTO<LogDAL> dtoL = _crud.<LogDAL>create(dalL);
+			_crud.<LogDAL>create(dalL);
 
-			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO();
+			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO<FightDataDAL>();
 			retSuccess.success = true;
-			retSuccess.message = "Good message";
+			retSuccess.message = "Good message"; //needs ENUM
 
 			return retSuccess;
 		}
 
-		ObjectDTO<FightDataDAL> retFailure = new ObjectDTO();
+		ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<FightDataDAL>();
 		retFailure.success = false;
 		retFailure.message = "Error message";
 
@@ -80,56 +80,120 @@ public class LoggerImpl implements ILogger {
 	}
 
 	@Override
-	public ListDTO<FightDataDAL> getLogs(int userIdA, int userIdB) {
+	public ListDTO<String> getLogs(int userIdA, int userIdB) {
 
 		LogDAL dalL = new LogDAL();
 
 		dalL.user1Id = userIdA;
 		dalL.user2Id = userIdB;
 
-		ListDTO<LogDAL> dtoL = _crud.<LogDAL>read(dalL);
-		if (dtoL.success) {
-			List<FightDataDAL> returnList = new ArrayList<>();
-			List<LogDAL> list = dtoL.transferDataList;
-			for (LogDAL l : list) {
-				JSONArray json = new JSONArray(l.log);
+		ListDTO<LogDAL> dtoLog = _crud.<LogDAL>read(dalL);
+		if (dtoLog.success) {
+			
+			List<String> returnList = makeTableFromFightData(dtoLog);
 
-				for (int i = 0; i < json.length(); i++) {
-					JSONObject jsonObj = (JSONObject) json.get(i);
-					FightDataDAL returnDAL = new FightDataDAL();
-
-					returnDAL.round = (Integer) jsonObj.get("r");
-					returnDAL.userId = (Integer) jsonObj.get("u");
-					returnDAL.healthPoints = (Integer) jsonObj.get("hp");
-					returnDAL.damage = (Integer) jsonObj.get("d");
-					returnDAL.attackHead = (Integer) jsonObj.get("ah");
-					returnDAL.attackBody = (Integer) jsonObj.get("ab");
-					returnDAL.attackHands = (Integer) jsonObj.get("ahn");
-					returnDAL.attackLegs = (Integer) jsonObj.get("al");
-					returnDAL.defenceHead = (Integer) jsonObj.get("dh");
-					returnDAL.defenceBody = (Integer) jsonObj.get("db");
-					returnDAL.defenceHands = (Integer) jsonObj.get("dhn");
-					returnDAL.defenceLegs = (Integer) jsonObj.get("dl");
-
-					returnList.add(returnDAL);
-				}
-			}
-
-			ListDTO<FightDataDAL> retSuccess = new ListDTO();
+			ListDTO<String> retSuccess = new ListDTO<String>();
 			retSuccess.success = true;
-			retSuccess.message = "Correct given users.";
+			retSuccess.message = "Correct given users."; //needs ENUM
 			retSuccess.transferDataList = returnList;
 
 			return retSuccess;
 		}
 
-		ListDTO<FightDataDAL> retFailure = new ListDTO();
+		ListDTO<String> retFailure = new ListDTO<String>();
 		retFailure.success = false;
-		retFailure.message = "Error! No such users.";
+		retFailure.message = "Error! No such users."; //needs ENUM
 
 		System.out.println("Failure");
 
 		return retFailure;
 	}
 
+	private List<String> makeTableFromFightData(ListDTO<LogDAL> dtoLog) {
+		List<String> returnList = new ArrayList<>();
+		List<LogDAL> list = dtoLog.transferDataList;
+		for (LogDAL l : list) {
+			JSONArray json = new JSONArray(l.log);
+			
+			String rows = makeAndFillTableRow(json);
+			
+			String table ="						<div class=\"container\">\r\n"
+					+ "									<h6>Fight ID: "+l.fightId+", date of match: "+l.date+"</h6>\r\n"
+					
+					+ "										<table class=\"table-sm table-bordered\">\r\n"
+					+ "											<thead class=\"thead-dark\">\r\n"
+					+ "												<tr>\r\n"
+					+ "													<th scope=\"col\">Round</th>\r\n"
+					+ "													<th scope=\"col\">UserID</th>\r\n"
+					+ "													<th scope=\"col\">Health Points</th>\r\n"
+					+ "													<th scope=\"col\">Damage</th>\r\n"
+					+ "													<th scope=\"col\">Attack Head</th>\r\n"
+					+ "													<th scope=\"col\">Attack Body</th>\r\n"
+					+ "													<th scope=\"col\">Attack Hands</th>\r\n"
+					+ "													<th scope=\"col\">Attack Legs</th>\r\n"
+					+ "													<th scope=\"col\">Defence Head</th>\r\n"
+					+ "													<th scope=\"col\">Defence Body</th>\r\n"
+					+ "													<th scope=\"col\">Defence Hands</th>\r\n"
+					+ "													<th scope=\"col\">Defence Legs</th>\r\n"
+					+ "												</tr>\r\n"
+					+ "											</thead>\r\n"
+					+ "											<tbody>\r\n"
+					+ 												rows
+					+ "											</tbody>\r\n"
+					+ "										</table>\r\n" 
+					+ "								</div>"
+					+ "                            <br>";
+			
+			returnList.add(table);
+		}
+		return returnList;
+	}
+
+	private String makeAndFillTableRow(JSONArray json) {
+		String rows = "";
+		for (int i = 0; i < json.length(); i++) {
+			JSONObject jsonObj = (JSONObject) json.get(i);
+			
+			rows += "													<tr>\r\n" + 
+					"														<th scope=\"row\">"+(Integer) jsonObj.get("r")+"</th>\r\n" + 
+					"														<td>"+(Integer) jsonObj.get("u")+"</td>\r\n" + 
+					"														<td>"+(Integer) jsonObj.get("hp")+"</td>\r\n" + 
+					"														<td>"+(Integer) jsonObj.get("d")+"</td>\r\n" + 
+					"														<td>"+changeATKChar((Integer) jsonObj.get("ah"))+"</td>\r\n" + 
+					"														<td>"+changeATKChar((Integer) jsonObj.get("ab"))+"</td>\r\n" + 
+					"														<td>"+changeATKChar((Integer) jsonObj.get("ahn"))+"</td>\r\n" + 
+					"														<td>"+changeATKChar((Integer) jsonObj.get("al"))+"</td>\r\n" + 
+					"														<td>"+changeDEFChar((Integer) jsonObj.get("dh"))+"</td>\r\n" + 
+					"														<td>"+changeDEFChar((Integer) jsonObj.get("db"))+"</td>\r\n" + 
+					"														<td>"+changeDEFChar((Integer) jsonObj.get("dhn"))+"</td>\r\n" + 
+					"														<td>"+changeDEFChar((Integer) jsonObj.get("dl"))+"</td>\r\n" + 
+					"													</tr>";
+		}
+		return rows;
+	}
+	
+	private String changeATKChar(int a) {
+		String string = null;
+		
+		if(a==1) {
+			string = "ATK";
+		} else {
+			string = "-";
+		}
+		
+		return string;
+	}
+	
+	private String changeDEFChar(int a) {
+		String string = null;
+		
+		if(a==1) {
+			string = "DEF";
+		} else {
+			string = "-";
+		}
+		
+		return string;
+	}
+	
 }

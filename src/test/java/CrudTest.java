@@ -76,12 +76,12 @@ public class CrudTest {
 		itemDAL.attackPoints = 10;
 		itemDAL.defencePoints = 5;
 		
-		ObjectDTO<ItemDAL> uploadDTO = crud.create(itemDAL);
+		ObjectDTO<Integer> uploadDTO = crud.create(itemDAL);
 
 		//update
-		ItemDAL createdItemDAL = uploadDTO.transferData;
-		createdItemDAL.itemType = ItemType.DEFENCE;
-		DTO updateDTO = crud.update(createdItemDAL);
+//		ItemDAL createdItemDAL = uploadDTO.transferData;
+//		createdItemDAL.itemType = ItemType.DEFENCE;
+//		DTO updateDTO = crud.update(createdItemDAL);
 
 		
 	}
@@ -95,9 +95,9 @@ public class CrudTest {
 		imageDAL.image = Files.readAllBytes(file.toPath());
 		imageDAL.userId = 8;
 
-		ObjectDTO<ImageDAL> uploadDTO = crud.create(imageDAL);
+		ObjectDTO<Integer> uploadDTO = crud.create(imageDAL);
 
-		int newImageId = uploadDTO.transferData.imageId;
+		int newImageId = uploadDTO.transferData;
 
 		// update image
 		File updateFile = new File("src\\main\\webapp\\resources\\images\\characters\\default2.jpg");

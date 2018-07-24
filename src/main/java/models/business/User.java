@@ -7,5 +7,4 @@ public class User {
 	public String cookiesValue;
 	public String eMail;
 	public Integer imageId;
-
 }
