@@ -27,7 +27,7 @@ public class LogImpl implements ILog {
 	}
 
 	@Override
-	public synchronized void writeErrorMessage(Exception e, boolean allowWriteToConsole, String... additionalMessages) {
+	public void writeErrorMessage(Exception e, boolean allowWriteToConsole, String... additionalMessages) {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println(e.toString());
 		}
@@ -51,7 +51,7 @@ public class LogImpl implements ILog {
 	}
 
 	@Override
-	public synchronized void writeWarningMessage(String message, boolean allowWriteToConsole,
+	public void writeWarningMessage(String message, boolean allowWriteToConsole,
 			String... additionalMessages) {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println("[WARNING] " + message);

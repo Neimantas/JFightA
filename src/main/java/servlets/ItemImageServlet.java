@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -10,59 +9,50 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
-import models.dal.ImageDAL;
-import models.dto.ObjectDTO;
-import services.IItem;
+import models.dal.ItemDAL;
+import models.dto.ListDTO;
+import services.ICRUD;
+import services.impl.CRUDImpl;
 import services.impl.ItemImpl;
 
-@WebServlet(urlPatterns = "/imageServlet")
-public class ImageServlet extends HttpServlet {
+@WebServlet("/itemImageServlet")
+public class ItemImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private IItem _item;
+	private ICRUD _crud;
 
-	public ImageServlet() {
-		_item = StartupContainer.easyDI.getInstance(ItemImpl.class);
+	public ItemImageServlet() {
+		super();
+		 _crud = CRUDImpl.getInstance();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String id = request.getParameter("id");
-		String user = request.getParameter("user");
+		ItemDAL dal = new ItemDAL();
 
-		if (id == null) {
-			id = "0";
-		}
+		dal.itemId = Integer.parseInt(request.getParameter("itemId"));
 
-		ObjectDTO<ImageDAL> objectDTO;
-		if (user != null && user.equalsIgnoreCase("b")) {
-			objectDTO = _item.getUserBImage(Integer.parseInt(id));
-		} else {
-			objectDTO = _item.getUserAImage(Integer.parseInt(id));
-		}
+		ListDTO<ItemDAL> dto = _crud.read(dal);
+		if (dto.success && dto.transferDataList != null) {
 
-		if (objectDTO.success && objectDTO.transferData != null) {
-
-			String imageFormat = objectDTO.transferData.imageName
-					.substring(objectDTO.transferData.imageName.lastIndexOf(".") + 1);
+			String imageFormat = dto.transferDataList.get(0).itemName
+					.substring(dto.transferDataList.get(0).itemName.lastIndexOf(".") + 1);
 
 			response.setContentType("image/" + imageFormat);
 
 			ServletOutputStream servletOutputStream = response.getOutputStream();
-			servletOutputStream.write(objectDTO.transferData.image);
+
+			servletOutputStream.write(dto.transferDataList.get(0).itemImage);
 			response.getOutputStream().close();
-			
 		} else {
-			response.getWriter().println(objectDTO.message);
+			response.getWriter().println(dto.message);
 			response.getWriter().close();
 		}
-
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
 	}
-
 }

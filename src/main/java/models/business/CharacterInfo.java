@@ -1,11 +1,12 @@
 package models.business;
 
-public class Character {
+public class CharacterInfo {
 	
 	public Integer userId;
 	public Integer healthPoints;
 	public Integer strenght;
 	public Integer experience;
 	public Integer level;
-	
+	public Integer attackItemId;
+	public Integer defenceItemId;
 }
