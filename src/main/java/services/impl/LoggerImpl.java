@@ -63,7 +63,7 @@ public class LoggerImpl implements ILogger {
 			dalL.user2Id = userIdB;
 			dalL.log = json.toString();
 
-			ObjectDTO<LogDAL> dtoL = _crud.<LogDAL>create(dalL);
+			ObjectDTO<Integer> dtoL = _crud.<LogDAL>create(dalL);
 
 			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO();
 			retSuccess.success = true;
