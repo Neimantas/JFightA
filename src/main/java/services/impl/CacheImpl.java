@@ -10,10 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import models.business.Player;
 import models.constant.Settings;
 import models.dal.ItemDAL;
-import models.dto.ListDTO;
-import services.ICRUD;
 import services.ICache;
-import services.ILog;
 
 public class CacheImpl implements ICache {
 	private static ICache _cache = new CacheImpl();
@@ -51,28 +48,13 @@ public class CacheImpl implements ICache {
 	}
 
 	@Override
-	public Player getPlayer(String userName) {
-		for (Map.Entry<Integer, Player> player : _players.entrySet()) {
-			if (userName.equals(player.getValue().user.name)) {
-				return player.getValue();
-			}
-		}
-		return null;
+	public Map<Integer, Player> getPlayers() {
+		return new HashMap<>(_players);
 	}
 
 	@Override
 	public Set<Player> getReadyPlayersList() {
 		return _readyPlayers;
-	}
-
-	@Override
-	public boolean containsPlayer(String userName) {
-		for (Map.Entry<Integer, Player> player : _players.entrySet()) {
-			if (userName.equals(player.getValue().user.name)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override

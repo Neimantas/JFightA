@@ -9,4 +9,5 @@ public class Player {
 	public CharacterInfo characterInfo;
 	public UserStatus userStatus;
 	public Date lastActivityTime;
+	
 }

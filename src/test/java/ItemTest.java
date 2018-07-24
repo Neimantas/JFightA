@@ -42,7 +42,7 @@ public class ItemTest {
 		
 		Player player = new Player();
 		player.user = user;
-		player.character = characterInfo;
+		player.characterInfo = characterInfo;
 		player.userStatus = UserStatus.NOT_READY;
 		
 		cache.addPlayer(player.user.userId, player);
