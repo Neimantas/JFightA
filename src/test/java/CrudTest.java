@@ -9,6 +9,7 @@ import java.nio.file.Files;
 
 import models.constant.ItemType;
 import models.dal.CharacterDAL;
+import models.dal.FightDataDAL;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dal.ResultDAL;
@@ -52,6 +53,11 @@ public class CrudTest {
 //		ImageDAL imageDAL = new ImageDAL();
 //		imageDAL.imageId = 11;
 //		crud.delete(imageDAL);
+		
+		FightDataDAL fdal = new FightDataDAL();
+		fdal.fightId = 2;
+		ListDTO<FightDataDAL> ldto = crud.read(fdal);
+		System.out.println(ldto.transferDataList.get(0).damage);
 
 	}
 	
