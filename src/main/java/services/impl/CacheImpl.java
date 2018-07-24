@@ -32,13 +32,13 @@ public class CacheImpl implements ICache {
 	@Override
 	public void addPlayer(String userName, Player player) {
 		_players.put(userName, player);
-		if (player.character.AttackItemId != null) {
-			setItem(player.character.AttackItemId);
+		if (player.characterInfo.AttackItemId != null) {
+			setItem(player.characterInfo.AttackItemId);
 		} else {
 			setItem(1);
 		}
-		if (player.character.DefenceItemId != null) {
-			setItem(player.character.DefenceItemId);
+		if (player.characterInfo.DefenceItemId != null) {
+			setItem(player.characterInfo.DefenceItemId);
 		} else {
 			setItem(2);
 		}
@@ -51,13 +51,13 @@ public class CacheImpl implements ICache {
 
 	@Override
 	public void removePlayer(String userName) {
-		if (_players.get(userName).character.AttackItemId != null) {
-			removeItem(_players.get(userName).character.AttackItemId);
+		if (_players.get(userName).characterInfo.AttackItemId != null) {
+			removeItem(_players.get(userName).characterInfo.AttackItemId);
 		} else {
 			removeItem(1);
 		}
-		if (_players.get(userName).character.DefenceItemId != null) {
-			removeItem(_players.get(userName).character.DefenceItemId);
+		if (_players.get(userName).characterInfo.DefenceItemId != null) {
+			removeItem(_players.get(userName).characterInfo.DefenceItemId);
 		} else {
 			removeItem(2);
 		}
