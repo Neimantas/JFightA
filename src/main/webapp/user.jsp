@@ -1,4 +1,3 @@
-
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,32 +31,36 @@
 <!--===============================================================================================-->
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-		<a class="navbar-brand mb-0 h1" href="#">JFight</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse"
-			data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
-			aria-expanded="false" aria-label="Toggle navigation">
+	<nav class="navbar navbar-expand-sm navbar-dark bg-dark flex-row">
+		<a class="navbar-brand mr-auto mb-0 h1" href="/JFight/News">JFight</a>
+		<ul class="navbar-nav flex-row mr-lg-0">
+			<li class="nav-item dropdown"><a
+				class="nav-link dropdown-toggle mr-3 mr-lg-0"
+				id="navbarDropdownMenuLink" data-toggle="dropdown"
+				aria-haspopup="true" aria-expanded="false"><i
+					class="fa fa-user-circle" aria-hidden="true"></i>Username<span
+					class="caret"></span> </a>
+				<div class="dropdown-menu dropdown-menu-right"
+					aria-labelledby="navbarDropdownMenuLink">
+					<a class="dropdown-item" href="/JFight/user?userId=5">Character
+						Info</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href=""><i class="fa fa-sign-out"
+						aria-hidden="true"></i>Logout</a>
+				</div></li>
+		</ul>
+		<button class="navbar-toggler ml-lg-0" type="button"
+			data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<div class="collapse navbar-collapse" id="navbarNavDropdown">
-			<ul class="navbar-nav w-100">
-				<li class="nav-item active"><a class="nav-link" href="#">Home
-				</a></li>
-				<li class="nav-item"><a class="nav-link disabled" href="#">Item
-						Shop</a></li>
-				<li class="nav-item dropdown ml-auto"><a
-					class="nav-link dropdown-toggle" href="#"
-					id="navbarDropdownMenuLink" data-toggle="dropdown"
-					aria-haspopup="true" aria-expanded="false"> <i
-						class="fa fa-user-circle" aria-hidden="true"></i>Username
-				</a>
-					<div class="dropdown-menu dropdown-menu-right"
-						aria-labelledby="navbarDropdownMenuLink">
-						<a class="dropdown-item" href="#">Character Info</a>
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#"><i class="fa fa-sign-out"
-							aria-hidden="true"></i> Logout</a>
-					</div></li>
+	</nav>
+	<nav class="navbar navbar-expand-md navbar-light py-md-0">
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav ml-1">
+				<li class="nav-item mx-2"><a class="nav-link" href="/JFight/News">Home</a></li>
+				<li class="nav-item mx-2"><a class="nav-link disabled" href="">Items</a></li>
 			</ul>
 		</div>
 	</nav>
@@ -67,7 +70,8 @@
 			<div class="col-lg-5 col-md-12 mx-lg-1">
 				<div class="row mb-1">
 					<div
-						class="col border border-dark rounded font-weight-bold text-center py-1">Username ${userId}</div>
+						class="col border border-dark rounded font-weight-bold text-center py-1">Username
+						${userId}</div>
 				</div>
 				<div class="row mb-1">
 					<div class="col border border-dark rounded text-center py-1">Level:
@@ -96,8 +100,10 @@
 					</div>
 				</div>
 				<div class="row mb-1">
-					<div class="col border border-dark rounded text-center py-1">Strength:
-						${strenght}</div>
+					<div class="col border border-dark rounded text-center py-1">
+						<div class="col-12 font-weight-bold">Character Stats</div>
+						<div class="col-12">Strength: ${strenght}</div>
+						</div>
 				</div>
 			</div>
 			<div class="col-lg col-md-12">
@@ -134,9 +140,9 @@
 		<div class="row mb-1">
 			<div class="col p-0">
 				<!-- Button trigger modal -->
-				<button type="button" class="btn btn-outline-dark float-right"
+				<button type="button" class="btn btn-dark float-right"
 					data-toggle="modal" data-target="#exampleModalLong">Fight
-					history</button>
+					Log</button>
 
 				<!-- Modal -->
 				<div class="modal fade" id="exampleModalLong" tabindex="-1"
@@ -145,8 +151,8 @@
 					<div class="modal-dialog modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title mx-auto" id="exampleModalLongTitle">UserNameA
-									vs UserNameB</h5>
+								<h5 class="modal-title mx-auto" id="exampleModalLongTitle">Fight
+									History</h5>
 								<button type="button" class="close" data-dismiss="modal"
 									aria-label="Close">
 									<span aria-hidden="true">&times;</span>
@@ -158,8 +164,7 @@
 								</c:forEach>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary"
-									data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
 							</div>
 						</div>
 					</div>

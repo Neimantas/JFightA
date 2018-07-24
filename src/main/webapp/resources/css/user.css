@@ -11,5 +11,9 @@ th {
 }
 
 .modal .modal-body {
-    overflow-x: auto;
+	overflow-x: auto;
+}
+
+.navbar-expand-sm .navbar-nav .dropdown-menu {
+    position: absolute !important;
 }
