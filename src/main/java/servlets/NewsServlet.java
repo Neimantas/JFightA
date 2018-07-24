@@ -28,6 +28,11 @@ public class NewsServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 
+		//Check GUID if user is valid, get his UserName
+		
+		
+		
+		
 		String param = request.getParameter("button");
 		if (param != null) {
 
