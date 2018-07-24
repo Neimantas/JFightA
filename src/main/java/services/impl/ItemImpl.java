@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import models.business.Player;
-import models.business.User;
+
 import models.constant.ItemType;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dal.UserDAL;
+import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
@@ -145,6 +146,50 @@ public class ItemImpl implements IItem {
 		} else {
 			return getItem(itemId).transferData;
 		}
+	}
+
+	@Override
+	public ObjectDTO<Integer> addImage(int userId, String imageName, byte[] image) {
+		ImageDAL imageDAL = new ImageDAL();
+		imageDAL.userId = userId;
+		imageDAL.imageName = imageName;
+		imageDAL.image = image;
+		ObjectDTO<Integer> imageDTO = _crud.create(imageDAL);
+		if (imageDTO.success) {
+			UserDAL userDAL = new UserDAL();
+			userDAL.userId = userId;
+			ListDTO<UserDAL> userListDTO = _crud.read(userDAL);
+			if (userListDTO.success && !userListDTO.transferDataList.isEmpty()) {
+				userDAL = userListDTO.transferDataList.get(0);
+				userDAL.imageId = imageDTO.transferData;
+				DTO dto = _crud.update(userDAL);
+				if (dto.success) {
+					return imageDTO;
+				}
+			}
+		} else {
+			return imageDTO;
+		}
+		
+		return null;
+	}
+
+	@Override
+	public DTO editImage(int userId, String imageName, byte[] image) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DTO editDefaultImage(int imageId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DTO deleteImage(int userId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
