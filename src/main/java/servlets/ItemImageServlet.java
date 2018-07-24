@@ -43,11 +43,7 @@ public class ItemImageServlet extends HttpServlet {
 
 			ServletOutputStream servletOutputStream = response.getOutputStream();
 
-			byte[] buffer = new byte[4096];
-			int n = -1;
-			while ((n = dto.transferDataList.get(0).itemImage.read(buffer)) != -1) {
-				servletOutputStream.write(buffer, 0, n);
-			}
+			servletOutputStream.write(dto.transferDataList.get(0).itemImage);
 			response.getOutputStream().close();
 		} else {
 			response.getWriter().println(dto.message);
