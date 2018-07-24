@@ -45,8 +45,8 @@
 </div>
 <div>
 	<div class = "leftcolumn">
-Online players. Get it somehow
-	
+		<c:forEach items="${readyUsers}"></c:forEach>
+		<button class="btn-default" id="refresh" onclick="refresh()">Refresh</button>
 	</div>
 	<div class = "rightcolumn">
 		<div class="textField">
