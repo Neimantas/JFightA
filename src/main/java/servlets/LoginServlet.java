@@ -8,7 +8,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
 import models.business.User;
+import models.business.UserLoginData;
+import models.dto.PlayerDTO;
+import models.dto.UserDTO;
+import models.dto.UserFrontDTO;
+import services.ILoginService;
+import services.impl.HigherLoginService;
 import services.impl.LoginService;
 
 /**
@@ -21,10 +28,16 @@ public class LoginServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
+	LoginService logService;
+
 	public LoginServlet() {
-		super();
-		// TODO Auto-generated constructor stub
+		 super();
+		 logService = StartupContainer.easyDI.getInstance(LoginService.class);
 	}
+
+	 public LoginServlet(LoginService logServiceImpl) {
+	 logService = logServiceImpl;
+	 }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -32,36 +45,30 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		logService.testCashe(request);
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * This one takes, user login info from index.jsp form and sends it to login server that gives response
-	 *  if user User Name and password is valid if they are valid refers to Users page(now to test.jsp) with user id data
+	 * This one takes, user login info from index.jsp form and sends it to login
+	 * server that gives response if user User Name and password is valid if they
+	 * are valid refers to Users page(now to test.jsp) with user id data
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		logService.testCashe(request);
 		String userName = request.getParameter("username");
 		String pass = request.getParameter("pass");
-
-		User user = new User();
-		user.name = request.getParameter("username");
-		user.password = request.getParameter("pass");
-
-		LoginService login = new LoginService();
-
-		// System.out.println("User name "+userName+" paswordas:"+pass);
-		// request.setAttribute("userName",userName);
-//		if (login.login(userName, pass) == true) {
-//			System.out.println("pateko i true");
-//			request.getRequestDispatcher("test.jsp").forward(request, response);
-//		}
-//		if (login.login(userName, pass) != true) {
-//			System.out.println("pateko i false");
-//			request.getRequestDispatcher("index.jsp");
-
-//		}
-
+		UserLoginData user = new UserLoginData();
+		user.name = userName;
+		user.password = pass;
+		PlayerDTO playerDTO=logService.login(response,user);
+		if (playerDTO._success) {
+			request.getRequestDispatcher("News.jsp").forward(request, response);
+		}
+		if(!playerDTO._success) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);	
+		}
 	}
 
 }

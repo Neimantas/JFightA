@@ -19,6 +19,7 @@ public class LogImpl implements ILog {
 	private SimpleDateFormat _simpleDateFormat;
 	private SimpleDateFormat _simpleDateAndTimeFormat;
 	private static Boolean _allowWriteToConsoleGlobal = Settings.WRITE_LOGS_TO_CONSOLE;
+	private static String _logDirectory = Settings.LOG_DIRECTORY;
 
 	private LogImpl() {
 		_simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -26,12 +27,11 @@ public class LogImpl implements ILog {
 	}
 
 	@Override
-	public synchronized void writeErrorMessage(Exception e, boolean allowWriteToConsole, String... additionalMessages) {
+	public void writeErrorMessage(Exception e, boolean allowWriteToConsole, String... additionalMessages) {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println(e.toString());
 		}
-		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
-		try (FileWriter fw = new FileWriter(fileName, true);
+		try (FileWriter fw = new FileWriter(createLogLocation(), true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
@@ -48,17 +48,15 @@ public class LogImpl implements ILog {
 		} catch (IOException io) {
 			System.out.println(io.toString());
 		}
-
 	}
 
 	@Override
-	public synchronized void writeWarningMessage(String message, boolean allowWriteToConsole,
+	public void writeWarningMessage(String message, boolean allowWriteToConsole,
 			String... additionalMessages) {
 		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
 			System.out.println("[WARNING] " + message);
 		}
-		String fileName = "log\\" + _simpleDateFormat.format(new Date()) + ".log";
-		try (FileWriter fw = new FileWriter(fileName, true);
+		try (FileWriter fw = new FileWriter(createLogLocation(), true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(System.getProperty("line.separator")
@@ -72,30 +70,43 @@ public class LogImpl implements ILog {
 		} catch (IOException io) {
 			System.out.println(io.toString());
 		}
-
 	}
 
 	@Override
 	public String getLog(Date date) {
-		String fileName = "log\\" + _simpleDateFormat.format(date) + ".log";
-		File file = new File(fileName);
+		File file = new File(getLogLocationByDate(date));
 		if (file.exists()) {
-			String returnString = "";
+
 			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+				String returnString = "";
 				String line;
 				while ((line = bufferedReader.readLine()) != null) {
 					returnString += line + "\n";
 				}
+				if (returnString.equals("")) {
+					return "Log file is empty.";
+				}
+				return returnString;
 			} catch (IOException e) {
 				return e.toString();
 			}
-			if (returnString.equals("")) {
-				return "Log file is empty.";
-			}
-			return returnString;
+
 		} else {
 			return "There are no logs at a current date.";
 		}
+	}
+
+	public static ILog getInstance() {
+		return _log;
+	}
+
+	private String createLogLocation() {
+		new File(_logDirectory).mkdirs();
+		return _logDirectory + _simpleDateFormat.format(new Date()) + ".log";
+	}
+
+	private String getLogLocationByDate(Date date) {
+		return _logDirectory + _simpleDateFormat.format(date) + ".log";
 	}
 
 	private String createAdditionalMessage(String... additionalMessages) {
@@ -104,10 +115,6 @@ public class LogImpl implements ILog {
 			additionalMessage += additionalMessages[i] + ", ";
 		}
 		return additionalMessage.substring(0, additionalMessage.length() - 2);
-	}
-
-	public static ILog getInstance() {
-		return _log;
 	}
 
 }

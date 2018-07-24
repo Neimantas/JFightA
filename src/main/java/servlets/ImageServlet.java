@@ -36,10 +36,10 @@ public class ImageServlet extends HttpServlet {
 		}
 
 		ObjectDTO<ImageDAL> objectDTO;
-		if (user.equalsIgnoreCase("a")) {
-			objectDTO = _item.getUserAImage(Integer.parseInt(id));
-		} else {
+		if (user != null && user.equalsIgnoreCase("b")) {
 			objectDTO = _item.getUserBImage(Integer.parseInt(id));
+		} else {
+			objectDTO = _item.getUserAImage(Integer.parseInt(id));
 		}
 
 		if (objectDTO.success && objectDTO.transferData != null) {
@@ -50,14 +50,9 @@ public class ImageServlet extends HttpServlet {
 			response.setContentType("image/" + imageFormat);
 
 			ServletOutputStream servletOutputStream = response.getOutputStream();
-
-			byte[] buffer = new byte[4096];
-			int n = 0;
-			while (-1 != (n = objectDTO.transferData.image.read(buffer))) {
-				servletOutputStream.write(buffer, 0, n);
-			}
-
+			servletOutputStream.write(objectDTO.transferData.image);
 			response.getOutputStream().close();
+			
 		} else {
 			response.getWriter().println(objectDTO.message);
 			response.getWriter().close();
