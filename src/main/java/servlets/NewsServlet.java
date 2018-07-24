@@ -27,29 +27,42 @@ public class NewsServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
-		System.out.println("news servelt click");
-		String param = request.getParameter("button");
 
+		//Check GUID if user is valid, get his UserName
+		
+		
+		
+		
+		String param = request.getParameter("button");
 		if (param != null) {
 
 			if (param.equals("logout")) {
-
+				System.out.println("doing logout");
 				// request.setAttribute("button", param);
 				request.getRequestDispatcher("index.jsp").forward(request, response);
 			}
-			if (param.equals("ready")) {
-				
-				System.out.println("Ready btn click");
-				request.setAttribute("ReadyMessage", "YOU ARE READY");
-				request.getRequestDispatcher("News.jsp").forward(request, response);
-			//	request.getRequestDispatcher("fight.jsp").forward(request, response);
-			}
+
 			if (param.equals("play")) {
+				System.out.println("doing play");
 				request.getRequestDispatcher("fight.jsp").forward(request, response);
 			}
 
-		} else {
+		}
+
+		// from url parameter get value and convert it to boolean.
+		Boolean ready = request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
+
+		if (ready == false) {
+
+			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
+
 			request.getRequestDispatcher("News.jsp").forward(request, response);
+
+		} else if(ready == true) {
+			request.setAttribute("ReadyMessage", "YOU ARE READY");
+			
+			request.getRequestDispatcher("News.jsp").forward(request, response);
+
 		}
 
 		// }
@@ -64,22 +77,8 @@ public class NewsServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		System.out.println("news servelt click");
-		
-		String param = request.getParameter("button");
-		if (param.equals("ready")) {
-			
-			System.out.println("Ready btn click");
-			request.setAttribute("ReadyMessage", "You are ready");
-			request.getRequestDispatcher("fight.jsp").forward(request, response);
-		}
-		else if (param.equals("logout")) {
+		request.getRequestDispatcher("News.jsp").forward(request, response);
 
-			request.setAttribute("button", param);
-			request.getRequestDispatcher("index.jsp").forward(request, response);
-		} else {
-			request.getRequestDispatcher("News.jsp").forward(request, response);
-		}
 	}
 
 	// TODO Auto-generated method stub

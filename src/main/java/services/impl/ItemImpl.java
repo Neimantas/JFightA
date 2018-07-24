@@ -94,9 +94,9 @@ public class ItemImpl implements IItem {
 	private ObjectDTO<ImageDAL> getUserImage(int userId, boolean isUserA) {
 		ImageDAL imageDAL = new ImageDAL();
 		ObjectDTO<ImageDAL> imageDTO = new ObjectDTO<>();
-		User user = _cache.getPlayer(userId).user;
-		if (user != null && user.imageId != null) {
-			imageDAL.imageId = user.imageId;
+		Player player = _cache.getPlayer(userId);
+		if (player != null && player.user.imageId != null) {
+			imageDAL.imageId = player.user.imageId;
 			ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
 			if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
 				imageListDTOtoImageDTO(imageDTO, imageListDTO);
