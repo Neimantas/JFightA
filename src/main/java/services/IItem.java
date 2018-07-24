@@ -12,7 +12,7 @@ public interface IItem {
 
 	ObjectDTO<ImageDAL> getUserAImage(int userAId);
 	ObjectDTO<ImageDAL> getUserBImage(int userBId);
-	ObjectDTO<ImageDAL> addImage(int userId, String imageName, byte[] image);
+	ObjectDTO<Integer> addImage(int userId, String imageName, byte[] image);
 	DTO editImage(int userId, String imageName, byte[] image);
 	DTO editDefaultImage(int imageId);
 	DTO deleteImage(int userId);

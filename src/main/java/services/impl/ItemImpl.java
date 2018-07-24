@@ -149,19 +149,19 @@ public class ItemImpl implements IItem {
 	}
 
 	@Override
-	public ObjectDTO<ImageDAL> addImage(int userId, String imageName, byte[] image) {
+	public ObjectDTO<Integer> addImage(int userId, String imageName, byte[] image) {
 		ImageDAL imageDAL = new ImageDAL();
 		imageDAL.userId = userId;
 		imageDAL.imageName = imageName;
 		imageDAL.image = image;
-		ObjectDTO<ImageDAL> imageDTO = _crud.create(imageDAL);
+		ObjectDTO<Integer> imageDTO = _crud.create(imageDAL);
 		if (imageDTO.success) {
 			UserDAL userDAL = new UserDAL();
 			userDAL.userId = userId;
 			ListDTO<UserDAL> userListDTO = _crud.read(userDAL);
 			if (userListDTO.success && !userListDTO.transferDataList.isEmpty()) {
 				userDAL = userListDTO.transferDataList.get(0);
-				userDAL.imageId = imageDTO.transferData.imageId;
+				userDAL.imageId = imageDTO.transferData;
 				DTO dto = _crud.update(userDAL);
 				if (dto.success) {
 					return imageDTO;
