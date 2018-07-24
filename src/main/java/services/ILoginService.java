@@ -14,7 +14,7 @@ public interface ILoginService {
 	PlayerDTO login(HttpServletResponse response,UserLoginData user);
 	UserFrontDTO registration(UserRegIn userRegIn);
 	void addCookies(HttpServletResponse response,User userWithInfo);
-	void aadCashe(Player player, String userName);
+	void aadCashe(Player player, int useId);
 	void logout (User user);
 	String newGuid();
 }

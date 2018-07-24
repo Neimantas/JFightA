@@ -37,6 +37,8 @@ public class LoginService implements ILoginService {
 			userOut.userId = userInDal.userId;
 			userOut.name = userInDal.name;
 			userOut.accessLevel = userInDal.accessLevel;
+			userOut.imageId= userInDal.imageId;
+			userOut.eMail=userInDal.eMail;
 			//Creates new guide and add it to cookies value
 			userOut.cookiesValue=newGuid();
 			addCookies(response,userOut);
@@ -47,14 +49,14 @@ public class LoginService implements ILoginService {
 			charInfo.level=playerDalDto._playerDal.characterDal.level;
 			charInfo.strenght=playerDalDto._playerDal.characterDal.strenght;
 			charInfo.userId=playerDalDto._playerDal.characterDal.userId;
-			charInfo.AttackItemId=playerDalDto._playerDal.characterDal.attackItemId;
-			charInfo.DefenceItemId=playerDalDto._playerDal.characterDal.defenceItemId;
+			charInfo.attackItemId=playerDalDto._playerDal.characterDal.attackItemId;
+			charInfo.defenceItemId=playerDalDto._playerDal.characterDal.defenceItemId;
 			//adds user and character to player
 			Player player = new Player();	
 			player.characterInfo=charInfo;
 			player.user=userOut;
 			//add player to cache
-			aadCashe(player, userOut.name);
+			aadCashe(player, userOut.userId);
 			return new PlayerDTO(true, "success", player);
 		}
 		return new PlayerDTO(false, playerDalDto._message, null);
@@ -87,7 +89,7 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public void aadCashe(Player player, String userName) {
-		cashe.addPlayer(userName, player);
+	public void aadCashe(Player player, int userId) {
+		cashe.addPlayer(userId, player);
 	}
 }

@@ -5,4 +5,7 @@ public class User {
 	public String name;
 	public Integer accessLevel;
 	public String cookiesValue;
+	public String eMail;
+	public Integer imageId;
+
 }

@@ -7,11 +7,14 @@ import models.dal.ItemDAL;
 
 public interface ICache {
 
-	void addPlayer(String userName, Player player);
+	void addPlayer(int userId, Player player);
+	void removePlayer(int userId);
+	Player getPlayer(int userId);
 	Player getPlayer(String userName);
-	void removePlayer(String userName);
 	Set<Player> getReadyPlayersList();
 	boolean containsPlayer(String userName);
+	void addItem(ItemDAL itemDAL);
+	void removeItem(int itemId);
 	ItemDAL getItem(int itemId);
 
 }
