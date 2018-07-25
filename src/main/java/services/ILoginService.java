@@ -2,7 +2,6 @@ package services;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import models.business.Player;
 import models.business.User;
 import models.business.UserLoginData;
@@ -15,6 +14,7 @@ public interface ILoginService {
 	UserFrontDTO registration(UserRegIn userRegIn);
 	void addCookies(HttpServletResponse response,User userWithInfo);
 	void aadCashe(Player player, int useId);
+	boolean userValidator (HttpServletRequest request);
 	void logout (User user);
 	String newGuid();
 }
