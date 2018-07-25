@@ -15,8 +15,8 @@ public class FightEngineImpl implements IFightEngine {
 	
 	private ICRUD _crud;
 
-	public FightEngineImpl() {
-		_crud = CRUDImpl.getInstance();
+	public FightEngineImpl(CRUDImpl crud) {
+		_crud = crud;
 	}
 	
 	@Override

@@ -30,10 +30,9 @@ public class LoginService implements ILoginService {
 
 	@Override
 	public PlayerDTO login(HttpServletResponse response, UserLoginData userIn) {
-		HigherLoginService hlog = new HigherLoginService();
 		User userOut = new User();
 		// Get player form hService
-		PlayerDalDTO playerDalDto = hlog.login(userIn);
+		PlayerDalDTO playerDalDto = hService.login(userIn);
 		if (playerDalDto._success) {
 			UserDAL userInDal = playerDalDto._playerDal.userDal;
 			// Transforms userDal to user
@@ -95,18 +94,19 @@ public class LoginService implements ILoginService {
 		cashe.addPlayer(userId, player);
 	}
 
-//	public void testCashe(HttpServletRequest request) {
-//		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
-//			System.out.println(entry.getKey() + ">>>>>>>>>>>>>> user name " + entry.getValue().user.name
-//					+ " cookies value " + entry.getValue().user.cookiesValue);
-//		}
-//		Cookie[] cookies = request.getCookies();
-//		for (int i = 0; i < cookies.length; i++) {
-//			String name = cookies[i].getName();
-//			String value = cookies[i].getValue();
-//			System.out.println("cookie name " + name + " value " + value);
-//		}
-//	}
+	// public void testCashe(HttpServletRequest request) {
+	// for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+	// System.out.println(entry.getKey() + ">>>>>>>>>>>>>> user name " +
+	// entry.getValue().user.name
+	// + " cookies value " + entry.getValue().user.cookiesValue);
+	// }
+	// Cookie[] cookies = request.getCookies();
+	// for (int i = 0; i < cookies.length; i++) {
+	// String name = cookies[i].getName();
+	// String value = cookies[i].getValue();
+	// System.out.println("cookie name " + name + " value " + value);
+	// }
+	// }
 
 	@Override
 	public boolean userValidator(HttpServletRequest request) {
@@ -122,8 +122,6 @@ public class LoginService implements ILoginService {
 				return true;
 			}
 		}
-		request.getRequestDispatcher("index.jsp");
 		return false;
 	}
 }
-
