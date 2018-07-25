@@ -1,0 +1,19 @@
+td {
+	text-align: center;
+}
+
+th {
+	text-align: center;
+}
+
+.modal-lg {
+	max-width: 70%;
+}
+
+.modal .modal-body {
+	overflow-x: auto;
+}
+
+.navbar-expand-sm .navbar-nav .dropdown-menu {
+    position: absolute !important;
+}
