@@ -13,6 +13,7 @@ import models.dal.ItemDAL;
 import models.dto.ListDTO;
 import services.ICRUD;
 import services.impl.CRUDImpl;
+import services.impl.FightEngineImpl;
 import services.impl.ItemImpl;
 
 @WebServlet("/itemImageServlet")
@@ -22,8 +23,7 @@ public class ItemImageServlet extends HttpServlet {
 	private ICRUD _crud;
 
 	public ItemImageServlet() {
-		super();
-		 _crud = CRUDImpl.getInstance();
+		_crud = StartupContainer.easyDI.getInstance(CRUDImpl.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)

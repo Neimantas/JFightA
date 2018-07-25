@@ -21,14 +21,13 @@ import services.IDatabase;
 import services.ILog;
 
 public class CRUDImpl implements ICRUD {
-	private static ICRUD _crud = new CRUDImpl();
 
 	private IDatabase _database;
 	private Connection _connection;
 	private ILog _log;
 
-	private CRUDImpl() {
-		_database = DatabaseImpl.getInstance();
+	public CRUDImpl(DatabaseImpl database) {
+		_database = database;
 		_log = LogImpl.getInstance();
 	}
 
@@ -315,10 +314,6 @@ public class CRUDImpl implements ICRUD {
 		} finally {
 			closeConnection();
 		}
-	}
-
-	public static ICRUD getInstance() {
-		return _crud;
 	}
 
 	private void setConnection()

@@ -10,11 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
 import models.dal.CharacterDAL;
 import models.dal.FightDataDAL;
 import models.dto.ListDTO;
 import services.ILogger;
 import services.IUserInfo;
+import services.impl.CRUDImpl;
 import services.impl.LoggerImpl;
 import services.impl.UserInfoImpl;
 
@@ -28,10 +30,9 @@ public class UserServlet extends HttpServlet {
 	private ILogger _logger;
 
 	public UserServlet() {
-		super();
-		_userInfo = new UserInfoImpl();
-		_character = new CharacterDAL();
-		_logger = new LoggerImpl();
+		_userInfo = StartupContainer.easyDI.getInstance(UserInfoImpl.class);
+		_character = StartupContainer.easyDI.getInstance(CharacterDAL.class);
+		_logger = StartupContainer.easyDI.getInstance(LoggerImpl.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -12,8 +12,8 @@ public class UserInfoImpl implements IUserInfo {
 	private ICRUD _crud;
 	private List<CharacterDAL> _cDAL;
 
-	public UserInfoImpl() {
-		_crud = CRUDImpl.getInstance();
+	public UserInfoImpl(CRUDImpl crud) {
+		_crud = crud;
 	}
 
 	@Override

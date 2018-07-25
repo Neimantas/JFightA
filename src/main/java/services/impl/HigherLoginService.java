@@ -25,8 +25,8 @@ public class HigherLoginService implements IHigherLoginService {
 	ICRUD crud;
 	ICache cashe;
 
-	public HigherLoginService() {
-		crud = CRUDImpl.getInstance();
+	public HigherLoginService(CRUDImpl inputCrud) {
+		crud = inputCrud;
 		cashe = CacheImpl.getInstance();
 	}
 
