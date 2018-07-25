@@ -95,16 +95,35 @@ public class LoginService implements ILoginService {
 		cashe.addPlayer(userId, player);
 	}
 
-	public void testCashe(HttpServletRequest request) {
-		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet())
-		{
-		    System.out.println(entry.getKey() + ">>>>>>>>>>>>>> user name " + entry.getValue().user.name+" cookies value "+entry.getValue().user.cookiesValue);
-		}
+//	public void testCashe(HttpServletRequest request) {
+//		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+//			System.out.println(entry.getKey() + ">>>>>>>>>>>>>> user name " + entry.getValue().user.name
+//					+ " cookies value " + entry.getValue().user.cookiesValue);
+//		}
+//		Cookie[] cookies = request.getCookies();
+//		for (int i = 0; i < cookies.length; i++) {
+//			String name = cookies[i].getName();
+//			String value = cookies[i].getValue();
+//			System.out.println("cookie name " + name + " value " + value);
+//		}
+//	}
+
+	@Override
+	public boolean userValidator(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
+		String cookieValue = "";
 		for (int i = 0; i < cookies.length; i++) {
-			  String name = cookies[i].getName();
-			  String value = cookies[i].getValue();
-			  System.out.println("cookie name "+name+" value "+value);
+			if (cookies[i].getName().equals("JFightUser")) {
+				cookieValue = cookies[i].getValue();
 			}
+		}
+		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
+				return true;
+			}
+		}
+		request.getRequestDispatcher("index.jsp");
+		return false;
 	}
 }
+
