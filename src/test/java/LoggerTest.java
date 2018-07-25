@@ -1,9 +1,11 @@
+import services.impl.CRUDImpl;
+import services.impl.DatabaseImpl;
 import services.impl.LoggerImpl;
 
 public class LoggerTest {
 
 	public static void main(String[] args) {
-		LoggerImpl log = new LoggerImpl();
+		LoggerImpl log = new LoggerImpl(new CRUDImpl(new DatabaseImpl()));
 		
 //		log.logFightData(2, 1, 2);
 		log.getLogs(1, 2);

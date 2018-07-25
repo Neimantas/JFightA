@@ -1,38 +1,69 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Servlet implementation class UserServlet
- */
+import configuration.StartupContainer;
+import models.dal.CharacterDAL;
+import models.dal.FightDataDAL;
+import models.dto.ListDTO;
+import services.ILogger;
+import services.IUserInfo;
+import services.impl.CRUDImpl;
+import services.impl.LoggerImpl;
+import services.impl.UserInfoImpl;
+
+@WebServlet(urlPatterns = "/user")
 public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public UserServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+	private IUserInfo _userInfo;
+	private String _userId;
+	private CharacterDAL _character;
+	private ILogger _logger;
+
+	public UserServlet() {
+		_userInfo = StartupContainer.easyDI.getInstance(UserInfoImpl.class);
+		_character = StartupContainer.easyDI.getInstance(CharacterDAL.class);
+		_logger = StartupContainer.easyDI.getInstance(LoggerImpl.class);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		_userId = request.getParameter("userId");
+
+		ListDTO<CharacterDAL> dtoCharacter = _userInfo.getUserInfo(Integer.parseInt(_userId));
+		if (dtoCharacter.success) {
+			_character = dtoCharacter.transferDataList.get(0);
+		} else {
+			// needs else return
+		}
+
+		ListDTO<String> dtoLog = _logger.getLogs(_character.userId, 2);
+		if (dtoLog.success) {
+			request.setAttribute("tableString", dtoLog.transferDataList);
+		}
+
+		request.setAttribute("userId", _character.userId);
+		request.setAttribute("level", _character.level);
+		request.setAttribute("experience", _character.experience);
+		request.setAttribute("healthPoints", _character.healthPoints);
+		request.setAttribute("strenght", _character.strenght);
+		request.setAttribute("attackItem", _character.attackItemId);
+		request.setAttribute("defenceItem", _character.defenceItemId);
+
+		request.getRequestDispatcher("user.jsp").forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		doGet(request, response);
 	}
 
