@@ -39,7 +39,8 @@ public class FightDataSetter extends HttpServlet {
 		response.addCookie(healthCookie);
 		response.addCookie(roundCookie);
 		
-		request.getRequestDispatcher("fight.jsp").forward(request, response);
+//		request.getRequestDispatcher("/fight").forward(request, response);
+		response.sendRedirect("/JFight/fight");
 	}
 
 	/**

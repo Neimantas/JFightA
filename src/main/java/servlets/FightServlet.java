@@ -75,10 +75,7 @@ public class FightServlet extends HttpServlet {
 		if (cookies == null)
 			response.sendRedirect("index.jsp");
 		
-		System.out.println( request.getCookies());
-		System.out.println(cookies.length);
 		for(Cookie c : cookies) {
-			System.out.println(c.getName() + " " + c.getValue());
 			if (c.getName().equals("userId"))
 				userId = c.getValue();
 			if (c.getName().equals("fightId"))
@@ -92,7 +89,6 @@ public class FightServlet extends HttpServlet {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
 			
-		
 		
 		String attackHead = request.getParameter("attackHead");
 		String attackBody = request.getParameter("attackBody");
@@ -126,23 +122,21 @@ public class FightServlet extends HttpServlet {
 			//first sent round param 0, then get heatl results from figth table
 			//engine - returns healhtA and healthB
 			//
-			roundI++;
-			
+			roundI++; //after success increment round counter
 			
 			List<FightDataDAL> dals = dto.transferDataList; //index:0-you, index:1-opponent
 			
-			
 			int playerAHealth = dals.get(0).healthPoints;
 			healthI = playerAHealth;
-			String playerBName = dals.get(1).userId + "";
-			int _playerBHealth = dals.get(1).healthPoints;
+			String playerBName = Integer.toString(dals.get(1).userId);
+			int playerBHealth = dals.get(1).healthPoints;
 			
-			
+			System.out.println("UserId " + userId);
 			
 			request.setAttribute("playerAName", userId);								//Sending refreshed info to page.
 			request.setAttribute("playerBName", playerBName);
 			request.setAttribute("healthA", playerAHealth);
-			request.setAttribute("healthB", _playerBHealth);
+			request.setAttribute("healthB", playerBHealth);
 			//avatar id
 			request.setAttribute("idA", 1);													//Picture ID. Still hardcoded.
 			request.setAttribute("idB", 2);
@@ -150,9 +144,9 @@ public class FightServlet extends HttpServlet {
 			response.addCookie(new Cookie("round", Integer.toString(roundI))); //add round cookie
 			response.addCookie(new Cookie("health", Integer.toString(healthI))); //add health cookie
 			
-			if(_playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
+			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
-			} else if(_playerBHealth<=0) {
+			} else if(playerBHealth<=0) {
 				request.getRequestDispatcher("win.jsp").forward(request, response);
 			} else if(playerAHealth<=0) {
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
