@@ -31,7 +31,6 @@ public class LoginServlet extends HttpServlet {
 	LoginService logService;
 
 	public LoginServlet() {
-		 super();
 		 logService = StartupContainer.easyDI.getInstance(LoginService.class);
 	}
 

@@ -23,8 +23,8 @@ public class ItemImpl implements IItem {
 	private ICache _cache;
 	private ILog _log;
 
-	public ItemImpl() {
-		_crud = CRUDImpl.getInstance();
+	public ItemImpl(CRUDImpl crud) {
+		_crud = crud;
 		_cache = CacheImpl.getInstance();
 		_log = LogImpl.getInstance();
 	}

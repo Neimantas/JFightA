@@ -7,12 +7,8 @@ import java.sql.SQLException;
 import services.IDatabase;
 
 public class DatabaseImpl implements IDatabase {
-	private static IDatabase _database = new DatabaseImpl();
 
 	private Connection _connection;
-
-	private DatabaseImpl() {
-	}
 
 	/**
 	 * Before changing a database please look at the database requirements and
@@ -32,10 +28,6 @@ public class DatabaseImpl implements IDatabase {
 			_connection.close();
 			System.out.println("Database connection was closed.");
 		}
-	}
-
-	public static IDatabase getInstance() {
-		return _database;
 	}
 
 }

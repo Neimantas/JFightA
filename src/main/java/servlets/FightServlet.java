@@ -10,8 +10,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
 import services.IFightEngine;
 import services.impl.FightEngineImpl;
+import services.impl.ItemImpl;
 import models.dto.ActionsDTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
@@ -34,8 +36,7 @@ public class FightServlet extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
     public FightServlet() {
-        super();
-        _engine = new FightEngineImpl();
+    	_engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
     }
 
 	/**

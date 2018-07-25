@@ -21,7 +21,7 @@ public class FightEngineTest {
 //		actions.attackLegs = 1;
 //		fe.engine(1, 2, 100, "2", actions);
 		
-		ICRUD crud = CRUDImpl.getInstance();
+		ICRUD crud = new CRUDImpl(new DatabaseImpl());
 		FightDataDAL dal = new FightDataDAL();
 		
 		ListDTO<FightDataDAL> ret = crud.<FightDataDAL>read(dal);
