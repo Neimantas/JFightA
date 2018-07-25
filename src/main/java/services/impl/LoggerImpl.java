@@ -155,10 +155,10 @@ public class LoggerImpl implements ILogger {
 			JSONObject jsonObj = (JSONObject) json.get(i);
 			
 			rows += "													<tr>\r\n" + 
-					"														<th scope=\"row\">"+(Integer) jsonObj.get("r")+"</th>\r\n" + 
-					"														<td>"+(Integer) jsonObj.get("u")+"</td>\r\n" + 
-					"														<td>"+(Integer) jsonObj.get("hp")+"</td>\r\n" + 
-					"														<td>"+(Integer) jsonObj.get("d")+"</td>\r\n" + 
+					"														<th scope=\"row\">"+jsonObj.get("r")+"</th>\r\n" + 
+					"														<td>"+jsonObj.get("u")+"</td>\r\n" + 
+					"														<td>"+jsonObj.get("hp")+"</td>\r\n" + 
+					"														<td>"+jsonObj.get("d")+"</td>\r\n" + 
 					"														<td>"+changeATKChar((Integer) jsonObj.get("ah"))+"</td>\r\n" + 
 					"														<td>"+changeATKChar((Integer) jsonObj.get("ab"))+"</td>\r\n" + 
 					"														<td>"+changeATKChar((Integer) jsonObj.get("ahn"))+"</td>\r\n" + 

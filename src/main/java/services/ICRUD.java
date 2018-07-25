@@ -6,7 +6,7 @@ import models.dto.ObjectDTO;
 
 public interface ICRUD {
 
-	<T> ObjectDTO<T> create(T dal);
+	<T> ObjectDTO<Integer> create(T dal);
 	<T> ListDTO<T> read(T dal);
 	<T> DTO update(T dal);
 	<T> DTO delete(T dal);

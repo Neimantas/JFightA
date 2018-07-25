@@ -45,7 +45,7 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		logService.testCashe(request);
+	
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
@@ -56,7 +56,6 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		logService.testCashe(request);
 		String userName = request.getParameter("username");
 		String pass = request.getParameter("pass");
 		UserLoginData user = new UserLoginData();
