@@ -37,7 +37,7 @@ public class FightServlet extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
     public FightServlet() {
-    	_engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
+//    	_engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
 //        _engine = new FightEngineImpl();
     }
 
@@ -65,7 +65,7 @@ public class FightServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 //		doGet(request, response);
-		IFightEngine _engine = new FightEngineImpl();
+		IFightEngine _engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
 		String userId = "";
 		String fightId = "";
 		String round = "";
