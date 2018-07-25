@@ -27,8 +27,9 @@ public class CRUDImpl implements ICRUD {
 	private Connection _connection;
 	private ILog _log;
 
-	private CRUDImpl() {
-		_database = DatabaseImpl.getInstance();
+	public CRUDImpl() {
+//		_database = DatabaseImpl.getInstance();
+		_database = new DatabaseImpl();
 		_log = LogImpl.getInstance();
 	}
 
@@ -73,9 +74,12 @@ public class CRUDImpl implements ICRUD {
 
 			dalClassFields[0].set(returnDAL, dalId);
 			preparedStatement.close();
-			returnDAL = read(returnDAL, false).transferDataList.get(0);
+			System.out.println("######################");
+			System.out.println(read(returnDAL, false));
+			System.out.println("#######################");
+			//returnDAL = read(returnDAL, false).transferDataList.get(0);
 
-			objectDTO.transferData = returnDAL;
+			//objectDTO.transferData = returnDAL;
 			objectDTO.success = true;
 			objectDTO.message = "New " + tableName.replace("`", "") + " row created.";
 

@@ -11,7 +11,7 @@ public class DatabaseImpl implements IDatabase {
 
 	private Connection _connection;
 
-	private DatabaseImpl() {
+	public DatabaseImpl() {
 	}
 
 	/**
