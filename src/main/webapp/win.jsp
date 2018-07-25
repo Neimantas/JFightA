@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,17 +32,51 @@
 <!--===============================================================================================-->
 </head>
 <body>
-
+	<nav class="navbar navbar-expand-sm navbar-dark bg-dark flex-row">
+		<a class="navbar-brand mr-auto mb-0 h1" href="/JFight/News">JFight</a>
+		<ul class="navbar-nav flex-row mr-lg-0">
+			<li class="nav-item dropdown"><a
+				class="nav-link dropdown-toggle mr-3 mr-lg-0"
+				id="navbarDropdownMenuLink" data-toggle="dropdown"
+				aria-haspopup="true" aria-expanded="false"><i
+					class="fa fa-user-circle" aria-hidden="true"></i>Username<span
+					class="caret"></span> </a>
+				<div class="dropdown-menu dropdown-menu-right"
+					aria-labelledby="navbarDropdownMenuLink">
+					<a class="dropdown-item" href="/JFight/user?userId=5">Character
+						Info</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href=""><i class="fa fa-sign-out"
+						aria-hidden="true"></i>Logout</a>
+				</div></li>
+		</ul>
+		<button class="navbar-toggler ml-lg-0" type="button"
+			data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</nav>
+	<nav class="navbar navbar-expand-md navbar-light py-md-0">
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav ml-1">
+				<li class="nav-item mx-2"><a class="nav-link"
+					href="/JFight/News">Home</a></li>
+				<li class="nav-item mx-2"><a class="nav-link disabled" href="">Items</a></li>
+			</ul>
+		</div>
+	</nav>
 
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12">
-				<img src="http://mrwgifs.com/wp-content/uploads
-				/2014/05/Pretty-Girl-Dancing-and-Spinning-At-The-Beach.gif"/>
-				<h2>YOU WON!</h2> 
+				<img
+					src="http://mrwgifs.com/wp-content/uploads
+				/2014/05/Pretty-Girl-Dancing-and-Spinning-At-The-Beach.gif" />
+				<h2>YOU WON!</h2>
 			</div>
-			
-		</div>	
+
+		</div>
 	</div>
 
 

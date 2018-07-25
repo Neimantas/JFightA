@@ -25,20 +25,17 @@
 		if(ready == false || ready == 'false')											//If false is got as a param, its in String format.
 		{											
 			document.getElementById('ready').innerText= 'Ready';						//If user is not ready - show buttons text "Ready"
-		    elements = document.getElementsByClassName('message');
-		    for (var i = 0; i < elements.length; i++) {									//make text boody red.
-		        elements[i].style.color="red";
-		        }
+		    elements = document.getElementById('message');
+		    elements.style.color="red";													//make text boody red.
+		      
 		}
 		else
 		{
 
 			document.getElementById('ready').innerText= 'Not ready';					//If user is ready - show button text "Not ready""
-		    elements = document.getElementsByClassName('message');
-		    for (var i = 0; i < elements.length; i++) {									//make text green, green as grass.
-		        elements[i].style.color="green";
+		    	elements = document.getElementById('message');
+			    elements.style.color="green";											//make text green, green as grass.
 		        }
-		}
 	}
 	
 	$( document ).ready(function() { 													//Starts this on Load
