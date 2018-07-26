@@ -28,6 +28,7 @@ public class CRUDImpl implements ICRUD {
 
 	public CRUDImpl(DatabaseImpl database) {
 		_database = database;
+		_database = new DatabaseImpl();
 		_log = LogImpl.getInstance();
 	}
 
@@ -70,6 +71,9 @@ public class CRUDImpl implements ICRUD {
 			}
 
 			preparedStatement.close();
+			System.out.println(read(returnDAL, false));
+			System.out.println("#######################");
+			//returnDAL = read(returnDAL, false).transferDataList.get(0);
 
 			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
 
