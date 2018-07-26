@@ -106,7 +106,7 @@ public class CRUDImpl implements ICRUD {
 	 * table is empty, will be returned DTO with an empty list.
 	 */
 	@Override
-	public synchronized <T> ListDTO<T> read(T dal) {
+	public <T> ListDTO<T> read(T dal) {
 		return read(dal, true);
 	}
 

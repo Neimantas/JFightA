@@ -70,14 +70,27 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public void logout(User user) {
+	public void logout(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		String cookieValue = "";
+		for (int i = 0; i < cookies.length; i++) {
+			if (cookies[i].getName().equals("JFightUser")) {
+				cookieValue = cookies[i].getValue();
+				cookies[i].setMaxAge(0);
+			}
+		}
+		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
+				cashe.removePlayer(entry.getKey());
+				}
+		}
 
 	}
 
 	@Override
 	public void addCookies(HttpServletResponse response, User userWithInfo) {
 		Cookie ck = new Cookie("JFightUser", userWithInfo.cookiesValue);
-		ck.setMaxAge(3000);
+		ck.setMaxAge(3600);
 		response.addCookie(ck);
 
 	}
@@ -92,21 +105,9 @@ public class LoginService implements ILoginService {
 	@Override
 	public void aadCashe(Player player, int userId) {
 		cashe.addPlayer(userId, player);
+		cashe.getPlayer(userId);
 	}
 
-	// public void testCashe(HttpServletRequest request) {
-	// for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
-	// System.out.println(entry.getKey() + ">>>>>>>>>>>>>> user name " +
-	// entry.getValue().user.name
-	// + " cookies value " + entry.getValue().user.cookiesValue);
-	// }
-	// Cookie[] cookies = request.getCookies();
-	// for (int i = 0; i < cookies.length; i++) {
-	// String name = cookies[i].getName();
-	// String value = cookies[i].getValue();
-	// System.out.println("cookie name " + name + " value " + value);
-	// }
-	// }
 
 	@Override
 	public boolean userValidator(HttpServletRequest request) {
@@ -115,6 +116,7 @@ public class LoginService implements ILoginService {
 		for (int i = 0; i < cookies.length; i++) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
+				cookies[i].setMaxAge(3600);
 			}
 		}
 		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {

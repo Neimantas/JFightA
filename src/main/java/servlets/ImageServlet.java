@@ -10,24 +10,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
+import eu.lestard.easydi.EasyDI;
 import models.dal.ImageDAL;
 import models.dto.ObjectDTO;
 import services.IItem;
+import services.impl.CRUDImpl;
+import services.impl.DatabaseImpl;
 import services.impl.ItemImpl;
 
 @WebServlet(urlPatterns = "/imageServlet")
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private IItem _item;
-
-	public ImageServlet() {
-		_item = StartupContainer.easyDI.getInstance(ItemImpl.class);
-	}
-
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		
+		EasyDI easyDI = new EasyDI();
+		IItem item = easyDI.getInstance(ItemImpl.class);
+		
 		String id = request.getParameter("id");
 		String user = request.getParameter("user");
 
@@ -37,9 +37,9 @@ public class ImageServlet extends HttpServlet {
 
 		ObjectDTO<ImageDAL> objectDTO;
 		if (user != null && user.equalsIgnoreCase("b")) {
-			objectDTO = _item.getUserBImage(Integer.parseInt(id));
+			objectDTO = item.getUserBImage(Integer.parseInt(id));
 		} else {
-			objectDTO = _item.getUserAImage(Integer.parseInt(id));
+			objectDTO = item.getUserAImage(Integer.parseInt(id));
 		}
 
 		if (objectDTO.success && objectDTO.transferData != null) {

@@ -15,7 +15,7 @@ public interface ILoginService {
 	void addCookies(HttpServletResponse response,User userWithInfo);
 	void aadCashe(Player player, int useId);
 	boolean userValidator (HttpServletRequest request);
-	void logout (User user);
+	void logout (HttpServletRequest request);
 	String newGuid();
 }
 
