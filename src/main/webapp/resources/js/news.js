@@ -1,5 +1,7 @@
-	function clicker(btnName){															//For Play and Logout functions.
-			url = "News?button=" + btnName;
+	url = "News?";
+
+function clicker(btnName){															//For Play and Logout functions.
+//			url = "News?button=" + btnName;
 			location.href = url;
 
 	}
@@ -18,7 +20,7 @@
 	}
 	
 	function readyFunc(){	
-		var url = new URL(location.href); 												//Put current Url to variable "url"
+		url = new URL(location.href); 												//Put current Url to variable "url"
 		var ready = url.searchParams.get("ready") == null ? false : url.searchParams.get("ready");		//gettin parameters from url, 
 																										//if there is no ready parameter -ready becomes false. 
 																										//if not null - var ready = current param.

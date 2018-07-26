@@ -73,7 +73,15 @@
 		<div class="row">
 			<div class="col-6">
 				<div class="row justify-content-center" id="message">${ReadyMessage}</div>
-				<div class="row justify-content-center">Online players. Get it somehow</div>
+				<div class="row justify-content-center">
+				<div class="col" >
+				<select class="custom-select" size="20" id="readyPlayers">
+					<c:forEach items="${readyPlayers}" var="players">
+					<option value="${players.key}">${players.value}</option>
+					</c:forEach>
+				</select>
+				</div>
+				</div>
 			</div>
 
 			<div class="col-6">
@@ -81,7 +89,7 @@
 					<button class="btn-default" id="play" onclick="clicker(this.id)">Play</button>
 					<button class="btn-default" id="ready"
 						onclick="rdyBtn(this.innerText)">${Ready}</button>
-					<button class="btn-default" id="logout" onclick="clicker(this.id)">Logout</button>
+					<button class="btn-default" id="refresh" onclick="clicker(this.id)">Refresh</button>
 				</div>
 				<div class="row justify-content-center">put here some text from admin</div>
 			</div>
