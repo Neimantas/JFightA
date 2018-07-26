@@ -12,6 +12,7 @@ import models.dal.CharacterDAL;
 import models.dal.FightDataDAL;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
+import models.dal.LogDAL;
 import models.dal.ResultDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
@@ -55,10 +56,9 @@ public class CrudTest {
 //		imageDAL.imageId = 11;
 //		crud.delete(imageDAL);
 		
-		FightDataDAL fdal = new FightDataDAL();
-		fdal.fightId = 2;
-		ListDTO<FightDataDAL> ldto = crud.read(fdal);
-		System.out.println(ldto.transferDataList.get(0).damage);
+		LogDAL logDAL = new LogDAL();
+		ListDTO<LogDAL> ldto = crud.read(logDAL);
+		System.out.println(ldto.transferDataList.size());
 
 	}
 	

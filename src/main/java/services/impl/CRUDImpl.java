@@ -26,9 +26,8 @@ public class CRUDImpl implements ICRUD {
 	private Connection _connection;
 	private ILog _log;
 
-	public CRUDImpl(DatabaseImpl database) {
-		_database = database;
-		_database = new DatabaseImpl();
+	public CRUDImpl( ) {
+		//_database = new DatabaseImpl();
 		_log = LogImpl.getInstance();
 	}
 
@@ -73,7 +72,7 @@ public class CRUDImpl implements ICRUD {
 			preparedStatement.close();
 			System.out.println(read(returnDAL, false));
 			System.out.println("#######################");
-			//returnDAL = read(returnDAL, false).transferDataList.get(0);
+			// returnDAL = read(returnDAL, false).transferDataList.get(0);
 
 			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
 
@@ -111,7 +110,11 @@ public class CRUDImpl implements ICRUD {
 	}
 
 	private <T> ListDTO<T> read(T dal, boolean setConnection, String... checkQuery) {
+		Connection conn;
+		DatabaseImpl db = new DatabaseImpl();
 		try {
+			setConnection = true;
+			
 			ListDTO<T> listDTO = new ListDTO<>();
 
 			Class<?> dalClass = dal.getClass();
@@ -122,10 +125,11 @@ public class CRUDImpl implements ICRUD {
 			Boolean hasCondition = readQuery.contains("WHERE");
 
 			if (setConnection) {
-				setConnection();
+				//setConnection();
 			}
 
-			PreparedStatement preparedStatement = _connection.prepareStatement(readQuery);
+			conn = returnConn(db);
+			PreparedStatement preparedStatement = conn.prepareStatement(readQuery);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			List<T> dalList = new ArrayList<>();
@@ -180,9 +184,15 @@ public class CRUDImpl implements ICRUD {
 			listDTO.message = e.getMessage() + ".";
 			return listDTO;
 		} finally {
-			if (setConnection) {
-				closeConnection();
+			try {
+				db.closeConnection();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			/*if (true) {
+				closeConnection();
+			}*/
 		}
 	}
 
@@ -323,8 +333,14 @@ public class CRUDImpl implements ICRUD {
 	private void setConnection()
 			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		if (_connection == null || _connection.isClosed()) {
-			_connection = _database.connect();
+			
+			//_connection = db.connect();
 		}
+	}
+	
+	private Connection returnConn(DatabaseImpl db) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+		//SDatabaseImpl db = new DatabaseImpl();
+		return db.connect();
 	}
 
 	private void closeConnection() {
@@ -364,6 +380,10 @@ public class CRUDImpl implements ICRUD {
 				&& (dalClassFields[1].get(dal) != null || dalClassFields[2].get(dal) != null
 						|| dalClassFields[3].get(dal) != null || dalClassFields[4].get(dal) != null)) {
 			return createResultTableQuery(dal, dalClassFields);
+		}
+		if (tableName.equalsIgnoreCase("`Log`") && dalClassFields[2].get(dal) != null
+				&& dalClassFields[3].get(dal) != null) {
+			return createLogTableQuery(dal, dalClassFields);
 		}
 
 		String readQuery = "";
@@ -410,7 +430,7 @@ public class CRUDImpl implements ICRUD {
 			for (int i = 1; i < dalClassFields.length; i++) {
 
 				if (dalClassFields[i].get(dal) != null) {
-					int userId = (Integer) dalClassFields[i].get(dal);
+					String userId = (String) dalClassFields[i].get(dal);
 					readQuery += "WinUserId = " + userId + " OR LossUserId = " + userId + " OR TieUser1Id = " + userId
 							+ " OR TieUser2Id = " + userId + ";";
 					break;
@@ -418,6 +438,15 @@ public class CRUDImpl implements ICRUD {
 			}
 		}
 		System.out.println("\n" + readQuery);
+		return readQuery;
+	}
+
+	private <T> String createLogTableQuery(T dal, Field[] dalClassFields)
+			throws IllegalArgumentException, IllegalAccessException {
+		String user1Id = (String) dalClassFields[2].get(dal);
+		String user2Id = (String) dalClassFields[3].get(dal);
+		String readQuery = "SELECT * FROM `log` WHERE (User1Id = " + user1Id + " AND User2Id = " + user2Id
+				+ ") OR (User1Id = " + user2Id + " AND User2Id = " + user1Id + ");";
 		return readQuery;
 	}
 

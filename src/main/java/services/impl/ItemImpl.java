@@ -42,6 +42,7 @@ public class ItemImpl implements IItem {
 	 */
 	@Override
 	public ObjectDTO<ImageDAL> getUserBImage(int userBId) {
+		System.out.println("====================================================");
 		return getUserImage(userBId, false);
 	}
 

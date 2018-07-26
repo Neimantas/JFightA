@@ -21,12 +21,19 @@ import services.impl.ItemImpl;
 @WebServlet(urlPatterns = "/imageServlet")
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private IItem item;
+	
+	public ImageServlet() {
+		item = StartupContainer.easyDI.getInstance(ItemImpl.class);
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-		EasyDI easyDI = new EasyDI();
-		IItem item = easyDI.getInstance(ItemImpl.class);
+//		EasyDI easyDI = new EasyDI();
+//		IItem item = StartupContainer.easyDI.getInstance(ItemImpl.class);
+
 		
 		String id = request.getParameter("id");
 		String user = request.getParameter("user");
