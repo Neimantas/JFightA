@@ -19,11 +19,12 @@ import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
 import services.impl.CRUDImpl;
+import services.impl.DatabaseImpl;
 
 public class CrudTest {
 
 	public static void main(String[] args) throws IOException {
-		ICRUD crud = CRUDImpl.getInstance();
+		ICRUD crud = new CRUDImpl(new DatabaseImpl());
 
 		// ResultDAL resultDAL = new ResultDAL();
 		//// resultDAL.fightId = 1;

@@ -30,10 +30,9 @@ public class LoginService implements ILoginService {
 
 	@Override
 	public PlayerDTO login(HttpServletResponse response, UserLoginData userIn) {
-		HigherLoginService hlog = new HigherLoginService();
 		User userOut = new User();
 		// Get player form hService
-		PlayerDalDTO playerDalDto = hlog.login(userIn);
+		PlayerDalDTO playerDalDto = hService.login(userIn);
 		if (playerDalDto._success) {
 			UserDAL userInDal = playerDalDto._playerDal.userDal;
 			// Transforms userDal to user
@@ -128,4 +127,3 @@ public class LoginService implements ILoginService {
 		return false;
 	}
 }
-

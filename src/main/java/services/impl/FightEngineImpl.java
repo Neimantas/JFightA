@@ -15,8 +15,8 @@ public class FightEngineImpl implements IFightEngine {
 	
 	private ICRUD _crud;
 
-	public FightEngineImpl() {
-		_crud = CRUDImpl.getInstance();
+	public FightEngineImpl(CRUDImpl crud) {
+		_crud = crud;
 	}
 	
 	@Override
@@ -75,6 +75,10 @@ public class FightEngineImpl implements IFightEngine {
 		//
 		FightDataDAL dal = new FightDataDAL();
 		dal.fightId = fightId;
+		System.out.println("********************************");
+		System.out.println(fightId);
+		System.out.println(dal);
+		System.out.println("********************************");
 		ListDTO<FightDataDAL> ldto = _crud.<FightDataDAL>read(dal);						//by this DAL search for fight ID made in CRUD
 		if(ldto.success) {
 //			int counter = 0;
@@ -114,12 +118,15 @@ public class FightEngineImpl implements IFightEngine {
 	}
 
 	@Override
-	public ListDTO<FightDataDAL> engine(int fightId, int roundId, int health,  String userId, ActionsDTO yourAction) {
+	public ListDTO<FightDataDAL> engine(int fightId, int roundId, int health, String userId, ActionsDTO yourAction) {
 		
 		FightDataDAL insertDAL = new FightDataDAL();									//Fill Users darta to FightData DB.
 		insertDAL.fightId = fightId;
 		insertDAL.round = roundId;
 		insertDAL.userId = Integer.parseInt(userId); //temporary solution
+		System.out.println("################");
+		System.out.println(userId + " " + fightId);
+		System.out.println("################");
 		insertDAL.healthPoints = health;
 		insertDAL.attackHead = yourAction.attackHead;
 		insertDAL.attackBody = yourAction.attackBody;
@@ -138,7 +145,7 @@ public class FightEngineImpl implements IFightEngine {
 			if(!obj.success && obj.message.equals("Cannot find opponent")) {			//needs upgrade, if data not received - autoWin for waiting user.
 				counter++;																//needs upgrade, instead of magic number count, make 35 second count/loop.
 				obj = getOpponentData(fightId, roundId, userId);
-				System.out.println("In waiting loop...");
+//				System.out.println("In waiting loop...");
 			} else {
 				break;
 			}

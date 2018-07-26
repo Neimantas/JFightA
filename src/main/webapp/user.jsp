@@ -27,12 +27,10 @@
 <link rel="stylesheet" type="text/css"
 	href="resources/vendor/select2/select2.min.css">
 <!--===============================================================================================-->
-<link rel="stylesheet" type="text/css" href="resources/css/util.css">
-<link rel="stylesheet" type="text/css" href="resources/css/main.css">
+<link rel="stylesheet" type="text/css" href="resources/css/user.css">
 <!--===============================================================================================-->
 </head>
 <body>
-
 	<nav class="navbar navbar-expand-sm navbar-dark bg-dark flex-row">
 		<a class="navbar-brand mr-auto mb-0 h1" href="/JFight/News">JFight</a>
 		<ul class="navbar-nav flex-row mr-lg-0">
@@ -61,27 +59,119 @@
 	<nav class="navbar navbar-expand-md navbar-light py-md-0">
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav ml-1">
-				<li class="nav-item mx-2"><a class="nav-link"
-					href="/JFight/News">Home</a></li>
+				<li class="nav-item mx-2"><a class="nav-link" href="/JFight/News">Home</a></li>
 				<li class="nav-item mx-2"><a class="nav-link disabled" href="">Items</a></li>
 			</ul>
 		</div>
 	</nav>
 
-	<div class="container">
-		<div class="row">
-			<div class="col-sm-12">
-				<img
-					src="https://vignette.wikia.nocookie.net/simpsons/
-				images/e/e9/Nelson_Ha-Ha.jpg/revision/latest
-				/scale-to-width-down/350?cb=20121205194057" />
-				<h2>HAHA!YOU LOST!</h2>
+	<div class="container w-50 mt-1">
+		<div class="row mb-1">
+			<div class="col-lg-5 col-md-12 mx-lg-1">
+				<div class="row mb-1">
+					<div
+						class="col border border-dark rounded font-weight-bold text-center py-1">Username
+						${userId}</div>
+				</div>
+				<div class="row mb-1">
+					<div class="col border border-dark rounded text-center py-1">Level:
+						${level}</div>
+				</div>
+				<div class="row mb-1 ">
+					<div class="col border border-dark rounded py-1">
+						Experience:
+						<div class="progress">
+							<div class="progress-bar bg-warning text-center text-black"
+								role="progressbar" style="width: ${experience}%"
+								aria-valuenow="${experience}" aria-valuemin="0"
+								aria-valuemax="100">${experience}/100</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-1">
+					<div class="col border border-dark rounded py-1">
+						Health Points:
+						<div class="progress">
+							<div class="progress-bar bg-danger text-center text-black"
+								role="progressbar" style="width: ${healthPoints}%"
+								aria-valuenow="${healthPoints}" aria-valuemin="0"
+								aria-valuemax="100">${healthPoints}</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-1">
+					<div class="col border border-dark rounded text-center py-1">
+						<div class="col-12 font-weight-bold">Character Stats</div>
+						<div class="col-12">Strength: ${strenght}</div>
+						</div>
+				</div>
 			</div>
+			<div class="col-lg col-md-12">
+				<div class="row mb-1">
+					<div class="col border border-dark rounded py-1">
+						<div class="text-center">
+							<img src="imageServlet?id=${userId}&user=a" class="rounded"
+								width=80%>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-1">
+					<div class="col-6 border border-dark rounded py-1">
+						<div class="list-group">
+							<div class="text-center">Attack Item</div>
+							<div class="text-center">
+								<img src="itemImageServlet?itemId=${attackItem}" class="rounded"
+									width=90%>
+							</div>
+						</div>
+					</div>
+					<div class="col-6 border border-dark rounded py-1">
+						<div class="list-group">
+							<div class="text-center">Defence Item</div>
+							<div class="text-center">
+								<img src="itemImageServlet?itemId=${defenceItem}"
+									class="rounded" width=90%>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row mb-1">
+			<div class="col p-0">
+				<!-- Button trigger modal -->
+				<button type="button" class="btn btn-dark float-right"
+					data-toggle="modal" data-target="#exampleModalLong">Fight
+					Log</button>
 
+				<!-- Modal -->
+				<div class="modal fade" id="exampleModalLong" tabindex="-1"
+					role="dialog" aria-labelledby="exampleModalLongTitle"
+					aria-hidden="true">
+					<div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title mx-auto" id="exampleModalLongTitle">Fight
+									History</h5>
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<c:forEach items="${tableString}" var="block">
+    								${block}
+								</c:forEach>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-
-
 
 	<!--===============================================================================================-->
 	<script src="resources/vendor/jquery/jquery-3.2.1.min.js"></script>
@@ -91,9 +181,6 @@
 	<!--===============================================================================================-->
 	<script src="resources/vendor/select2/select2.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="resources/js/main.js"></script>
-	<!--===============================================================================================-->
-	<script src="resources/js/fightPageControls.js"></script>
 
 </body>
 </html>

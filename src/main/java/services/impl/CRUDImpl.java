@@ -21,14 +21,14 @@ import services.IDatabase;
 import services.ILog;
 
 public class CRUDImpl implements ICRUD {
-	private static ICRUD _crud = new CRUDImpl();
 
 	private IDatabase _database;
 	private Connection _connection;
 	private ILog _log;
 
-	private CRUDImpl() {
-		_database = DatabaseImpl.getInstance();
+	public CRUDImpl(DatabaseImpl database) {
+		_database = database;
+		_database = new DatabaseImpl();
 		_log = LogImpl.getInstance();
 	}
 
@@ -71,6 +71,9 @@ public class CRUDImpl implements ICRUD {
 			}
 
 			preparedStatement.close();
+			System.out.println(read(returnDAL, false));
+			System.out.println("#######################");
+			//returnDAL = read(returnDAL, false).transferDataList.get(0);
 
 			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
 
@@ -103,7 +106,7 @@ public class CRUDImpl implements ICRUD {
 	 * table is empty, will be returned DTO with an empty list.
 	 */
 	@Override
-	public synchronized <T> ListDTO<T> read(T dal) {
+	public <T> ListDTO<T> read(T dal) {
 		return read(dal, true);
 	}
 
@@ -315,10 +318,6 @@ public class CRUDImpl implements ICRUD {
 		} finally {
 			closeConnection();
 		}
-	}
-
-	public static ICRUD getInstance() {
-		return _crud;
 	}
 
 	private void setConnection()

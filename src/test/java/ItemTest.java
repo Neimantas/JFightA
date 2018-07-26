@@ -14,15 +14,16 @@ import services.ICache;
 import services.IItem;
 import services.impl.CRUDImpl;
 import services.impl.CacheImpl;
+import services.impl.DatabaseImpl;
 import services.impl.ItemImpl;
 
 public class ItemTest {
 
 	public static void main(String[] args) {
 		
-		ICRUD crud = CRUDImpl.getInstance();
+		ICRUD crud = new CRUDImpl(new DatabaseImpl());
 		ICache cache = CacheImpl.getInstance();
-		IItem item = new ItemImpl();
+		IItem item = new ItemImpl(new CRUDImpl(new DatabaseImpl()));
 		
 		UserDAL userDAL = new UserDAL();
 		userDAL.name = "labas";
