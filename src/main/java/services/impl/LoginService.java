@@ -67,14 +67,14 @@ public class LoginService implements ILoginService {
 
 	@Override
 	public UserLoginDataDTO registration(UserRegIn userRegIn) {
-		PlayerDalDTO playerDalDto = hService.registration(userRegIn);
-		if (playerDalDto._success) {
+		UserLoginDataDTO userloginData = hService.registration(userRegIn);
+		if (userloginData.success) {
 			UserLoginData loginData = new UserLoginData();
-			loginData.name = playerDalDto._playerDal.userDal.name;
-			loginData.password = playerDalDto._playerDal.userDal.password;
+			loginData.name = userloginData.userloginData.name;
+			loginData.password = userloginData.userloginData.password;
 			return new UserLoginDataDTO(true, "success", loginData);
 		}
-		return new UserLoginDataDTO(false, playerDalDto._message, null);
+		return new UserLoginDataDTO(false, userloginData.message, null);
 	}
 
 	@Override

@@ -47,11 +47,13 @@ public class RegistrationServlet extends HttpServlet {
 		userRegInfo.name= request.getParameter("username");
 		userRegInfo.password= request.getParameter("pass");
 		userRegInfo.mail=request.getParameter("mail");
-		UserLoginData userLogin=new UserLoginData();
-		userLogin.name=userRegInfo.name;
-		userLogin.password=userRegInfo.password;
 		UserLoginDataDTO dto=_logService.registration(userRegInfo);
+		System.out.println(">>>>>>>>>>>>>>"+dto.userloginData.name);
+		System.out.println(">>>>>>>>>>>>>>"+dto.userloginData.password);
 		if(dto.success) {
+			UserLoginData userLogin=new UserLoginData();
+			userLogin.name=dto.userloginData.name;
+			userLogin.password=dto.userloginData.password;
 			DTO playerDTO=_logService.login(response,userLogin);
 			if (playerDTO.success) {
 				request.getRequestDispatcher("News.jsp").forward(request, response);

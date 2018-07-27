@@ -5,7 +5,7 @@ import models.business.UserLoginData;
 public class UserLoginDataDTO {
 	public boolean success;
 	public String message;
-	UserLoginData userloginData;
+	public UserLoginData userloginData;
 
 	public UserLoginDataDTO(){
 	}
