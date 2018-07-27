@@ -19,14 +19,12 @@ public class DatabaseImpl implements IDatabase {
 		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 		_connection = DriverManager.getConnection("jdbc:mysql://88.223.54.41:3306/jfight", "CBjava2018",
 				"Student_java2");
-		System.out.println("Connection to database has been established.");
 		return _connection;
 	}
 
 	public void closeConnection() throws SQLException {
 		if (_connection != null && !_connection.isClosed()) {
 			_connection.close();
-			System.out.println("Database connection was closed.");
 		}
 	}
 

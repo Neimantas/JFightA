@@ -21,9 +21,9 @@ public class ItemTest {
 
 	public static void main(String[] args) {
 		
-		ICRUD crud = new CRUDImpl(new DatabaseImpl());
+		ICRUD crud = new CRUDImpl();
 		ICache cache = CacheImpl.getInstance();
-		IItem item = new ItemImpl(new CRUDImpl(new DatabaseImpl()));
+		IItem item = new ItemImpl(new CRUDImpl());
 		
 		UserDAL userDAL = new UserDAL();
 		userDAL.name = "labas";
@@ -52,8 +52,7 @@ public class ItemTest {
 		
 		System.out.println(items.get(ItemType.ATTACK).itemId);
 		System.out.println(items.get(ItemType.DEFENCE).itemId);
-		System.out.println(items.get(ItemType.ATTACK).itemId);
-		System.out.println(items.get(ItemType.DEFENCE).itemId);
+
 	}
 
 }

@@ -25,40 +25,17 @@ import services.impl.DatabaseImpl;
 public class CrudTest {
 
 	public static void main(String[] args) throws IOException {
-		ICRUD crud = new CRUDImpl(new DatabaseImpl());
-
-		// ResultDAL resultDAL = new ResultDAL();
-		//// resultDAL.fightId = 1;
-		// resultDAL.tieUser2Id = 1;
-		//// resultDAL.tieUser1Id = 2;
-		//
-		// ListDTO<ResultDAL> listDTO = crud.read(resultDAL);
-		// System.out.println(listDTO.transferDataList.size());
-
-//		 UserDAL userDAL = new UserDAL();
-//		 userDAL.name = "Teeest";
-//		 userDAL.password = "fdgfsdgf";
-//		 userDAL.eMail = "test@test.lt";
-//		 ObjectDTO<UserDAL> listDTOu = crud.create(userDAL);
-//		 
-//		 CharacterDAL characterDAL = new CharacterDAL();
-//		 characterDAL.userId = listDTOu.transferData.userId;
-//		 characterDAL.healthPoints = 100;
-//		 characterDAL.strenght = 5;
-//		 characterDAL.experience = 5;
-//		 characterDAL.level = 1;
-//		 ObjectDTO<CharacterDAL> listDTOc = crud.create(characterDAL);
-		// System.out.println(listDTOu.transferDataList.size());
-
-//		testImage(crud);
-		
-//		ImageDAL imageDAL = new ImageDAL();
-//		imageDAL.imageId = 11;
-//		crud.delete(imageDAL);
-		
+		ICRUD crud = new CRUDImpl();
+	
 		LogDAL logDAL = new LogDAL();
+		logDAL.user1Id = 5;
+		logDAL.user2Id = 2;
 		ListDTO<LogDAL> ldto = crud.read(logDAL);
 		System.out.println(ldto.transferDataList.size());
+		
+		
+//		testImage(crud);
+//		testItem(crud);
 
 	}
 	
@@ -80,9 +57,9 @@ public class CrudTest {
 		ObjectDTO<Integer> uploadDTO = crud.create(itemDAL);
 
 		//update
-//		ItemDAL createdItemDAL = uploadDTO.transferData;
-//		createdItemDAL.itemType = ItemType.DEFENCE;
-//		DTO updateDTO = crud.update(createdItemDAL);
+		itemDAL.itemId = uploadDTO.transferData;
+		itemDAL.itemType = ItemType.DEFENCE;
+		DTO updateDTO = crud.update(itemDAL);
 
 		
 	}

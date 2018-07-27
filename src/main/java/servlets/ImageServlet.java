@@ -31,10 +31,6 @@ public class ImageServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-//		EasyDI easyDI = new EasyDI();
-//		IItem item = StartupContainer.easyDI.getInstance(ItemImpl.class);
-
-		
 		String id = request.getParameter("id");
 		String user = request.getParameter("user");
 
