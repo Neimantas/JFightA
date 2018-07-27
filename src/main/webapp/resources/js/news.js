@@ -9,7 +9,7 @@ function play(){
 	var readyPlayers = document.getElementById("readyPlayers");
 	var selectas = readyPlayers.options[readyPlayers.selectedIndex];
 	if(selectas != undefined){
-		var url2 ="News?selectedPlayer="+selectas.value;
+		var url2 ="News?button=play&selectedPlayer="+selectas.value;
 		location.href = url2;
 	}else{
 		location.href = url;		//if there is no selection - refresh page

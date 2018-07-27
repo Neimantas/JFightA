@@ -40,54 +40,66 @@ public class NewsServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 		
-		//Player player = getThisPlayer(request);
-		System.out.println(request.getParameter("selectedPlayer"));
+		Player player = getThisPlayer(request);
 		
-		
-		
-		//Check GUID if user is valid, get his UserName
-		Map<Integer, String> listPlayers = getReadyPlayers();
-		listPlayers.put(9999, "Player1");
-		listPlayers.put(8888, "Player2");
-		request.setAttribute("readyPlayers", listPlayers);
-		
-		
-		String param = request.getParameter("button");
-		if (param != null) {
-
-			if (param.equals("refresh")) {
-				System.out.println("doing refresh");
-				request.getRequestDispatcher("News.jsp").forward(request, response);
-			}
-
-			if (param.equals("play")) {
-				System.out.println("doing play");
-				//get who i am
-				//get chalanged player
-				//somehow move them to fight
-				request.getRequestDispatcher("fight.jsp").forward(request, response);
-			}
-
-		}
-
-		// from url parameter get value and convert it to boolean.
-		Boolean ready = request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
-
-		if (ready == false) {
-			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
-	//		player.userStatus = UserStatus.NOT_READY;
-			request.getRequestDispatcher("News.jsp").forward(request, response);
+		if(player.userStatus == UserStatus.PLAYING) {
+			String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + 1;
+			response.sendRedirect(url);
 			
+		} else {
+			
+			//Check GUID if user is valid, get his UserName
+			Map<Integer, String> listPlayers = getReadyPlayers();
+			listPlayers.put(9999, "Player1");
+			listPlayers.put(8888, "Player2");
+			request.setAttribute("readyPlayers", listPlayers);
+			request.setAttribute("userName", player.user.name);
+			
+			
+			String param = request.getParameter("button");
+			if (param != null) {
 
-		} else if(ready == true) {
-			request.setAttribute("ReadyMessage", "YOU ARE READY");
-	//		player.userStatus = UserStatus.READY;
-			request.getRequestDispatcher("News.jsp").forward(request, response);
+				if (param.equals("refresh")) {
+					request.getRequestDispatcher("News.jsp").forward(request, response);
+				}
 
+				if (param.equals("play")) {
+					ICache cache = CacheImpl.getInstance();
+					cache.getPlayer(Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
+					System.out.println(cache.getPlayer(Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus);
+					player.userStatus = UserStatus.PLAYING;
+					String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + 1;
+					System.out.println("myUrl" + url);
+					
+					response.sendRedirect(url);
+//					request.getRequestDispatcher("fight.jsp").forward(request, response);
+				}
+			}
+
+			// from url parameter get value and convert it to boolean.
+			else {
+				Boolean ready = request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
+				
+				if (ready == false) {
+					System.out.println("ready=false");
+					request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
+					player.userStatus = UserStatus.NOT_READY;
+					request.getRequestDispatcher("News.jsp").forward(request, response);
+					
+
+				} else if(ready == true) {
+					System.out.println("ready=true");
+					request.setAttribute("ReadyMessage", "YOU ARE READY");
+					player.userStatus = UserStatus.READY;
+					request.getRequestDispatcher("News.jsp").forward(request, response);
+				}
+			}
+			
+			// }
+			// doPost(request, response);
 		}
-
-		// }
-		// doPost(request, response);
+		
+		
 
 	}
 
