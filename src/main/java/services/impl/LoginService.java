@@ -2,7 +2,6 @@ package services.impl;
 
 import java.util.Map.Entry;
 import java.util.UUID;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,9 +11,11 @@ import models.business.User;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.UserDAL;
+import models.dto.DTO;
 import models.dto.PlayerDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserFrontDTO;
+import models.dto.UserLoginDataDTO;
 import services.ICache;
 import services.ILoginService;
 
@@ -29,7 +30,7 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public PlayerDTO login(HttpServletResponse response, UserLoginData userIn) {
+	public DTO login(HttpServletResponse response, UserLoginData userIn) {
 		User userOut = new User();
 		// Get player form hService
 		PlayerDalDTO playerDalDto = hService.login(userIn);
@@ -59,14 +60,21 @@ public class LoginService implements ILoginService {
 			player.user = userOut;
 			// add player to cache
 			aadCashe(player, userOut.userId);
-			return new PlayerDTO(true, "success", player);
+			return new DTO(true, "success");
 		}
-		return new PlayerDTO(false, playerDalDto._message, null);
+		return new DTO(false, playerDalDto._message);
 	}
 
 	@Override
-	public UserFrontDTO registration(UserRegIn userRegIn) {
-		return null;
+	public UserLoginDataDTO registration(UserRegIn userRegIn) {
+		PlayerDalDTO playerDalDto = hService.registration(userRegIn);
+		if (playerDalDto._success) {
+			UserLoginData loginData = new UserLoginData();
+			loginData.name = playerDalDto._playerDal.userDal.name;
+			loginData.password = playerDalDto._playerDal.userDal.password;
+			return new UserLoginDataDTO(true, "success", loginData);
+		}
+		return new UserLoginDataDTO(false, playerDalDto._message, null);
 	}
 
 	@Override
@@ -82,7 +90,7 @@ public class LoginService implements ILoginService {
 		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
 				cashe.removePlayer(entry.getKey());
-				}
+			}
 		}
 
 	}
@@ -107,7 +115,6 @@ public class LoginService implements ILoginService {
 		cashe.addPlayer(userId, player);
 		cashe.getPlayer(userId);
 	}
-
 
 	@Override
 	public boolean userValidator(HttpServletRequest request) {

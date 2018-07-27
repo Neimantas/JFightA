@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import configuration.StartupContainer;
 import models.business.User;
 import models.business.UserLoginData;
+import models.dto.DTO;
 import models.dto.PlayerDTO;
 import models.dto.UserDTO;
 import models.dto.UserFrontDTO;
@@ -28,15 +29,15 @@ public class LoginServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	LoginService logService;
+	private ILoginService _logService;
 
 	public LoginServlet() {
-		 logService = StartupContainer.easyDI.getInstance(LoginService.class);
+		 _logService = StartupContainer.easyDI.getInstance(LoginService.class);
 	}
 
-	 public LoginServlet(LoginService logServiceImpl) {
-	 logService = logServiceImpl;
-	 }
+//	 public LoginServlet(LoginService logServiceImpl) {
+//	 _logService = logServiceImpl;
+//	 }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -60,11 +61,11 @@ public class LoginServlet extends HttpServlet {
 		UserLoginData user = new UserLoginData();
 		user.name = userName;
 		user.password = pass;
-		PlayerDTO playerDTO=logService.login(response,user);
-		if (playerDTO._success) {
+		DTO playerDTO=_logService.login(response,user);
+		if (playerDTO.success) {
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 		}
-		if(!playerDTO._success) {
+		if(!playerDTO.success) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);	
 		}
 	}

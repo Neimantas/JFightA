@@ -7,6 +7,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
+import models.business.UserLoginData;
+import models.business.UserRegIn;
+import models.dto.DTO;
+import models.dto.UserLoginDataDTO;
+import services.ILoginService;
+import services.impl.LoginService;
+
 /**
  * Servlet implementation class RegistrationServlet
  */
@@ -17,9 +25,10 @@ public class RegistrationServlet extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
+	private ILoginService _logService;
+	
     public RegistrationServlet() {
-        super();
-        // TODO Auto-generated constructor stub
+    	 _logService = StartupContainer.easyDI.getInstance(LoginService.class);
     }
 
 	/**
@@ -34,8 +43,24 @@ public class RegistrationServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		UserRegIn userRegInfo = new UserRegIn();
+		userRegInfo.name= request.getParameter("username");
+		userRegInfo.password= request.getParameter("pass");
+		userRegInfo.mail=request.getParameter("mail");
+		UserLoginData userLogin=new UserLoginData();
+		userLogin.name=userRegInfo.name;
+		userLogin.password=userRegInfo.password;
+		UserLoginDataDTO dto=_logService.registration(userRegInfo);
+		if(dto.success) {
+			DTO playerDTO=_logService.login(response,userLogin);
+			if (playerDTO.success) {
+				request.getRequestDispatcher("News.jsp").forward(request, response);
+			}
+			if(!playerDTO.success) {
+				request.getRequestDispatcher("index.jsp").forward(request, response);	
+			}
+		};
+		
 	}
 
 }

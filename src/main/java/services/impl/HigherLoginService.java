@@ -65,10 +65,12 @@ public class HigherLoginService implements IHigherLoginService {
 		userInDal.password = userRegIn.password;
 		userInDal.eMail = userRegIn.mail;
 		//Creates new user 
-		ObjectDTO<Integer> newUserDto = crud.create(userInDal);
+		crud.create(userInDal);
+		//Read new created user
+		ListDTO<UserDAL> newUserDto = crud.read(userInDal);		
 		if (newUserDto.success) {
 			//Fills new char info
-			userInDal.userId = newUserDto.transferData;
+			userInDal.userId = newUserDto.transferDataList.get(0).userId;
 			CharacterDAL newCharacter = new CharacterDAL();
 			newCharacter.userId = userInDal.userId;
 			newCharacter.healthPoints = 100;
@@ -81,8 +83,6 @@ public class HigherLoginService implements IHigherLoginService {
 				UserLoginData user = new UserLoginData();
 				user.name = userInDal.name;
 				user.password = userInDal.password;
-				//logins to created user
-				login(user);
 				return new PlayerDalDTO(true, "success",null);
 			}
 			return new PlayerDalDTO(false, characterCreat.message,null);
