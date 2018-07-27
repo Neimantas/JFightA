@@ -86,7 +86,7 @@
 
 			<div class="col-6">
 				<div class="row justify-content-center">
-					<button class="btn-default" id="play" onclick="clicker(this.id)">Play</button>
+					<button class="btn-default" id="play" onclick="play()">Play</button>
 					<button class="btn-default" id="ready"
 						onclick="rdyBtn(this.innerText)">${Ready}</button>
 					<button class="btn-default" id="refresh" onclick="clicker(this.id)">Refresh</button>

@@ -5,6 +5,17 @@ function clicker(btnName){															//For Play and Logout functions.
 			location.href = url;
 
 	}
+function play(){
+	var readyPlayers = document.getElementById("readyPlayers");
+	var selectas = readyPlayers.options[readyPlayers.selectedIndex];
+	if(selectas != undefined){
+		var url2 ="News?selectedPlayer="+selectas.value;
+		location.href = url2;
+	}else{
+		location.href = url;		//if there is no selection - refresh page
+	}
+}
+
 	
 	function rdyBtn(text){																//When ready/Not Ready button is pressed do:
 		var tempText = "";

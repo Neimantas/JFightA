@@ -41,7 +41,7 @@ public class NewsServlet extends HttpServlet {
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		//Player player = getThisPlayer(request);
-		
+		System.out.println(request.getParameter("selectedPlayer"));
 		
 		
 		
