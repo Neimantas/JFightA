@@ -2,7 +2,6 @@ package services.impl;
 
 import java.util.Map.Entry;
 import java.util.UUID;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,9 +11,11 @@ import models.business.User;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.UserDAL;
+import models.dto.DTO;
 import models.dto.PlayerDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserFrontDTO;
+import models.dto.UserLoginDataDTO;
 import services.ICache;
 import services.ILoginService;
 
@@ -29,7 +30,7 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public PlayerDTO login(HttpServletResponse response, UserLoginData userIn) {
+	public DTO login(HttpServletResponse response, UserLoginData userIn) {
 		User userOut = new User();
 		// Get player form hService
 		PlayerDalDTO playerDalDto = hService.login(userIn);
@@ -59,25 +60,45 @@ public class LoginService implements ILoginService {
 			player.user = userOut;
 			// add player to cache
 			aadCashe(player, userOut.userId);
-			return new PlayerDTO(true, "success", player);
+			return new DTO(true, "success");
 		}
-		return new PlayerDTO(false, playerDalDto._message, null);
+		return new DTO(false, playerDalDto._message);
 	}
 
 	@Override
-	public UserFrontDTO registration(UserRegIn userRegIn) {
-		return null;
+	public UserLoginDataDTO registration(UserRegIn userRegIn) {
+		UserLoginDataDTO userloginData = hService.registration(userRegIn);
+		if (userloginData.success) {
+			UserLoginData loginData = new UserLoginData();
+			loginData.name = userloginData.userloginData.name;
+			loginData.password = userloginData.userloginData.password;
+			return new UserLoginDataDTO(true, "success", loginData);
+		}
+		return new UserLoginDataDTO(false, userloginData.message, null);
 	}
 
 	@Override
-	public void logout(User user) {
+	public void logout(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		String cookieValue = "";
+		for (int i = 0; i < cookies.length; i++) {
+			if (cookies[i].getName().equals("JFightUser")) {
+				cookieValue = cookies[i].getValue();
+				cookies[i].setMaxAge(0);
+			}
+		}
+		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
+				cashe.removePlayer(entry.getKey());
+			}
+		}
 
 	}
 
 	@Override
 	public void addCookies(HttpServletResponse response, User userWithInfo) {
 		Cookie ck = new Cookie("JFightUser", userWithInfo.cookiesValue);
-		ck.setMaxAge(3000);
+		ck.setMaxAge(3600);
 		response.addCookie(ck);
 
 	}
@@ -92,21 +113,8 @@ public class LoginService implements ILoginService {
 	@Override
 	public void aadCashe(Player player, int userId) {
 		cashe.addPlayer(userId, player);
+		cashe.getPlayer(userId);
 	}
-
-	// public void testCashe(HttpServletRequest request) {
-	// for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
-	// System.out.println(entry.getKey() + ">>>>>>>>>>>>>> user name " +
-	// entry.getValue().user.name
-	// + " cookies value " + entry.getValue().user.cookiesValue);
-	// }
-	// Cookie[] cookies = request.getCookies();
-	// for (int i = 0; i < cookies.length; i++) {
-	// String name = cookies[i].getName();
-	// String value = cookies[i].getValue();
-	// System.out.println("cookie name " + name + " value " + value);
-	// }
-	// }
 
 	@Override
 	public boolean userValidator(HttpServletRequest request) {
@@ -115,6 +123,7 @@ public class LoginService implements ILoginService {
 		for (int i = 0; i < cookies.length; i++) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
+				cookies[i].setMaxAge(3600);
 			}
 		}
 		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {

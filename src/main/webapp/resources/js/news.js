@@ -1,8 +1,21 @@
-	function clicker(btnName){															//For Play and Logout functions.
-			url = "News?button=" + btnName;
+	url = "News?";
+
+function clicker(btnName){															//For Play and Logout functions.
+//			url = "News?button=" + btnName;
 			location.href = url;
 
 	}
+function play(){
+	var readyPlayers = document.getElementById("readyPlayers");
+	var selectas = readyPlayers.options[readyPlayers.selectedIndex];
+	if(selectas != undefined){
+		var url2 ="News?button=play&selectedPlayer="+selectas.value;
+		location.href = url2;
+	}else{
+		location.href = url;		//if there is no selection - refresh page
+	}
+}
+
 	
 	function rdyBtn(text){																//When ready/Not Ready button is pressed do:
 		var tempText = "";
@@ -18,7 +31,7 @@
 	}
 	
 	function readyFunc(){	
-		var url = new URL(location.href); 												//Put current Url to variable "url"
+		url = new URL(location.href); 												//Put current Url to variable "url"
 		var ready = url.searchParams.get("ready") == null ? false : url.searchParams.get("ready");		//gettin parameters from url, 
 																										//if there is no ready parameter -ready becomes false. 
 																										//if not null - var ready = current param.

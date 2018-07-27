@@ -16,6 +16,7 @@ import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserDTO;
+import models.dto.UserLoginDataDTO;
 import services.ICRUD;
 import services.ICache;
 import services.IHigherLoginService;
@@ -58,35 +59,40 @@ public class HigherLoginService implements IHigherLoginService {
 	}
 
 	@Override
-	public PlayerDalDTO registration(UserRegIn userRegIn) {
+	public UserLoginDataDTO registration(UserRegIn userRegIn) {
 		//Fills new user info
 		UserDAL userInDal = new UserDAL();
 		userInDal.name = userRegIn.name;
 		userInDal.password = userRegIn.password;
 		userInDal.eMail = userRegIn.mail;
+		userInDal.accessLevel=1;
+		userInDal.imageId=20;
 		//Creates new user 
-		ObjectDTO<Integer> newUserDto = crud.create(userInDal);
+		crud.create(userInDal);
+		//Read new created user
+		ListDTO<UserDAL> newUserDto = crud.read(userInDal);		
 		if (newUserDto.success) {
 			//Fills new char info
-			userInDal.userId = newUserDto.transferData;
+			userInDal.userId = newUserDto.transferDataList.get(0).userId;
 			CharacterDAL newCharacter = new CharacterDAL();
 			newCharacter.userId = userInDal.userId;
 			newCharacter.healthPoints = 100;
 			newCharacter.strenght = 5;
 			newCharacter.experience = 0;
 			newCharacter.level = 1;
+			newCharacter.attackItemId=1;
+			newCharacter.defenceItemId=2;
 			//Creates mew char
 			ObjectDTO<Integer> characterCreat = crud.create(newCharacter);
 			if (characterCreat.success) {
+				System.out.println("pateko");
 				UserLoginData user = new UserLoginData();
 				user.name = userInDal.name;
 				user.password = userInDal.password;
-				//logins to created user
-				login(user);
-				return new PlayerDalDTO(true, "success",null);
+				return new UserLoginDataDTO(true, "success",user);
 			}
-			return new PlayerDalDTO(false, characterCreat.message,null);
+			return new UserLoginDataDTO(false, characterCreat.message,null);
 		}
-		return new PlayerDalDTO(false, newUserDto.message,null);
+		return new UserLoginDataDTO(false, newUserDto.message,null);
 	}
 }

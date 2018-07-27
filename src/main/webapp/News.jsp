@@ -41,7 +41,7 @@
 			class="nav-link dropdown-toggle mr-3 mr-lg-0"
 			id="navbarDropdownMenuLink" data-toggle="dropdown"
 			aria-haspopup="true" aria-expanded="false"><i
-				class="fa fa-user-circle" aria-hidden="true"></i>Username<span
+				class="fa fa-user-circle" aria-hidden="true"></i>${userName}<span
 				class="caret"></span> </a>
 			<div class="dropdown-menu dropdown-menu-right"
 				aria-labelledby="navbarDropdownMenuLink">
@@ -73,15 +73,23 @@
 		<div class="row">
 			<div class="col-6">
 				<div class="row justify-content-center" id="message">${ReadyMessage}</div>
-				<div class="row justify-content-center">Online players. Get it somehow</div>
+				<div class="row justify-content-center">
+				<div class="col" >
+				<select class="custom-select" size="20" id="readyPlayers">
+					<c:forEach items="${readyPlayers}" var="players">
+					<option value="${players.key}">${players.value}</option>
+					</c:forEach>
+				</select>
+				</div>
+				</div>
 			</div>
 
 			<div class="col-6">
 				<div class="row justify-content-center">
-					<button class="btn-default" id="play" onclick="clicker(this.id)">Play</button>
+					<button class="btn-default" id="play" onclick="play()">Play</button>
 					<button class="btn-default" id="ready"
 						onclick="rdyBtn(this.innerText)">${Ready}</button>
-					<button class="btn-default" id="logout" onclick="clicker(this.id)">Logout</button>
+					<button class="btn-default" id="refresh" onclick="clicker(this.id)">Refresh</button>
 				</div>
 				<div class="row justify-content-center">put here some text from admin</div>
 			</div>
