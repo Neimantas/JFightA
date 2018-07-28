@@ -46,7 +46,7 @@ public class ItemTest {
 		player.characterInfo = characterInfo;
 		player.userStatus = UserStatus.NOT_READY;
 		
-		cache.addPlayer(player.user.userId, player);
+		cache.addPlayer(player);
 		
 		Map<ItemType, ItemDAL> items = item.getUserItems(player.user.userId);
 		

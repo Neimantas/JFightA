@@ -14,17 +14,22 @@ public class Settings {
 	public static final boolean WRITE_LOGS_TO_CONSOLE = true;
 
 	/**
-	 * Expire time in seconds.
-	 * Item will be deleted from the cache if it will not be
-	 * used longer than expire time. Max round time is 30 seconds, so item expire
-	 * time should longer.
+	 * Expire time in hours. Player will be removed from the cache if it is inactive
+	 * longer than expire time.
 	 */
-	public static final int CACHE_ITEM_EXPIRE_TIME = 31;
+	public static final int CACHE_PLAYER_EXPIRE_TIME = 6;
 
 	/**
-	 * Approximate expire time in minutes.
-	 * Every period cache service deletes expired data itself.
-	 * The time of a fight is somewhere about 3 minutes. So 5 minutes should be ok.
+	 * Expire time in seconds. Image and item will be deleted from the cache if it
+	 * will not be used longer than expire time. Max round time is 30 seconds, so
+	 * item expire time should longer.
+	 */
+	public static final int CACHE_IMAGE_AND_ITEM_EXPIRE_TIME = 31;
+
+	/**
+	 * Approximate cleanup period in minutes. Every period cache service deletes
+	 * expired data itself. The time of a fight is somewhere about 3 minutes. So 5
+	 * minutes should be ok.
 	 */
 	public static final int CACHE_EXPIRED_DATA_CLEANUP_PERIOD = 5;
 

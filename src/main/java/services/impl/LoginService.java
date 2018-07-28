@@ -85,11 +85,13 @@ public class LoginService implements ILoginService {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(0);
+				break;
 			}
 		}
 		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
 				cashe.removePlayer(entry.getKey());
+				break;
 			}
 		}
 
@@ -112,7 +114,7 @@ public class LoginService implements ILoginService {
 
 	@Override
 	public void aadCashe(Player player, int userId) {
-		cashe.addPlayer(userId, player);
+		cashe.addPlayer(player);
 		cashe.getPlayer(userId);
 	}
 

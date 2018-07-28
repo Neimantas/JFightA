@@ -18,7 +18,7 @@ public class LogImpl implements ILog {
 
 	private SimpleDateFormat _simpleDateFormat;
 	private SimpleDateFormat _simpleDateAndTimeFormat;
-	private static Boolean _allowWriteToConsoleGlobal = Settings.WRITE_LOGS_TO_CONSOLE;
+	private static boolean _allowWriteToConsoleGlobal = Settings.WRITE_LOGS_TO_CONSOLE;
 	private static String _logDirectory = Settings.LOG_DIRECTORY;
 
 	private LogImpl() {

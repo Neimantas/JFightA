@@ -1,7 +1,6 @@
 package services.impl;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +34,7 @@ public class CRUDImpl implements ICRUD {
 	 */
 	@Override
 	public <T> ObjectDTO<Integer> create(T dal) {
-		try (Connection connection = setDatabaseConnection();) {
+		try (Connection connection = setDatabaseConnection()) {
 			Class<?> dalClass = dal.getClass();
 			Field[] dalClassFields = dalClass.getFields();
 			String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
@@ -91,7 +90,7 @@ public class CRUDImpl implements ICRUD {
 	 */
 	@Override
 	public <T> ListDTO<T> read(T dal) {
-		try (Connection connection = setDatabaseConnection();) {
+		try (Connection connection = setDatabaseConnection()) {
 
 			ListDTO<T> listDTO = new ListDTO<>();
 
@@ -161,7 +160,7 @@ public class CRUDImpl implements ICRUD {
 	 */
 	@Override
 	public <T> DTO update(T dal) {
-		try (Connection connection = setDatabaseConnection();) {
+		try (Connection connection = setDatabaseConnection()) {
 			DTO dto = new DTO();
 
 			Class<?> dalClass = dal.getClass();
@@ -208,7 +207,7 @@ public class CRUDImpl implements ICRUD {
 	 */
 	@Override
 	public <T> DTO delete(T dal) {
-		try (Connection connection = setDatabaseConnection();) {
+		try (Connection connection = setDatabaseConnection()) {
 			DTO dto = new DTO();
 
 			Class<?> dalClass = dal.getClass();
@@ -230,7 +229,7 @@ public class CRUDImpl implements ICRUD {
 			preparedStatement.close();
 
 			dto.success = true;
-			dto.message = "Row deleted successfully.";
+			dto.message = "Delete successful.";
 
 			return dto;
 		} catch (Exception e) {

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import models.constant.ItemType;
 import models.dal.CharacterDAL;
@@ -33,6 +35,10 @@ public class CrudTest {
 		ListDTO<LogDAL> ldto = crud.read(logDAL);
 		System.out.println(ldto.transferDataList.size());
 		
+		UserDAL userDAL = new UserDAL();
+		userDAL.userId = 100;
+		DTO deleteDTO = crud.delete(userDAL);
+		System.out.println("\n" + deleteDTO.message);
 		
 //		testImage(crud);
 //		testItem(crud);
