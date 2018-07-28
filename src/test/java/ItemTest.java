@@ -1,6 +1,3 @@
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Map;
 
 import models.business.CharacterInfo;
@@ -23,15 +20,9 @@ public class ItemTest {
 
 	public static void main(String[] args) {
 
-//		testDeleteImage();
-//		try {
-//			// testAddImage();
-//			testEditImage();
-//		} catch (IOException e) {
-//		}
 
 	}
-
+	
 	private static void testGetUserItems() {
 
 		ICRUD crud = new CRUDImpl();
@@ -68,31 +59,5 @@ public class ItemTest {
 
 	}
 
-	private static void testAddImage() throws IOException {
-
-		IItem item = new ItemImpl(new CRUDImpl());
-
-		File file = new File("src\\main\\webapp\\resources\\images\\characters\\Alex.png");
-		byte[] image = Files.readAllBytes(file.toPath());
-		String imageName = "Alex.png";
-		item.addImage(11, imageName, image);
-
-	}
 	
-	private static void testEditImage() throws IOException {
-		
-		IItem item = new ItemImpl(new CRUDImpl());
-
-		File file = new File("src\\main\\webapp\\resources\\images\\characters\\chun-li.jpg");
-		byte[] image = Files.readAllBytes(file.toPath());
-		String imageName = "chun-li.jpg";
-		item.editImage(11, imageName, image);
-	}
-	
-	private static void testDeleteImage() {
-		
-		IItem item = new ItemImpl(new CRUDImpl());
-		item.deleteImage(10);
-		
-	}
 }

@@ -13,19 +13,19 @@ import configuration.StartupContainer;
 import eu.lestard.easydi.EasyDI;
 import models.dal.ImageDAL;
 import models.dto.ObjectDTO;
-import services.IItem;
+import services.IImage;
 import services.impl.CRUDImpl;
 import services.impl.DatabaseImpl;
-import services.impl.ItemImpl;
+import services.impl.ImageImpl;
 
 @WebServlet(urlPatterns = "/imageServlet")
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private IItem item;
+	private IImage image;
 	
 	public ImageServlet() {
-		item = StartupContainer.easyDI.getInstance(ItemImpl.class);
+		image = StartupContainer.easyDI.getInstance(ImageImpl.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,9 +40,9 @@ public class ImageServlet extends HttpServlet {
 
 		ObjectDTO<ImageDAL> objectDTO;
 		if (user != null && user.equalsIgnoreCase("b")) {
-			objectDTO = item.getUserBImage(Integer.parseInt(id));
+			objectDTO = image.getUserBImage(Integer.parseInt(id));
 		} else {
-			objectDTO = item.getUserAImage(Integer.parseInt(id));
+			objectDTO = image.getUserAImage(Integer.parseInt(id));
 		}
 
 		if (objectDTO.success && objectDTO.transferData != null) {

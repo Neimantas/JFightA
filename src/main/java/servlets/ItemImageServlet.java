@@ -14,7 +14,7 @@ import models.dto.ListDTO;
 import services.ICRUD;
 import services.impl.CRUDImpl;
 import services.impl.FightEngineImpl;
-import services.impl.ItemImpl;
+import services.impl.ImageImpl;
 
 @WebServlet("/itemImageServlet")
 public class ItemImageServlet extends HttpServlet {
