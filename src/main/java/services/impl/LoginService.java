@@ -22,11 +22,11 @@ import services.ILoginService;
 public class LoginService implements ILoginService {
 
 	HigherLoginService hService;
-	ICache cashe;
+	ICache cache;
 
 	public LoginService(HigherLoginService hServiceImpl) {
 		hService = hServiceImpl;
-		cashe = CacheImpl.getInstance();
+		cache = CacheImpl.getInstance();
 	}
 
 	@Override
@@ -88,9 +88,12 @@ public class LoginService implements ILoginService {
 				break;
 			}
 		}
-		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+		for (Entry<Integer, Player> entry : cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
-				cashe.removePlayer(entry.getKey());
+				if (entry.getValue().user.imageId != null) {
+					cache.removeImage(entry.getValue().user.imageId);
+				}
+				cache.removePlayer(entry.getKey());
 				break;
 			}
 		}
@@ -114,8 +117,8 @@ public class LoginService implements ILoginService {
 
 	@Override
 	public void aadCashe(Player player, int userId) {
-		cashe.addPlayer(player);
-		cashe.getPlayer(userId);
+		cache.addPlayer(player);
+		cache.getPlayer(userId);
 	}
 
 	@Override
@@ -128,7 +131,7 @@ public class LoginService implements ILoginService {
 				cookies[i].setMaxAge(3600);
 			}
 		}
-		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+		for (Entry<Integer, Player> entry : cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
 				return true;
 			}

@@ -14,7 +14,7 @@ public interface IItem {
 	ObjectDTO<ImageDAL> getUserBImage(int userBId);
 	ObjectDTO<Integer> addImage(int userId, String imageName, byte[] image);
 	DTO editImage(int userId, String imageName, byte[] image);
-	DTO editDefaultImage(int imageId);
+	DTO editDefaultImage(int imageId, String imageName, byte[] image);
 	DTO deleteImage(int userId);
 	ObjectDTO<ItemDAL> getItem(int itemId);
 	Map<ItemType, ItemDAL> getUserItems(int userId);

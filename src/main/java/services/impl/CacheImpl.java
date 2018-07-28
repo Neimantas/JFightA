@@ -1,6 +1,7 @@
 package services.impl;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -113,9 +114,34 @@ public class CacheImpl implements ICache {
 	}
 
 	private void cleanUpExpiredData() {
-		_playerExpireTime.entrySet().removeIf(e -> System.currentTimeMillis() > e.getValue());
-		_imageExpireTime.entrySet().removeIf(e -> System.currentTimeMillis() > e.getValue());
-		_itemExpireTime.entrySet().removeIf(e -> System.currentTimeMillis() > e.getValue());
+		// Clean up players if expired
+		for (Iterator<Map.Entry<Integer, Long>> playerIterator = _playerExpireTime.entrySet().iterator(); 
+				playerIterator.hasNext();) {
+			Map.Entry<Integer, Long> playerEntry = playerIterator.next();
+			if (System.currentTimeMillis() > playerEntry.getValue()) {
+				_players.remove(playerEntry.getKey());
+				playerIterator.remove();
+			}
+		}
+		// Clean up images if expired
+		for (Iterator<Map.Entry<Integer, Long>> imageIterator = _imageExpireTime.entrySet().iterator();
+				imageIterator.hasNext();) {
+			Map.Entry<Integer, Long> imageEntry = imageIterator.next();
+			if (System.currentTimeMillis() > imageEntry.getValue()) {
+				_images.remove(imageEntry.getKey());
+				imageIterator.remove();
+			}
+		}
+		// Clean up items if expired
+		for (Iterator<Map.Entry<Integer, Long>> itemIterator = _itemExpireTime.entrySet().iterator();
+				itemIterator.hasNext();) {
+			Map.Entry<Integer, Long> itemEntry = itemIterator.next();
+			if (System.currentTimeMillis() > itemEntry.getValue()) {
+				_items.remove(itemEntry.getKey());
+				itemIterator.remove();
+			}
+		}
+
 		_nextExpiredDataCleanUpTime = System.currentTimeMillis()
 				+ Settings.CACHE_EXPIRED_DATA_CLEANUP_PERIOD * ONE_MINUTE;
 	}

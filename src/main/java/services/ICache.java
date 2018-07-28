@@ -17,6 +17,6 @@ public interface ICache {
 	ItemDAL getItem(int itemId);
 	void addImage(ImageDAL imageDAL);
 	void removeImage(int imageId);
-	ImageDAL getImage(int imagemId);
+	ImageDAL getImage(int imageId);
 
 }
