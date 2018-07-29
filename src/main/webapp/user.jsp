@@ -45,7 +45,7 @@
 					<a class="dropdown-item" href="/JFight/user?log=false">Character
 						Info</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href=""><i class="fa fa-sign-out"
+					<a class="dropdown-item" href="/JFight/LogOutServlet"><i class="fa fa-sign-out"
 						aria-hidden="true"></i>Logout</a>
 				</div></li>
 		</ul>
