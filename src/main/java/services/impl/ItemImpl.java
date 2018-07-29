@@ -3,8 +3,10 @@ package services.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import models.constant.ImageType;
 import models.constant.ItemType;
 import models.dal.ItemDAL;
+import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
@@ -13,7 +15,7 @@ import services.IItem;
 import services.ILog;
 
 public class ItemImpl implements IItem {
-	
+
 	private ICRUD _crud;
 	private ICache _cache;
 	private ILog _log;
@@ -24,6 +26,11 @@ public class ItemImpl implements IItem {
 		_log = LogImpl.getInstance();
 	}
 
+	/**
+	 * Method gets item from the cache. If there is no item in a cache, method
+	 * downloads it from a database ant puts it to cache. In case of error, if there
+	 * is no item with such Id, method will try get and return item No 1.
+	 */
 	@Override
 	public ObjectDTO<ItemDAL> getItem(int itemId) {
 		ObjectDTO<ItemDAL> itemDTO = new ObjectDTO<>();
@@ -44,6 +51,10 @@ public class ItemImpl implements IItem {
 		}
 	}
 
+	/**
+	 * Returns user items. In case of error will try to return ATTACK item No 1 and
+	 * DEFENCE item No 2.
+	 */
 	@Override
 	public Map<ItemType, ItemDAL> getUserItems(int userId) {
 		int attackItemId = 0;
@@ -70,7 +81,60 @@ public class ItemImpl implements IItem {
 		userItems.put(ItemType.DEFENCE, defenceItemDAL);
 		return userItems;
 	}
-	
+
+	@Override
+	public ObjectDTO<Integer> createNewItem(String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
+			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
+
+		if (minCharacterLevel < 1) {
+			return createInputParameterErrorDTO("createNewItem");
+		}
+
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemName = itemName;
+		itemDAL.itemImage = itemImage;
+		itemDAL.imageFormat = imageType.getImageExtension();
+		itemDAL.itemType = itemType;
+		itemDAL.description = !description.equals("") ? description : null;
+		itemDAL.minCharacterLevel = minCharacterLevel;
+		itemDAL.attackPoints = attackPoints;
+		itemDAL.defencePoints = defencePoints;
+		return _crud.create(itemDAL);
+	}
+
+	@Override
+	public DTO editItem(int itemId, String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
+			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
+
+		if (minCharacterLevel < 1) {
+			return createInputParameterErrorDTO("editItem");
+		}
+
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		itemDAL.itemName = itemName;
+		itemDAL.itemImage = itemImage;
+		itemDAL.imageFormat = imageType.getImageExtension();
+		itemDAL.itemType = itemType;
+		itemDAL.description = !description.equals("") ? description : null;
+		itemDAL.minCharacterLevel = minCharacterLevel;
+		itemDAL.attackPoints = attackPoints;
+		itemDAL.defencePoints = defencePoints;
+
+		DTO updateDTO = _crud.update(itemDAL);
+		if (updateDTO.success) {
+			_cache.removeItem(itemId);
+		}
+
+		return updateDTO;
+	}
+
+	@Override
+	public DTO deleteItem(int itemId) {
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		return _crud.delete(itemDAL);
+	}
 
 	private ObjectDTO<ItemDAL> downloadItemFromDatabase(int itemId) {
 		ItemDAL itemDAL = new ItemDAL();
@@ -84,7 +148,8 @@ public class ItemImpl implements IItem {
 			return itemDTO;
 		} else {
 			_log.writeWarningMessage("Item No " + itemId + " wasn't downloaded from the database.", true,
-					"Class: CacheImpl, method: private boolean downloadItem(int itemId).");
+					"Class: CacheImpl, method: private boolean downloadItemFromDatabase(int itemId).",
+					"crud read message: " + listDTO.message);
 			itemDTO.message = listDTO.message;
 			return itemDTO;
 		}
@@ -96,6 +161,14 @@ public class ItemImpl implements IItem {
 		} else {
 			return getItem(itemId).transferData;
 		}
+	}
+
+	private ObjectDTO<Integer> createInputParameterErrorDTO(String methodName) {
+		ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
+		objectDTO.message = "Wrong input parameter. minCharacterLevel should be not less than one.";
+		_log.writeWarningMessage(objectDTO.message, true,
+				"Class: ItemImpl, Method: " + methodName + "(input parameters)");
+		return objectDTO;
 	}
 
 }

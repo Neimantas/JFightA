@@ -6,6 +6,7 @@ import java.util.Map;
 import models.business.CharacterInfo;
 import models.business.Player;
 import models.business.User;
+import models.constant.ImageType;
 import models.constant.ItemType;
 import models.constant.UserStatus;
 import models.dal.CharacterDAL;
@@ -38,8 +39,8 @@ public class ImageTest {
 
 		File file = new File("src\\main\\webapp\\resources\\images\\characters\\Alex.png");
 		byte[] image = Files.readAllBytes(file.toPath());
-		String imageName = "Alex.png";
-		item.addImage(11, imageName, image);
+		String imageName = "Alex";
+		item.addImage(11, imageName, ImageType.PNG, image);
 
 	}
 
@@ -49,8 +50,8 @@ public class ImageTest {
 
 		File file = new File("src\\main\\webapp\\resources\\images\\characters\\chun-li.jpg");
 		byte[] image = Files.readAllBytes(file.toPath());
-		String imageName = "chun-li.jpg";
-		item.editImage(11, imageName, image);
+		String imageName = "chun-li";
+		item.editImage(11, imageName, ImageType.JPG, image);
 	}
 
 	private static void testDeleteImage() {
