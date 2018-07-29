@@ -1,7 +1,7 @@
 package services.impl;
 
 import models.business.Player;
-
+import models.constant.ImageType;
 import models.dal.ImageDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
@@ -22,7 +22,9 @@ public class ImageImpl implements IImage {
 	}
 
 	/**
-	 * If user A has no his own image, will be downloaded default image 1.
+	 * If user A has no his own image, will be got default image 1.
+	 * Method gets image from the cache. If image in a cache doesn't exists,
+	 * method downloads it from a database ant puts to cache.
 	 */
 	@Override
 	public ObjectDTO<ImageDAL> getUserAImage(int userAId) {
@@ -30,18 +32,24 @@ public class ImageImpl implements IImage {
 	}
 
 	/**
-	 * If user B has no his own image, will be downloaded default image 2.
+	 * If user B has no his own image, will be got default image 2.
+	 * Method gets image from the cache. If image in a cache doesn't exists,
+	 * method downloads it from a database ant puts to cache.
 	 */
 	@Override
 	public ObjectDTO<ImageDAL> getUserBImage(int userBId) {
 		return getUserImage(userBId, false);
 	}
 
+	/**
+	 * Method add's new user image to database image table, updates user info in a
+	 * database user table, updates user info in a cache.
+	 */
 	@Override
-	public ObjectDTO<Integer> addImage(int userId, String imageName, byte[] image) {
+	public ObjectDTO<Integer> addImage(int userId, String imageName, ImageType imageType, byte[] image) {
 		ImageDAL imageDAL = new ImageDAL();
 		imageDAL.userId = userId;
-		imageDAL.imageName = imageName;
+		imageDAL.imageName = imageName + imageType.getImageExtension();
 		imageDAL.image = image;
 
 		ObjectDTO<Integer> imageDTO = _crud.create(imageDAL);
@@ -64,8 +72,12 @@ public class ImageImpl implements IImage {
 		}
 	}
 
+	/**
+	 * Changes user image in a database image table. Removes old user image from
+	 * cache if exists.
+	 */
 	@Override
-	public DTO editImage(int userId, String imageName, byte[] image) {
+	public DTO editImage(int userId, String imageName, ImageType imageType, byte[] image) {
 		DTO editDTO = new DTO();
 		ObjectDTO<Integer> imageIdDTO = getImageId(userId);
 
@@ -77,7 +89,7 @@ public class ImageImpl implements IImage {
 		ImageDAL imageDAL = new ImageDAL();
 		imageDAL.imageId = imageIdDTO.transferData;
 		imageDAL.userId = userId;
-		imageDAL.imageName = imageName;
+		imageDAL.imageName = imageName + imageType.getImageExtension();
 		imageDAL.image = image;
 
 		editDTO = _crud.update(imageDAL);
@@ -87,8 +99,13 @@ public class ImageImpl implements IImage {
 		return editDTO;
 	}
 
+	/**
+	 * Changes default image (imageId can be only 1 or 2). Remove old default image
+	 * from cache if exists.
+	 * Method should be used by administrators only.
+	 */
 	@Override
-	public DTO editDefaultImage(int imageId, String imageName, byte[] image) {
+	public DTO editDefaultImage(int imageId, String imageName, ImageType imageType, byte[] image) {
 		DTO editDTO = new DTO();
 
 		if (imageId < 1 || imageId > 2) {
@@ -98,7 +115,7 @@ public class ImageImpl implements IImage {
 
 		ImageDAL imageDAL = new ImageDAL();
 		imageDAL.imageId = imageId;
-		imageDAL.imageName = imageName;
+		imageDAL.imageName = imageName + imageType.getImageExtension();
 		imageDAL.image = image;
 
 		editDTO = _crud.update(imageDAL);
@@ -108,6 +125,9 @@ public class ImageImpl implements IImage {
 		return editDTO;
 	}
 
+	/**
+	 * Deletes user image from a database and from a cache if exists.
+	 */
 	@Override
 	public DTO deleteImage(int userId) {
 		DTO deleteDTO = new DTO();
