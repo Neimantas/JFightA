@@ -13,6 +13,7 @@ import models.dal.ItemDAL;
 import models.dto.ObjectDTO;
 import services.IItem;
 import services.impl.ImageImpl;
+import services.impl.ItemImpl;
 
 @WebServlet("/itemImageServlet")
 public class ItemImageServlet extends HttpServlet {
