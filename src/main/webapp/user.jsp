@@ -38,11 +38,11 @@
 				class="nav-link dropdown-toggle mr-3 mr-lg-0"
 				id="navbarDropdownMenuLink" data-toggle="dropdown"
 				aria-haspopup="true" aria-expanded="false"><i
-					class="fa fa-user-circle" aria-hidden="true"></i>Username<span
+					class="fa fa-user-circle" aria-hidden="true"></i>${userName}<span
 					class="caret"></span> </a>
 				<div class="dropdown-menu dropdown-menu-right"
 					aria-labelledby="navbarDropdownMenuLink">
-					<a class="dropdown-item" href="/JFight/user?userId=5">Character
+					<a class="dropdown-item" href="/JFight/user?log=true">Character
 						Info</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href=""><i class="fa fa-sign-out"
@@ -59,7 +59,8 @@
 	<nav class="navbar navbar-expand-md navbar-light py-md-0">
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav ml-1">
-				<li class="nav-item mx-2"><a class="nav-link" href="/JFight/News">Home</a></li>
+				<li class="nav-item mx-2"><a class="nav-link"
+					href="/JFight/News">Home</a></li>
 				<li class="nav-item mx-2"><a class="nav-link disabled" href="">Items</a></li>
 			</ul>
 		</div>
@@ -70,8 +71,7 @@
 			<div class="col-lg-5 col-md-12 mx-lg-1">
 				<div class="row mb-1">
 					<div
-						class="col border border-dark rounded font-weight-bold text-center py-1">Username
-						${userId}</div>
+						class="col border border-dark rounded font-weight-bold text-center py-1">${userName}</div>
 				</div>
 				<div class="row mb-1">
 					<div class="col border border-dark rounded text-center py-1">Level:
@@ -103,14 +103,14 @@
 					<div class="col border border-dark rounded text-center py-1">
 						<div class="col-12 font-weight-bold">Character Stats</div>
 						<div class="col-12">Strength: ${strenght}</div>
-						</div>
+					</div>
 				</div>
 			</div>
 			<div class="col-lg col-md-12">
 				<div class="row mb-1">
 					<div class="col border border-dark rounded py-1">
 						<div class="text-center">
-							<img src="imageServlet?id=${userId}&user=a" class="rounded"
+							<img src="imageServlet?id=${userId}" class="rounded"
 								width=80%>
 						</div>
 					</div>
@@ -141,7 +141,7 @@
 			<div class="col p-0">
 				<!-- Button trigger modal -->
 				<button type="button" class="btn btn-dark float-right"
-					data-toggle="modal" data-target="#exampleModalLong">Fight
+					data-toggle="modal" data-target="#exampleModalLong" id="logBtn">Fight
 					Log</button>
 
 				<!-- Modal -->
@@ -181,6 +181,8 @@
 	<!--===============================================================================================-->
 	<script src="resources/vendor/select2/select2.min.js"></script>
 	<!--===============================================================================================-->
-
+	<script src="resources/js/user.js"></script>
+	<!--===============================================================================================-->
+	
 </body>
 </html>

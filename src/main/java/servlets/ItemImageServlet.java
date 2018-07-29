@@ -10,43 +10,37 @@ import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
 import models.dal.ItemDAL;
-import models.dto.ListDTO;
-import services.ICRUD;
-import services.impl.CRUDImpl;
-import services.impl.FightEngineImpl;
+import models.dto.ObjectDTO;
+import services.IItem;
 import services.impl.ItemImpl;
 
 @WebServlet("/itemImageServlet")
 public class ItemImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private ICRUD _crud;
+	private IItem _item;
 
 	public ItemImageServlet() {
-		_crud = StartupContainer.easyDI.getInstance(CRUDImpl.class);
+		_item = StartupContainer.easyDI.getInstance(ItemImpl.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		ItemDAL dal = new ItemDAL();
+		ObjectDTO<ItemDAL> objectDTO = _item.getItem(Integer.parseInt(request.getParameter("itemId")));
+		if (objectDTO.success && objectDTO.transferData != null) {
 
-		dal.itemId = Integer.parseInt(request.getParameter("itemId"));
+			String imageFormat = objectDTO.transferData.itemName
+					.substring(objectDTO.transferData.itemName.lastIndexOf(".") + 1);
 
-		ListDTO<ItemDAL> dto = _crud.read(dal);
-		if (dto.success && dto.transferDataList != null) {
-
-			String imageFormat = dto.transferDataList.get(0).itemName
-					.substring(dto.transferDataList.get(0).itemName.lastIndexOf(".") + 1);
-
-			response.setContentType("image/" + imageFormat);
+			response.setContentType("/image" + imageFormat);
 
 			ServletOutputStream servletOutputStream = response.getOutputStream();
 
-			servletOutputStream.write(dto.transferDataList.get(0).itemImage);
+			servletOutputStream.write(objectDTO.transferData.itemImage);
 			response.getOutputStream().close();
 		} else {
-			response.getWriter().println(dto.message);
+			response.getWriter().println(objectDTO.message);
 			response.getWriter().close();
 		}
 	}
