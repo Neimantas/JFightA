@@ -38,11 +38,11 @@
 				class="nav-link dropdown-toggle mr-3 mr-lg-0"
 				id="navbarDropdownMenuLink" data-toggle="dropdown"
 				aria-haspopup="true" aria-expanded="false"><i
-					class="fa fa-user-circle" aria-hidden="true"></i>${userName}<span
+					class="fa fa-user-circle" aria-hidden="true"></i>${currentUserName}<span
 					class="caret"></span> </a>
 				<div class="dropdown-menu dropdown-menu-right"
 					aria-labelledby="navbarDropdownMenuLink">
-					<a class="dropdown-item" href="/JFight/user?log=true">Character
+					<a class="dropdown-item" href="/JFight/user?log=false">Character
 						Info</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href=""><i class="fa fa-sign-out"

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
 import models.business.Player;
+import models.dal.CharacterDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ILogger;
@@ -38,6 +39,8 @@ public class UserServlet extends HttpServlet {
 		// request.getRequestDispatcher("index.jsp").forward(request, response);
 		// }
 
+		String userId = request.getParameter("userId");
+
 		ObjectDTO<Player> dtoPlayer = _userInfo.getCacheUserInfo(request);
 		if (dtoPlayer.success) {
 			_player = dtoPlayer.transferData;
@@ -45,21 +48,38 @@ public class UserServlet extends HttpServlet {
 			// needs else return
 		}
 
-		if (request.getParameter("log") == "true" ? true : false) {
-			ListDTO<String> dtoLog = _logger.getLogs(_player.characterInfo.userId, 2);
+		if (request.getParameter("log") == null && userId != null) {
+			ObjectDTO<CharacterDAL> dtoUser = _userInfo.getUserInfo(Integer.parseInt(userId));
+			if (dtoUser.success) {
+				CharacterDAL dal = dtoUser.transferData;
+
+				request.setAttribute("userName", dal.userId);
+				request.setAttribute("userId", dal.userId);
+				request.setAttribute("level", dal.level);
+				request.setAttribute("experience", dal.experience);
+				request.setAttribute("healthPoints", dal.healthPoints);
+				request.setAttribute("strenght", dal.strenght);
+				request.setAttribute("attackItem", dal.attackItemId);
+				request.setAttribute("defenceItem", dal.defenceItemId);
+			}
+			ListDTO<String> dtoLog = _logger.getLogs(_player.characterInfo.userId, Integer.parseInt(userId));
 			if (dtoLog.success) {
 				request.setAttribute("tableString", dtoLog.transferDataList);
 			}
 		}
 
-		request.setAttribute("userName", firstLetterToUpper(_player.user.name));
-		request.setAttribute("userId", _player.characterInfo.userId);
-		request.setAttribute("level", _player.characterInfo.level);
-		request.setAttribute("experience", _player.characterInfo.experience);
-		request.setAttribute("healthPoints", _player.characterInfo.healthPoints);
-		request.setAttribute("strenght", _player.characterInfo.strenght);
-		request.setAttribute("attackItem", _player.characterInfo.attackItemId);
-		request.setAttribute("defenceItem", _player.characterInfo.defenceItemId);
+		if (userId == null) {
+			request.setAttribute("userName", _player.user.name);
+			request.setAttribute("userId", _player.characterInfo.userId);
+			request.setAttribute("level", _player.characterInfo.level);
+			request.setAttribute("experience", _player.characterInfo.experience);
+			request.setAttribute("healthPoints", _player.characterInfo.healthPoints);
+			request.setAttribute("strenght", _player.characterInfo.strenght);
+			request.setAttribute("attackItem", _player.characterInfo.attackItemId);
+			request.setAttribute("defenceItem", _player.characterInfo.defenceItemId);
+		}
+
+		request.setAttribute("currentUserName", _player.user.name);
 
 		request.getRequestDispatcher("user.jsp").forward(request, response);
 	}

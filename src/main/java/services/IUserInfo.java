@@ -9,7 +9,7 @@ import models.dto.ObjectDTO;
 
 public interface IUserInfo {
 
-	ListDTO<CharacterDAL> getUserInfo(int userId);
+	ObjectDTO<CharacterDAL> getUserInfo(int userId);
 
 	ObjectDTO<Player> getCacheUserInfo(HttpServletRequest request);
 }

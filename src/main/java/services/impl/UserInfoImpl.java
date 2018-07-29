@@ -18,7 +18,7 @@ import services.IUserInfo;
 public class UserInfoImpl implements IUserInfo {
 
 	private ICRUD _crud;
-	private List<CharacterDAL> _cDAL;
+	private CharacterDAL _cDAL;
 	private ICache _cache;
 
 	public UserInfoImpl(CRUDImpl crud) {
@@ -27,7 +27,7 @@ public class UserInfoImpl implements IUserInfo {
 	}
 
 	@Override
-	public ListDTO<CharacterDAL> getUserInfo(int userId) {
+	public ObjectDTO<CharacterDAL> getUserInfo(int userId) {
 
 		CharacterDAL dal = new CharacterDAL();
 
@@ -36,17 +36,17 @@ public class UserInfoImpl implements IUserInfo {
 		ListDTO<CharacterDAL> dto = _crud.<CharacterDAL>read(dal);
 		if (dto.success) {
 
-			_cDAL = dto.transferDataList;
+			_cDAL = dto.transferDataList.get(0);
 
-			ListDTO<CharacterDAL> retSuccess = new ListDTO();
+			ObjectDTO<CharacterDAL> retSuccess = new ObjectDTO();
 			retSuccess.success = true;
 			retSuccess.message = "User exists in DB."; // Needs ENUM
-			retSuccess.transferDataList = _cDAL;
+			retSuccess.transferData = _cDAL;
 
 			return retSuccess;
 		}
 
-		ListDTO<CharacterDAL> retFailure = new ListDTO();
+		ObjectDTO<CharacterDAL> retFailure = new ObjectDTO();
 		retFailure.success = false;
 		retFailure.message = "Error! No such user."; // Needs ENUM
 
