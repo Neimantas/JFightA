@@ -134,9 +134,9 @@ public class FightServlet extends HttpServlet {
 			int playerBUserId = dals.get(1).userId;
 			int playerBHealth = dals.get(1).healthPoints;
 			
-			System.out.println("UserId" + playerAUserId);
-			System.out.println(cache);
-			System.out.println(cache.getPlayer(Integer.parseInt(playerAUserId)).user.name);
+//			System.out.println("UserId" + playerAUserId);
+//			System.out.println(cache);
+//			System.out.println(cache.getPlayer(Integer.parseInt(playerAUserId)).user.name);
 			String playerAName = cache.getPlayer(Integer.parseInt(playerAUserId)).user.name;
 //			String playerBName = cache.getPlayer(playerBUserId).user.name;
 			
