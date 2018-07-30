@@ -70,10 +70,10 @@ public class FightEngineImpl implements IFightEngine {
 	
 	
 	
-	public ObjectDTO<FightDataDAL> getOpponentData(int fightId, int round, String userID) {
+	public ObjectDTO<FightDataDAL> getOpponentData(int fightId, int round, int userID) {
 		//This method is in Use :)
 		//temporary solution, only for testing purposes
-		int userId = Integer.parseInt(userID); 											//Parse from string.
+		int userId = userID; 											//Parse from string.
 		//
 		FightDataDAL dal = new FightDataDAL();
 		dal.fightId = fightId;
@@ -120,14 +120,14 @@ public class FightEngineImpl implements IFightEngine {
 	}
 
 	@Override
-	public ListDTO<FightDataDAL> engine(int fightId, int roundId, int health, String userId, ActionsDTO yourAction) {
+	public ListDTO<FightDataDAL> engine(int fightId, int roundId, int health, int userID, ActionsDTO yourAction) {
 		
 		FightDataDAL insertDAL = new FightDataDAL();									//Fill Users darta to FightData DB.
 		insertDAL.fightId = fightId;
 		insertDAL.round = roundId;
-		insertDAL.userId = Integer.parseInt(userId); //temporary solution
+		insertDAL.userId = userID;
 		System.out.println("################");
-		System.out.println(userId + " " + fightId);
+		System.out.println(userID + " " + fightId);
 		System.out.println("################");
 		insertDAL.healthPoints = health;
 		insertDAL.attackHead = yourAction.attackHead;
@@ -142,11 +142,11 @@ public class FightEngineImpl implements IFightEngine {
 		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
 		
 		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Settings.ONE_SECOND;
-		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userId);
+		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userID);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
 			if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message)) {			//needs upgrade, if data not received - autoWin for waiting user.
 //				counter++;																//needs upgrade, instead of magic number count, make 35 second count/loop.
-				obj = getOpponentData(fightId, roundId, userId);
+				obj = getOpponentData(fightId, roundId, userID);
 //				System.out.println("In waiting loop...");
 			} else {
 				break;
@@ -187,7 +187,7 @@ public class FightEngineImpl implements IFightEngine {
 		FightDataDAL yourDAL = new FightDataDAL();										//to send DAL to Servlet
 		yourDAL.fightId = fightId;
 		yourDAL.round = roundId;
-		yourDAL.userId = Integer.parseInt(userId);
+		yourDAL.userId = userID;
 		yourDAL.healthPoints = yourHealth;
 		//update opponentHealthPoints
 		opponentDAL.healthPoints = opponentHealth;										//to show oponents health.
