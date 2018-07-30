@@ -9,7 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.constant.Error;
 import models.constant.ItemType;
+import models.constant.Success;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dto.DTO;
@@ -70,7 +72,7 @@ public class CRUDImpl implements ICRUD {
 
 			objectDTO.transferData = dalId;
 			objectDTO.success = true;
-			objectDTO.message = "New " + tableName.replace("`", "") + " row created.";
+			objectDTO.message = Success.DB_CREATE_SUCCESSFUL.getMessage();
 
 			return objectDTO;
 		} catch (Exception e) {
@@ -139,9 +141,8 @@ public class CRUDImpl implements ICRUD {
 
 			listDTO.transferDataList = dalList;
 			listDTO.success = true;
-			listDTO.message = !dalList.isEmpty() ? "Read successful."
-					: (hasCondition == true ? "There are now data in a table with such values."
-							: "The database table is empty.");
+			listDTO.message = !dalList.isEmpty() ? Success.DB_READ_SUCCESSFUL.getMessage()
+					: (hasCondition == true ? Error.DB_CANT_FIND_DATA.getMessage() : Error.DB_EMPTY_TABLE.getMessage());
 
 			return listDTO;
 		} catch (Exception e) {
@@ -169,8 +170,8 @@ public class CRUDImpl implements ICRUD {
 			Integer firstFieldValue = (Integer) dalClassFields[0].get(dal);
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
-				dto.message = "Wrong input DAL first field value (should be not null and greater than 0).";
-				_log.writeWarningMessage("CRUD update failed. " + dto.message, true,
+				dto.message = Error.DB_WRON_ID.getMessage();
+				_log.writeWarningMessage(Error.DB_UPDATE_FILED.getMessage() + " " + Error.DB_WRON_ID.getMessage(), true,
 						"Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
@@ -189,7 +190,7 @@ public class CRUDImpl implements ICRUD {
 			preparedStatement.close();
 
 			dto.success = true;
-			dto.message = "Update successful.";
+			dto.message = Success.DB_UPDATE_SUCCESSFUL.getMessage();
 
 			return dto;
 		} catch (Exception e) {
@@ -216,8 +217,8 @@ public class CRUDImpl implements ICRUD {
 			Integer firstFieldValue = (Integer) dalClassFields[0].get(dal);
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
-				dto.message = "Wrong input DAL first field value (should be not null and greater than 0).";
-				_log.writeWarningMessage("CRUD delete failed. " + dto.message, true,
+				dto.message = Error.DB_WRON_ID.getMessage();
+				_log.writeWarningMessage(Error.DB_DELETE_FILED.getMessage() + " " + Error.DB_WRON_ID.getMessage(), true,
 						"Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
@@ -229,7 +230,7 @@ public class CRUDImpl implements ICRUD {
 			preparedStatement.close();
 
 			dto.success = true;
-			dto.message = "Delete successful.";
+			dto.message = Success.DB_DELETE_SUCCESSFUL.getMessage();
 
 			return dto;
 		} catch (Exception e) {

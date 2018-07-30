@@ -1,7 +1,9 @@
 package services.impl;
 
 import models.business.Player;
+import models.constant.Error;
 import models.constant.ImageType;
+import models.constant.Success;
 import models.dal.ImageDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
@@ -109,7 +111,7 @@ public class ImageImpl implements IImage {
 		DTO editDTO = new DTO();
 
 		if (imageId < 1 || imageId > 2) {
-			editDTO.message = "Wrong default image Id.";
+			editDTO.message = Error.WRONG_DEFAULT_IMAGE_ID.getMessage();
 			return editDTO;
 		}
 
@@ -163,7 +165,7 @@ public class ImageImpl implements IImage {
 
 		if (imageDAL != null) {
 			imageDTO.transferData = imageDAL;
-			imageDTO.message = "Image is taken from the cache.";
+			imageDTO.message = Success.IMAGE_IS_TAKEN_FROM_CACHE.getMessage();
 			imageDTO.success = true;
 			return imageDTO;
 		}
@@ -231,11 +233,11 @@ public class ImageImpl implements IImage {
 		if (player != null) {
 			if (player.user.imageId != null) {
 				imageIdDTO.transferData = player.user.imageId;
-				imageIdDTO.message = "User has an image.";
+				imageIdDTO.message = Success.USER_HAS_AN_IMAGE.getMessage();
 				imageIdDTO.success = true;
 				return imageIdDTO;
 			} else {
-				imageIdDTO.message = "User has no image.";
+				imageIdDTO.message = Error.USER_HAS_NO_IMAGE.getMessage();
 				return imageIdDTO;
 			}
 		}
@@ -251,11 +253,11 @@ public class ImageImpl implements IImage {
 		if (listDTO.success) {
 			if (!listDTO.transferDataList.isEmpty() && listDTO.transferDataList.get(0).imageId != null) {
 				imageIdDTO.transferData = listDTO.transferDataList.get(0).imageId;
-				imageIdDTO.message = "User has an image.";
+				imageIdDTO.message = Success.USER_HAS_AN_IMAGE.getMessage();
 				imageIdDTO.success = true;
 				return imageIdDTO;
 			}
-			imageIdDTO.message = "User has no image.";
+			imageIdDTO.message = Error.USER_HAS_NO_IMAGE.getMessage();
 			return imageIdDTO;
 		}
 		imageIdDTO.message = listDTO.message;

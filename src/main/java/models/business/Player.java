@@ -7,5 +7,6 @@ public class Player {
 	public User user;
 	public CharacterInfo characterInfo;
 	public UserStatus userStatus;
+	public Integer currentFightID;
 	
 }

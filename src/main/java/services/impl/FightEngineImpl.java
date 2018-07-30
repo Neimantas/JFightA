@@ -2,23 +2,29 @@ package services.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import models.business.Actions;
 import models.constant.DefaultDamagePoints;
-import models.constant.Errors;
+import models.constant.Error;
+import models.constant.ItemType;
 import models.constant.Settings;
 import models.dal.FightDataDAL;
-import models.dto.ActionsDTO;
+import models.dal.ItemDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
 import services.IFightEngine;
+import services.IItem;
 
 public class FightEngineImpl implements IFightEngine {
 	
 	private ICRUD _crud;
+	private IItem _item;
 
-	public FightEngineImpl(CRUDImpl crud) {
+	public FightEngineImpl(CRUDImpl crud, ItemImpl item) {
 		_crud = crud;
+		_item = item;
 	}
 	
 	@Override
@@ -100,7 +106,7 @@ public class FightEngineImpl implements IFightEngine {
 			if (retDAL == null) {														//If Round ID not found - return DAL with success = false 
 				ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<>();
 				retFailure.success = false;
-				retFailure.message = Errors.OpponentIsMissing.message;
+				retFailure.message = Error.OPPONENT_IS_MISSING.getMessage();
 				return retFailure;
 			}
 				
@@ -144,7 +150,7 @@ public class FightEngineImpl implements IFightEngine {
 		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Settings.ONE_SECOND;
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userID);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
-			if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message)) {			//needs upgrade, if data not received - autoWin for waiting user.
+			if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {			//needs upgrade, if data not received - autoWin for waiting user.
 //				counter++;																//needs upgrade, instead of magic number count, make 35 second count/loop.
 				obj = getOpponentData(fightId, roundId, userID);
 //				System.out.println("In waiting loop...");
@@ -153,7 +159,7 @@ public class FightEngineImpl implements IFightEngine {
 			}
 		}
 		 
-		if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message))	{				//When Data is nor received from one of the Users.
+		if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage()))	{				//When Data is nor received from one of the Users.
 			System.out.println("ERROR: " + obj.message);
 			System.out.println("Here current user action data will be written");
 			System.out.println("");
@@ -167,7 +173,7 @@ public class FightEngineImpl implements IFightEngine {
 		
 		
 		FightDataDAL opponentDAL = obj.transferData;									//Fill data to DAL when all data received successfull. DAL for sending to servlet.
-		ActionsDTO opponentActions = new ActionsDTO();
+		Actions opponentActions = new Actions();
 		
 		opponentActions.attackHead = opponentDAL.attackHead == null?0:opponentDAL.attackHead;		//if form DB getting info with null - make it "0".
 		opponentActions.attackBody = opponentDAL.attackBody == null?0:opponentDAL.attackBody;
@@ -179,7 +185,7 @@ public class FightEngineImpl implements IFightEngine {
 		opponentActions.defenceArms = opponentDAL.defenceHands == null?0:opponentDAL.defenceHands;
 		opponentActions.defenceLegs = opponentDAL.defenceLegs == null?0:opponentDAL.defenceLegs;
 		
-		int[] damages = calculateDamage(yourAction, opponentActions);					//CalculateDamage :)
+		int[] damages = calculateDamage(yourAction, opponentActions, Integer.parseInt(userId), opponentDAL.userId); //CalculateDamage :)
 		
 		int yourHealth = health + damages[1];											//sending these to Servlet
 		int opponentHealth = opponentDAL.healthPoints + damages[0];
@@ -217,27 +223,35 @@ public class FightEngineImpl implements IFightEngine {
 		
 	}
 	
-	private int[] calculateDamage(ActionsDTO yourActions, ActionsDTO opponentActions) {
-		//Calculating damage of round's.
+	private int[] calculateDamage(Actions yourActions, Actions opponentActions, int yourUserId, int opponentUserId) {
 		
-		int givenDamage = 0; 
+		
+		//Calculating damage of round's.
+		Map<ItemType, ItemDAL> yourItems = _item.getUserItems(yourUserId);
+		Map<ItemType, ItemDAL> opponentItems = _item.getUserItems(opponentUserId);
+		int givenDamage = 0;
+		
 		//how much damage you given
 //		int givenDamage = (opponentActions.defenceHead - yourActions.attackHead) * CharacterBodyPart.HEAD.getDamagePoints()
 //						+ (opponentActions.defenceBody - yourActions.attackBody) * CharacterBodyPart.BODY.getDamagePoints()
 //						+ (opponentActions.defenceArms - yourActions.attackArms) * CharacterBodyPart.HANDS.getDamagePoints()
 //						+ (opponentActions.defenceLegs - yourActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
 		
-		if(yourActions.attackHead > 0) {
-			givenDamage += (opponentActions.defenceHead - yourActions.attackHead) * DefaultDamagePoints.HEAD.getDamagePoints();
+		if(yourActions.attackHead > 0 && (opponentActions.defenceHead - yourActions.attackHead) == 1) {
+			givenDamage += DefaultDamagePoints.HEAD.getDamagePoints() + 
+					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
 		}
-		if(yourActions.attackBody > 0) {
-			givenDamage += (opponentActions.defenceBody - yourActions.attackBody) * DefaultDamagePoints.BODY.getDamagePoints();
+		if(yourActions.attackBody > 0 && (opponentActions.defenceBody - yourActions.attackBody) == 1) {
+			givenDamage += DefaultDamagePoints.BODY.getDamagePoints() + 
+					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
 		}
-		if(yourActions.attackArms > 0) {
-			givenDamage += (opponentActions.defenceArms - yourActions.attackArms) * DefaultDamagePoints.HANDS.getDamagePoints();
+		if(yourActions.attackArms > 0 && (opponentActions.defenceArms - yourActions.attackArms) == 1) {
+			givenDamage += DefaultDamagePoints.HANDS.getDamagePoints() + 
+					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
 		}
-		if(yourActions.attackLegs > 0) {
-			givenDamage += (opponentActions.defenceLegs - yourActions.attackLegs) * DefaultDamagePoints.LEGS.getDamagePoints();
+		if(yourActions.attackLegs > 0 && (opponentActions.defenceLegs - yourActions.attackLegs) == 1) {
+			givenDamage += DefaultDamagePoints.LEGS.getDamagePoints() + 
+					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
 		}
 		
 		int takenDamage = 0;
@@ -247,17 +261,21 @@ public class FightEngineImpl implements IFightEngine {
 //						+ (yourActions.defenceArms - opponentActions.attackArms) * CharacterBodyPart.HANDS.getDamagePoints()
 //						+ (yourActions.defenceLegs - opponentActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
 		
-		if(opponentActions.attackHead > 0) {
-			takenDamage += (yourActions.defenceHead - opponentActions.attackHead) * DefaultDamagePoints.HEAD.getDamagePoints();
+		if(opponentActions.attackHead > 0 && (yourActions.defenceHead - opponentActions.attackHead) == 1) {
+			takenDamage += DefaultDamagePoints.HEAD.getDamagePoints() + 
+					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
 		}
-		if(opponentActions.attackBody > 0) {
-			takenDamage += (yourActions.defenceBody - opponentActions.attackBody) * DefaultDamagePoints.BODY.getDamagePoints();
+		if(opponentActions.attackBody > 0 && (yourActions.defenceBody - opponentActions.attackBody) == 1) {
+			takenDamage += DefaultDamagePoints.BODY.getDamagePoints() + 
+					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
 		}
-		if(opponentActions.attackArms > 0) {
-			takenDamage += (yourActions.defenceArms - opponentActions.attackArms) * DefaultDamagePoints.HANDS.getDamagePoints();
+		if(opponentActions.attackArms > 0 && (yourActions.defenceArms - opponentActions.attackArms) == 1) {
+			takenDamage += DefaultDamagePoints.HANDS.getDamagePoints() + 
+					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
 		}
-		if(opponentActions.attackLegs > 0) {
-			takenDamage += (yourActions.defenceLegs - opponentActions.attackLegs) * DefaultDamagePoints.LEGS.getDamagePoints();
+		if(opponentActions.attackLegs > 0 && (yourActions.defenceLegs - opponentActions.attackLegs) == 1) {
+			takenDamage += DefaultDamagePoints.LEGS.getDamagePoints() + 
+					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
 		}
 		System.out.println(givenDamage);
 		System.out.println(takenDamage);
