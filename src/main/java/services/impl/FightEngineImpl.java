@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.constant.DefaultDamagePoints;
-import models.constant.Errors;
+import models.constant.Error;
 import models.constant.Settings;
 import models.dal.FightDataDAL;
 import models.dto.ActionsDTO;
@@ -100,7 +100,7 @@ public class FightEngineImpl implements IFightEngine {
 			if (retDAL == null) {														//If Round ID not found - return DAL with success = false 
 				ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<>();
 				retFailure.success = false;
-				retFailure.message = Errors.OpponentIsMissing.message;
+				retFailure.message = Error.OPPONENT_IS_MISSING.getMessage();
 				return retFailure;
 			}
 				
@@ -144,7 +144,7 @@ public class FightEngineImpl implements IFightEngine {
 		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Settings.ONE_SECOND;
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userId);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
-			if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message)) {			//needs upgrade, if data not received - autoWin for waiting user.
+			if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {			//needs upgrade, if data not received - autoWin for waiting user.
 //				counter++;																//needs upgrade, instead of magic number count, make 35 second count/loop.
 				obj = getOpponentData(fightId, roundId, userId);
 //				System.out.println("In waiting loop...");
@@ -153,7 +153,7 @@ public class FightEngineImpl implements IFightEngine {
 			}
 		}
 		 
-		if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message))	{				//When Data is nor received from one of the Users.
+		if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage()))	{				//When Data is nor received from one of the Users.
 			System.out.println("ERROR: " + obj.message);
 			System.out.println("Here current user action data will be written");
 			System.out.println("");
