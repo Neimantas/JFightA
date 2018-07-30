@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import models.business.Player;
+import services.ICache;
+import services.impl.CacheImpl;
+
 /**
  * Servlet implementation class FightDataSetter
  */
@@ -27,10 +31,13 @@ public class FightDataSetter extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		//get player instance to set health points
+		ICache cache = CacheImpl.getInstance();
+		Player player = cache.getPlayer(Integer.parseInt(request.getParameter("name")));
+		
 		Cookie userIdCookie = new Cookie("userId", request.getParameter("name"));
 		Cookie fightIdCookie = new Cookie("fightId", request.getParameter("fightId"));
-		Cookie healthCookie = new Cookie("health", "100");
+		Cookie healthCookie = new Cookie("health", Integer.toString(player.characterInfo.healthPoints));
 		Cookie roundCookie = new Cookie("round", "0");
 		userIdCookie.setMaxAge(60 * 60 * 24); //24h
 		fightIdCookie.setMaxAge(60 * 60 * 24);

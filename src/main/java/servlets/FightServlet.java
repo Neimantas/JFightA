@@ -138,7 +138,7 @@ public class FightServlet extends HttpServlet {
 //			System.out.println(cache);
 //			System.out.println(cache.getPlayer(Integer.parseInt(playerAUserId)).user.name);
 			String playerAName = cache.getPlayer(Integer.parseInt(playerAUserId)).user.name;
-//			String playerBName = cache.getPlayer(playerBUserId).user.name;
+			String playerBName = cache.getPlayer(playerBUserId).user.name;
 			
 			int attackItemAId = cache.getPlayer(Integer.parseInt(playerAUserId)).characterInfo.attackItemId;
 			int defenceItemAId = cache.getPlayer(Integer.parseInt(playerAUserId)).characterInfo.defenceItemId;
@@ -147,7 +147,7 @@ public class FightServlet extends HttpServlet {
 			int defenceItemBId = cache.getPlayer(playerBUserId).characterInfo.defenceItemId;
 			
 			request.setAttribute("playerAName", playerAName);								//Sending refreshed info to page.
-			request.setAttribute("playerBName", playerBUserId);
+			request.setAttribute("playerBName", playerBName);
 			request.setAttribute("healthA", playerAHealth);
 			request.setAttribute("healthB", playerBHealth);
 			//avatar id
