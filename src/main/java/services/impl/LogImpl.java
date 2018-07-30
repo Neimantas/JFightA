@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import models.constant.Error;
 import models.constant.Settings;
 import services.ILog;
 
@@ -84,7 +85,7 @@ public class LogImpl implements ILog {
 					returnString += line + "\n";
 				}
 				if (returnString.equals("")) {
-					return "Log file is empty.";
+					return Error.LOG_FILE_IS_EMPTY.getMessage();
 				}
 				return returnString;
 			} catch (IOException e) {
@@ -92,7 +93,7 @@ public class LogImpl implements ILog {
 			}
 
 		} else {
-			return "There are no logs at a current date.";
+			return Error.NO_LOGS_AT_CURRENT_DATE.getMessage();
 		}
 	}
 
