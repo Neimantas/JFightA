@@ -13,7 +13,7 @@ import services.impl.LoginService;
 /**
  * Servlet implementation class LogOutServlet
  */
-@WebServlet("/LogOutServlet")
+@WebServlet("/logout")
 public class LogOutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

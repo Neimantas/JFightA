@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
 		user.password = pass;
 		DTO playerDTO=_logService.login(response,user);
 		if (playerDTO.success) {
-			request.getRequestDispatcher("News.jsp").forward(request, response);
+			response.sendRedirect("/JFight/News");
 		}
 		if(!playerDTO.success) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);	

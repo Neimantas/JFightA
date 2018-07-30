@@ -12,9 +12,7 @@ import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.UserDAL;
 import models.dto.DTO;
-import models.dto.PlayerDTO;
 import models.dto.PlayerDalDTO;
-import models.dto.UserFrontDTO;
 import models.dto.UserLoginDataDTO;
 import services.ICache;
 import services.ILoginService;
@@ -59,7 +57,7 @@ public class LoginService implements ILoginService {
 			player.characterInfo = charInfo;
 			player.user = userOut;
 			// add player to cache
-			aadCashe(player, userOut.userId);
+			aadCashe(player);
 			return new DTO(true, "success");
 		}
 		return new DTO(false, playerDalDto._message);
@@ -81,7 +79,7 @@ public class LoginService implements ILoginService {
 	public void logout(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
-		for (int i = 0; i < cookies.length; i++) {
+		for (int i = cookies.length-1; i <= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(0);
@@ -97,7 +95,6 @@ public class LoginService implements ILoginService {
 				break;
 			}
 		}
-
 	}
 
 	@Override
@@ -116,16 +113,15 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public void aadCashe(Player player, int userId) {
+	public void aadCashe(Player player) {
 		cache.addPlayer(player);
-		cache.getPlayer(userId);
 	}
 
 	@Override
 	public boolean userValidator(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
-		for (int i = 0; i < cookies.length; i++) {
+		for (int i = cookies.length-1; i >= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(3600);
