@@ -15,9 +15,9 @@ import configuration.StartupContainer;
 import services.IFightEngine;
 import services.impl.FightEngineImpl;
 import services.impl.ImageImpl;
-import models.dto.ActionsDTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
+import models.business.Actions;
 import models.dal.FightDataDAL;
 
 /**
@@ -100,7 +100,7 @@ public class FightServlet extends HttpServlet {
 		String defenceArms = request.getParameter("defenceArms");
 		String defenceLegs = request.getParameter("defenceLegs");
 		
-		ActionsDTO action = new ActionsDTO();
+		Actions action = new Actions();
 		
 		action.attackArms = attackArms == null?0:1;
 		action.attackBody = attackBody == null?0:1;

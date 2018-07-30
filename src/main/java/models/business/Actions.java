@@ -1,6 +1,6 @@
-package models.dto;
+package models.business;
 
-public class ActionsDTO {
+public class Actions {
 	
 	public int attackHead = 0;
 	public int attackBody = 0;
