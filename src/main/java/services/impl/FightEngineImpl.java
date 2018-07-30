@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.constant.DefaultDamagePoints;
+import models.constant.Errors;
+import models.constant.Settings;
 import models.dal.FightDataDAL;
 import models.dto.ActionsDTO;
 import models.dto.ListDTO;
@@ -98,7 +100,7 @@ public class FightEngineImpl implements IFightEngine {
 			if (retDAL == null) {														//If Round ID not found - return DAL with success = false 
 				ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<>();
 				retFailure.success = false;
-				retFailure.message = "Cannot find opponent";
+				retFailure.message = Errors.OpponentIsMissing.message;
 				return retFailure;
 			}
 				
@@ -139,11 +141,11 @@ public class FightEngineImpl implements IFightEngine {
 		
 		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
 		
-		int counter = 0;
+		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Settings.ONE_SECOND;
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userId);
-		while(counter < 1000) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
-			if(!obj.success && obj.message.equals("Cannot find opponent")) {			//needs upgrade, if data not received - autoWin for waiting user.
-				counter++;																//needs upgrade, instead of magic number count, make 35 second count/loop.
+		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
+			if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message)) {			//needs upgrade, if data not received - autoWin for waiting user.
+//				counter++;																//needs upgrade, instead of magic number count, make 35 second count/loop.
 				obj = getOpponentData(fightId, roundId, userId);
 //				System.out.println("In waiting loop...");
 			} else {
@@ -151,7 +153,7 @@ public class FightEngineImpl implements IFightEngine {
 			}
 		}
 		 
-		if(!obj.success && obj.message.equals("Cannot find opponent"))	{				//When Data is nor received from one of the Users.
+		if(!obj.success && obj.message.equals(Errors.OpponentIsMissing.message))	{				//When Data is nor received from one of the Users.
 			System.out.println("ERROR: " + obj.message);
 			System.out.println("Here current user action data will be written");
 			System.out.println("");
