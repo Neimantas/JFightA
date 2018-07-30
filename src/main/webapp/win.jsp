@@ -39,14 +39,14 @@
 				class="nav-link dropdown-toggle mr-3 mr-lg-0"
 				id="navbarDropdownMenuLink" data-toggle="dropdown"
 				aria-haspopup="true" aria-expanded="false"><i
-					class="fa fa-user-circle" aria-hidden="true"></i>Username<span
+					class="fa fa-user-circle" aria-hidden="true"></i>${userName}<span
 					class="caret"></span> </a>
 				<div class="dropdown-menu dropdown-menu-right"
 					aria-labelledby="navbarDropdownMenuLink">
-					<a class="dropdown-item" href="/JFight/user?userId=5">Character
+					<a class="dropdown-item" href="/JFight/user?log=false">Character
 						Info</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href=""><i class="fa fa-sign-out"
+					<a class="dropdown-item" href="/JFight/LogOutServlet"><i class="fa fa-sign-out"
 						aria-hidden="true"></i>Logout</a>
 				</div></li>
 		</ul>
@@ -69,7 +69,7 @@
 
 	<div class="container">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-12 text-center">
 				<img
 					src="http://mrwgifs.com/wp-content/uploads
 				/2014/05/Pretty-Girl-Dancing-and-Spinning-At-The-Beach.gif" />
