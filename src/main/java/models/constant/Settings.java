@@ -32,5 +32,12 @@ public class Settings {
 	 * minutes should be ok.
 	 */
 	public static final int CACHE_EXPIRED_DATA_CLEANUP_PERIOD = 5;
-
+	/**
+	 * 	Determines how much time wait for player action in seconds
+	 */
+	public static final long PLAYER_ACTION_WAITING_TIME = 35;
+	/**
+	 * One second in miliseconds
+	 */
+	public static final long ONE_SECOND = 1000;
 }
