@@ -75,7 +75,7 @@
 				<div class="row justify-content-center" id="message">${ReadyMessage}</div>
 				<div class="row justify-content-center">
 				<div class="col" >
-				<select class="custom-select" size="20" id="readyPlayers">
+				<select class="custom-select pLayerSelect" size="100" id="readyPlayers">
 					<c:forEach items="${readyPlayers}" var="players">
 					<option value="${players.key}">${players.value}</option>
 					</c:forEach>

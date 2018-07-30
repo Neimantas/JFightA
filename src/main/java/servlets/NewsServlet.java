@@ -41,6 +41,7 @@ public class NewsServlet extends HttpServlet {
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		Player player = getThisPlayer(request);
+	
 		
 		if(player.userStatus == UserStatus.PLAYING) {
 			String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + 1;
@@ -50,8 +51,6 @@ public class NewsServlet extends HttpServlet {
 			
 			//Check GUID if user is valid, get his UserName
 			Map<Integer, String> listPlayers = getReadyPlayers();
-			listPlayers.put(9999, "Player1");
-			listPlayers.put(8888, "Player2");
 			request.setAttribute("readyPlayers", listPlayers);
 			request.setAttribute("userName", player.user.name);
 			
@@ -62,17 +61,23 @@ public class NewsServlet extends HttpServlet {
 				if (param.equals("refresh")) {
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
-
-				if (param.equals("play")) {
+				
+				// If player press Play button, check if player hasn't selected himself.
+				if (param.equals("play") && player.user.userId != Integer.parseInt(request.getParameter("selectedPlayer"))) {
+					
 					ICache cache = CacheImpl.getInstance();
 					cache.getPlayer(Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
-					System.out.println(cache.getPlayer(Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus);
 					player.userStatus = UserStatus.PLAYING;
 					String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + 1;
-					System.out.println("myUrl" + url);
+					
 					
 					response.sendRedirect(url);
 //					request.getRequestDispatcher("fight.jsp").forward(request, response);
+					
+				}
+				else {
+					player.userStatus = UserStatus.NOT_READY;
+					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
 			}
 
