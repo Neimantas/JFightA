@@ -12,9 +12,7 @@ import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.UserDAL;
 import models.dto.DTO;
-import models.dto.PlayerDTO;
 import models.dto.PlayerDalDTO;
-import models.dto.UserFrontDTO;
 import models.dto.UserLoginDataDTO;
 import services.ICache;
 import services.ILoginService;
@@ -22,11 +20,11 @@ import services.ILoginService;
 public class LoginService implements ILoginService {
 
 	HigherLoginService hService;
-	ICache cashe;
+	ICache cache;
 
 	public LoginService(HigherLoginService hServiceImpl) {
 		hService = hServiceImpl;
-		cashe = CacheImpl.getInstance();
+		cache = CacheImpl.getInstance();
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class LoginService implements ILoginService {
 			player.characterInfo = charInfo;
 			player.user = userOut;
 			// add player to cache
-			aadCashe(player, userOut.userId);
+			aadCashe(player);
 			return new DTO(true, "success");
 		}
 		return new DTO(false, playerDalDto._message);
@@ -81,18 +79,22 @@ public class LoginService implements ILoginService {
 	public void logout(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
-		for (int i = 0; i < cookies.length; i++) {
+		for (int i = cookies.length-1; i <= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(0);
+				break;
 			}
 		}
-		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+		for (Entry<Integer, Player> entry : cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
-				cashe.removePlayer(entry.getKey());
+				if (entry.getValue().user.imageId != null) {
+					cache.removeImage(entry.getValue().user.imageId);
+				}
+				cache.removePlayer(entry.getKey());
+				break;
 			}
 		}
-
 	}
 
 	@Override
@@ -111,22 +113,21 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public void aadCashe(Player player, int userId) {
-		cashe.addPlayer(userId, player);
-		cashe.getPlayer(userId);
+	public void aadCashe(Player player) {
+		cache.addPlayer(player);
 	}
 
 	@Override
 	public boolean userValidator(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
-		for (int i = 0; i < cookies.length; i++) {
+		for (int i = cookies.length-1; i >= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(3600);
 			}
 		}
-		for (Entry<Integer, Player> entry : cashe.getPlayers().entrySet()) {
+		for (Entry<Integer, Player> entry : cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
 				return true;
 			}

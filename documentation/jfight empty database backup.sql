@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 15, 2018 at 10:49 PM
+-- Generation Time: Jul 29, 2018 at 04:33 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -102,7 +102,7 @@ CREATE TABLE `image` (
   `ImageId` int(11) NOT NULL,
   `UserId` int(11) DEFAULT NULL COMMENT 'Should be not null for non default image.',
   `Image` mediumblob NOT NULL,
-  `ImageName` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name should contain  filename extension (e.g. default.jpg).'
+  `ImageName` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name should contain filename extension (e.g. default.jpg).'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -285,6 +285,7 @@ ALTER TABLE `result`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`UserId`),
   ADD UNIQUE KEY `Name` (`Name`),
+  ADD UNIQUE KEY `ImageId_2` (`ImageId`),
   ADD KEY `ImageId` (`ImageId`);
 
 --
@@ -362,6 +363,18 @@ ALTER TABLE `result`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `user_image_fk` FOREIGN KEY (`ImageId`) REFERENCES `image` (`ImageId`) ON DELETE SET NULL;
+
+DELIMITER $$
+--
+-- Events
+--
+DROP EVENT `Delete logs older than 1 month`$$
+CREATE DEFINER=`Kolia`@`%` EVENT `Delete logs older than 1 month` ON SCHEDULE EVERY 1 DAY STARTS '2018-07-03 03:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM log WHERE Date < (NOW() - INTERVAL 1 MONTH)$$
+
+DROP EVENT `Delete results where both users checked out`$$
+CREATE DEFINER=`root`@`localhost` EVENT `Delete results where both users checked out` ON SCHEDULE EVERY 1 MONTH STARTS '2018-07-01 04:00:00' ON COMPLETION PRESERVE ENABLE DO DELETE FROM result WHERE result.Win = NULL AND result.Loss = NULL AND result.TieUser1 = NULL AND result.TieUser2 = NULL$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

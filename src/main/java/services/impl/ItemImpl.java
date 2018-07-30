@@ -3,12 +3,9 @@ package services.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import models.business.Player;
-
+import models.constant.ImageType;
 import models.constant.ItemType;
-import models.dal.ImageDAL;
 import models.dal.ItemDAL;
-import models.dal.UserDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
@@ -30,27 +27,16 @@ public class ItemImpl implements IItem {
 	}
 
 	/**
-	 * If user A has no his own image, will be downloaded default image 1.
+	 * Method gets item from the cache. If there is no item in a cache, method
+	 * downloads it from a database ant puts it to cache. In case of error, if there
+	 * is no item with such Id, method will try get and return item No 1.
 	 */
-	@Override
-	public ObjectDTO<ImageDAL> getUserAImage(int userAId) {
-		return getUserImage(userAId, true);
-	}
-
-	/**
-	 * If user B has no his own image, will be downloaded default image 2.
-	 */
-	@Override
-	public ObjectDTO<ImageDAL> getUserBImage(int userBId) {
-		return getUserImage(userBId, false);
-	}
-
 	@Override
 	public ObjectDTO<ItemDAL> getItem(int itemId) {
 		ObjectDTO<ItemDAL> itemDTO = new ObjectDTO<>();
 		if (_cache.getItem(itemId) != null) {
 			itemDTO.transferData = _cache.getItem(itemId);
-			itemDTO.message = "Item is taken from cache.";
+			itemDTO.message = "Item is taken from the cache.";
 			itemDTO.success = true;
 			return itemDTO;
 		}
@@ -65,6 +51,10 @@ public class ItemImpl implements IItem {
 		}
 	}
 
+	/**
+	 * Returns user items. In case of error will try to return ATTACK item No 1 and
+	 * DEFENCE item No 2.
+	 */
 	@Override
 	public Map<ItemType, ItemDAL> getUserItems(int userId) {
 		int attackItemId = 0;
@@ -92,34 +82,58 @@ public class ItemImpl implements IItem {
 		return userItems;
 	}
 
-	private ObjectDTO<ImageDAL> getUserImage(int userId, boolean isUserA) {
-		ImageDAL imageDAL = new ImageDAL();
-		ObjectDTO<ImageDAL> imageDTO = new ObjectDTO<>();
-		Player player = _cache.getPlayer(userId);
-		if (player != null && player.user.imageId != null) {
-			imageDAL.imageId = player.user.imageId;
-			ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
-			if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
-				imageListDTOtoImageDTO(imageDTO, imageListDTO);
-				return imageDTO;
-			}
-		} else {
-			imageDAL.imageId = isUserA ? 1 : 2;
-			ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
-			if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
-				imageListDTOtoImageDTO(imageDTO, imageListDTO);
-				return imageDTO;
-			} else {
-				imageDTO.message = imageListDTO.message;
-			}
+	@Override
+	public ObjectDTO<Integer> createNewItem(String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
+			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
+
+		if (minCharacterLevel < 1) {
+			return createInputParameterErrorDTO("createNewItem");
 		}
-		return imageDTO;
+
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemName = itemName;
+		itemDAL.itemImage = itemImage;
+		itemDAL.imageFormat = imageType.getImageExtension();
+		itemDAL.itemType = itemType;
+		itemDAL.description = !description.equals("") ? description : null;
+		itemDAL.minCharacterLevel = minCharacterLevel;
+		itemDAL.attackPoints = attackPoints;
+		itemDAL.defencePoints = defencePoints;
+		return _crud.create(itemDAL);
 	}
 
-	private void imageListDTOtoImageDTO(ObjectDTO<ImageDAL> imageDTO, ListDTO<ImageDAL> imageListDTO) {
-		imageDTO.transferData = imageListDTO.transferDataList.get(0);
-		imageDTO.message = imageListDTO.message;
-		imageDTO.success = true;
+	@Override
+	public DTO editItem(int itemId, String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
+			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
+
+		if (minCharacterLevel < 1) {
+			return createInputParameterErrorDTO("editItem");
+		}
+
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		itemDAL.itemName = itemName;
+		itemDAL.itemImage = itemImage;
+		itemDAL.imageFormat = imageType.getImageExtension();
+		itemDAL.itemType = itemType;
+		itemDAL.description = !description.equals("") ? description : null;
+		itemDAL.minCharacterLevel = minCharacterLevel;
+		itemDAL.attackPoints = attackPoints;
+		itemDAL.defencePoints = defencePoints;
+
+		DTO updateDTO = _crud.update(itemDAL);
+		if (updateDTO.success) {
+			_cache.removeItem(itemId);
+		}
+
+		return updateDTO;
+	}
+
+	@Override
+	public DTO deleteItem(int itemId) {
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		return _crud.delete(itemDAL);
 	}
 
 	private ObjectDTO<ItemDAL> downloadItemFromDatabase(int itemId) {
@@ -134,7 +148,8 @@ public class ItemImpl implements IItem {
 			return itemDTO;
 		} else {
 			_log.writeWarningMessage("Item No " + itemId + " wasn't downloaded from the database.", true,
-					"Class: CacheImpl, method: private boolean downloadItem(int itemId).");
+					"Class: CacheImpl, method: private boolean downloadItemFromDatabase(int itemId).",
+					"crud read message: " + listDTO.message);
 			itemDTO.message = listDTO.message;
 			return itemDTO;
 		}
@@ -148,48 +163,12 @@ public class ItemImpl implements IItem {
 		}
 	}
 
-	@Override
-	public ObjectDTO<Integer> addImage(int userId, String imageName, byte[] image) {
-		ImageDAL imageDAL = new ImageDAL();
-		imageDAL.userId = userId;
-		imageDAL.imageName = imageName;
-		imageDAL.image = image;
-		ObjectDTO<Integer> imageDTO = _crud.create(imageDAL);
-		if (imageDTO.success) {
-			UserDAL userDAL = new UserDAL();
-			userDAL.userId = userId;
-			ListDTO<UserDAL> userListDTO = _crud.read(userDAL);
-			if (userListDTO.success && !userListDTO.transferDataList.isEmpty()) {
-				userDAL = userListDTO.transferDataList.get(0);
-				userDAL.imageId = imageDTO.transferData;
-				DTO dto = _crud.update(userDAL);
-				if (dto.success) {
-					return imageDTO;
-				}
-			}
-		} else {
-			return imageDTO;
-		}
-		
-		return null;
-	}
-
-	@Override
-	public DTO editImage(int userId, String imageName, byte[] image) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DTO editDefaultImage(int imageId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DTO deleteImage(int userId) {
-		// TODO Auto-generated method stub
-		return null;
+	private ObjectDTO<Integer> createInputParameterErrorDTO(String methodName) {
+		ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
+		objectDTO.message = "Wrong input parameter. minCharacterLevel should be not less than one.";
+		_log.writeWarningMessage(objectDTO.message, true,
+				"Class: ItemImpl, Method: " + methodName + "(input parameters)");
+		return objectDTO;
 	}
 
 }

@@ -6,12 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import models.constant.ItemType;
 import models.dal.CharacterDAL;
 import models.dal.FightDataDAL;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
+import models.dal.LogDAL;
 import models.dal.ResultDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
@@ -24,41 +27,21 @@ import services.impl.DatabaseImpl;
 public class CrudTest {
 
 	public static void main(String[] args) throws IOException {
-		ICRUD crud = new CRUDImpl(new DatabaseImpl());
-
-		// ResultDAL resultDAL = new ResultDAL();
-		//// resultDAL.fightId = 1;
-		// resultDAL.tieUser2Id = 1;
-		//// resultDAL.tieUser1Id = 2;
-		//
-		// ListDTO<ResultDAL> listDTO = crud.read(resultDAL);
-		// System.out.println(listDTO.transferDataList.size());
-
-//		 UserDAL userDAL = new UserDAL();
-//		 userDAL.name = "Teeest";
-//		 userDAL.password = "fdgfsdgf";
-//		 userDAL.eMail = "test@test.lt";
-//		 ObjectDTO<UserDAL> listDTOu = crud.create(userDAL);
-//		 
-//		 CharacterDAL characterDAL = new CharacterDAL();
-//		 characterDAL.userId = listDTOu.transferData.userId;
-//		 characterDAL.healthPoints = 100;
-//		 characterDAL.strenght = 5;
-//		 characterDAL.experience = 5;
-//		 characterDAL.level = 1;
-//		 ObjectDTO<CharacterDAL> listDTOc = crud.create(characterDAL);
-		// System.out.println(listDTOu.transferDataList.size());
-
+		ICRUD crud = new CRUDImpl();
+	
+		LogDAL logDAL = new LogDAL();
+		logDAL.user1Id = 5;
+		logDAL.user2Id = 2;
+		ListDTO<LogDAL> ldto = crud.read(logDAL);
+		System.out.println(ldto.transferDataList.size());
+		
+		UserDAL userDAL = new UserDAL();
+		userDAL.userId = 100;
+		DTO deleteDTO = crud.delete(userDAL);
+		System.out.println("\n" + deleteDTO.message);
+		
 //		testImage(crud);
-		
-//		ImageDAL imageDAL = new ImageDAL();
-//		imageDAL.imageId = 11;
-//		crud.delete(imageDAL);
-		
-		FightDataDAL fdal = new FightDataDAL();
-		fdal.fightId = 2;
-		ListDTO<FightDataDAL> ldto = crud.read(fdal);
-		System.out.println(ldto.transferDataList.get(0).damage);
+//		testItem(crud);
 
 	}
 	
@@ -80,9 +63,9 @@ public class CrudTest {
 		ObjectDTO<Integer> uploadDTO = crud.create(itemDAL);
 
 		//update
-//		ItemDAL createdItemDAL = uploadDTO.transferData;
-//		createdItemDAL.itemType = ItemType.DEFENCE;
-//		DTO updateDTO = crud.update(createdItemDAL);
+		itemDAL.itemId = uploadDTO.transferData;
+		itemDAL.itemType = ItemType.DEFENCE;
+		DTO updateDTO = crud.update(itemDAL);
 
 		
 	}

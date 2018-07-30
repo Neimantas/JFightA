@@ -1,21 +1,15 @@
 
 package services.impl;
 
-import javax.servlet.http.Cookie;
-
-import models.business.CharacterInfo;
-import models.business.Player;
-import models.business.User;
+import models.business.DefaultCharacter;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.CharacterDAL;
 import models.dal.PlayerDAL;
 import models.dal.UserDAL;
-import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.dto.PlayerDalDTO;
-import models.dto.UserDTO;
 import models.dto.UserLoginDataDTO;
 import services.ICRUD;
 import services.ICache;
@@ -75,13 +69,14 @@ public class HigherLoginService implements IHigherLoginService {
 			//Fills new char info
 			userInDal.userId = newUserDto.transferDataList.get(0).userId;
 			CharacterDAL newCharacter = new CharacterDAL();
+			DefaultCharacter defaul=new DefaultCharacter();
 			newCharacter.userId = userInDal.userId;
-			newCharacter.healthPoints = 100;
-			newCharacter.strenght = 5;
-			newCharacter.experience = 0;
-			newCharacter.level = 1;
-			newCharacter.attackItemId=1;
-			newCharacter.defenceItemId=2;
+			newCharacter.healthPoints = defaul.healthPoints;
+			newCharacter.strenght = defaul.strenght;
+			newCharacter.experience = defaul.experience;
+			newCharacter.level = defaul.level;
+			newCharacter.attackItemId=defaul.attackItemId;
+			newCharacter.defenceItemId=defaul.defenceItemId;
 			//Creates mew char
 			ObjectDTO<Integer> characterCreat = crud.create(newCharacter);
 			if (characterCreat.success) {

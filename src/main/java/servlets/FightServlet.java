@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import configuration.StartupContainer;
 import services.IFightEngine;
 import services.impl.FightEngineImpl;
-import services.impl.ItemImpl;
+import services.impl.ImageImpl;
 import models.dto.ActionsDTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
