@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import models.business.Player;
 import models.constant.Settings;
+import models.constant.Time;
 import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import services.ICache;
@@ -14,9 +15,6 @@ import services.ICache;
 public class CacheImpl implements ICache {
 	private static ICache _cache = new CacheImpl();
 
-	private static final int ONE_SECOND = 1000; // one second == 1000 ms
-	private static final int ONE_MINUTE = ONE_SECOND * 60;
-	private static final int ONE_HOUR = ONE_MINUTE * 60;
 	private long _nextExpiredDataCleanUpTime;
 	private Map<Integer, Player> _players; // Map<UserId, Player>
 	private Map<Integer, ImageDAL> _images; // Map<ImageId, ImageDAL>
@@ -33,14 +31,14 @@ public class CacheImpl implements ICache {
 		_imageExpireTime = new ConcurrentHashMap<>();
 		_itemExpireTime = new ConcurrentHashMap<>();
 		_nextExpiredDataCleanUpTime = System.currentTimeMillis()
-				+ Settings.CACHE_EXPIRED_DATA_CLEANUP_PERIOD * ONE_MINUTE;
+				+ Settings.CACHE_EXPIRED_DATA_CLEANUP_PERIOD * Time.MINUTE.getMilliseconds();
 	}
 
 	@Override
 	public void addPlayer(Player player) {
 		_players.put(player.user.userId, player);
 		_playerExpireTime.put(player.user.userId,
-				System.currentTimeMillis() + ONE_HOUR * Settings.CACHE_PLAYER_EXPIRE_TIME);
+				System.currentTimeMillis() + Time.HOUR.getMilliseconds() * Settings.CACHE_PLAYER_EXPIRE_TIME);
 	}
 
 	@Override
@@ -52,7 +50,8 @@ public class CacheImpl implements ICache {
 	@Override
 	public Player getPlayer(int userId) {
 		if (_playerExpireTime.containsKey(userId)) { // if player exists in a cache
-			_playerExpireTime.put(userId, System.currentTimeMillis() + ONE_HOUR * Settings.CACHE_PLAYER_EXPIRE_TIME);
+			_playerExpireTime.put(userId,
+					System.currentTimeMillis() + Time.HOUR.getMilliseconds() * Settings.CACHE_PLAYER_EXPIRE_TIME);
 		}
 		return _players.get(userId); // return null if player doesn't exists
 	}
@@ -66,7 +65,7 @@ public class CacheImpl implements ICache {
 	public void addItem(ItemDAL itemDAL) {
 		_items.put(itemDAL.itemId, itemDAL);
 		_itemExpireTime.put(itemDAL.itemId,
-				System.currentTimeMillis() + ONE_SECOND * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
+				System.currentTimeMillis() + Time.SECOND.getMilliseconds() * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
 	}
 
 	@Override
@@ -78,8 +77,8 @@ public class CacheImpl implements ICache {
 	@Override
 	public ItemDAL getItem(int itemId) {
 		if (_itemExpireTime.containsKey(itemId)) { // if item exists in a cache
-			_itemExpireTime.put(itemId,
-					System.currentTimeMillis() + ONE_SECOND * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
+			_itemExpireTime.put(itemId, System.currentTimeMillis()
+					+ Time.SECOND.getMilliseconds() * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
 		}
 		return _items.get(itemId); // return null if item doesn't exists
 	}
@@ -88,7 +87,7 @@ public class CacheImpl implements ICache {
 	public void addImage(ImageDAL imageDAL) {
 		_images.put(imageDAL.imageId, imageDAL);
 		_imageExpireTime.put(imageDAL.imageId,
-				System.currentTimeMillis() + ONE_SECOND * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
+				System.currentTimeMillis() + Time.SECOND.getMilliseconds() * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
 	}
 
 	@Override
@@ -100,8 +99,8 @@ public class CacheImpl implements ICache {
 	@Override
 	public ImageDAL getImage(int imageId) {
 		if (_imageExpireTime.containsKey(imageId)) { // if image exists in a cache
-			_imageExpireTime.put(imageId,
-					System.currentTimeMillis() + ONE_SECOND * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
+			_imageExpireTime.put(imageId, System.currentTimeMillis()
+					+ Time.SECOND.getMilliseconds() * Settings.CACHE_IMAGE_AND_ITEM_EXPIRE_TIME);
 		}
 		if (System.currentTimeMillis() > _nextExpiredDataCleanUpTime) {
 			cleanUpExpiredData();
@@ -115,7 +114,7 @@ public class CacheImpl implements ICache {
 
 	private void cleanUpExpiredData() {
 		// Clean up players if expired
-		for (Iterator<Map.Entry<Integer, Long>> playerIterator = _playerExpireTime.entrySet().iterator(); 
+		for (Iterator<Map.Entry<Integer, Long>> playerIterator = _playerExpireTime.entrySet().iterator();
 				playerIterator.hasNext();) {
 			Map.Entry<Integer, Long> playerEntry = playerIterator.next();
 			if (System.currentTimeMillis() > playerEntry.getValue()) {
@@ -133,7 +132,7 @@ public class CacheImpl implements ICache {
 			}
 		}
 		// Clean up items if expired
-		for (Iterator<Map.Entry<Integer, Long>> itemIterator = _itemExpireTime.entrySet().iterator();
+		for (Iterator<Map.Entry<Integer, Long>> itemIterator = _itemExpireTime.entrySet().iterator(); 
 				itemIterator.hasNext();) {
 			Map.Entry<Integer, Long> itemEntry = itemIterator.next();
 			if (System.currentTimeMillis() > itemEntry.getValue()) {
@@ -143,7 +142,7 @@ public class CacheImpl implements ICache {
 		}
 
 		_nextExpiredDataCleanUpTime = System.currentTimeMillis()
-				+ Settings.CACHE_EXPIRED_DATA_CLEANUP_PERIOD * ONE_MINUTE;
+				+ Settings.CACHE_EXPIRED_DATA_CLEANUP_PERIOD * Time.MINUTE.getMilliseconds();
 	}
 
 }
