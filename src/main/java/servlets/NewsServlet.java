@@ -24,6 +24,8 @@ import services.impl.CacheImpl;
 
 @WebServlet(urlPatterns = "/News")
 public class NewsServlet extends HttpServlet {
+	
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -40,14 +42,11 @@ public class NewsServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		// response.getWriter().append("Served at: ").append(request.getContextPath());
 
+		ICache cache = CacheImpl.getInstance();
 		Player player = getThisPlayer(request);
 
 		if (player.userStatus == UserStatus.PLAYING) {
-			// need to get current fight ID and set to url
-			ICache cache = CacheImpl.getInstance();
 			Integer currentFight = player.currentFightID;
 			System.out.println("current Fight: " +currentFight);
 			String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + currentFight;
@@ -67,11 +66,11 @@ public class NewsServlet extends HttpServlet {
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
 
-				// If player press Play button, check if player hasn't selected himself.
+				// If player press Play button, check if player hasn't selected himsel
 				if (param.equals("play")
 						&& player.user.userId != Integer.parseInt(request.getParameter("selectedPlayer"))) {
 
-					ICache cache = CacheImpl.getInstance();
+//					ICache cache = CacheImpl.getInstance();
 					cache.getPlayer(
 							Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
 
@@ -100,7 +99,8 @@ public class NewsServlet extends HttpServlet {
 					player.userStatus = UserStatus.NOT_READY;
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 
-				} else if (ready == true) {
+					//Skip this step if player is set to play, in this case player can't set no ready and will be redirected to fight engine.
+				} else if (ready == true  && player.userStatus != UserStatus.PLAYING ) {
 					request.setAttribute("ReadyMessage", "YOU ARE READY");
 					player.userStatus = UserStatus.READY;
 					request.getRequestDispatcher("News.jsp").forward(request, response);
