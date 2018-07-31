@@ -139,11 +139,11 @@ public class FightEngineImpl implements IFightEngine {
 		insertDAL.healthPoints = health;
 		insertDAL.attackHead = yourAction.attackHead;
 		insertDAL.attackBody = yourAction.attackBody;
-		insertDAL.attackHands = yourAction.attackArms;
+		insertDAL.attackArms = yourAction.attackArms;
 		insertDAL.attackLegs = yourAction.attackLegs;
 		insertDAL.defenceHead = yourAction.defenceHead;
 		insertDAL.defenceBody = yourAction.defenceBody;
-		insertDAL.defenceHands = yourAction.defenceArms;
+		insertDAL.defenceArms = yourAction.defenceArms;
 		insertDAL.defenceLegs = yourAction.defenceLegs;
 		
 		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
@@ -178,12 +178,12 @@ public class FightEngineImpl implements IFightEngine {
 		
 		opponentActions.attackHead = opponentDAL.attackHead == null?0:opponentDAL.attackHead;		//if form DB getting info with null - make it "0".
 		opponentActions.attackBody = opponentDAL.attackBody == null?0:opponentDAL.attackBody;
-		opponentActions.attackArms = opponentDAL.attackHands == null?0:opponentDAL.attackHands;
+		opponentActions.attackArms = opponentDAL.attackArms == null?0:opponentDAL.attackArms;
 		opponentActions.attackLegs = opponentDAL.attackLegs == null?0:opponentDAL.attackLegs;
 		
 		opponentActions.defenceHead = opponentDAL.defenceHead == null?0:opponentDAL.defenceHead;
 		opponentActions.defenceBody = opponentDAL.defenceBody == null?0:opponentDAL.defenceBody;
-		opponentActions.defenceArms = opponentDAL.defenceHands == null?0:opponentDAL.defenceHands;
+		opponentActions.defenceArms = opponentDAL.defenceArms == null?0:opponentDAL.defenceArms;
 		opponentActions.defenceLegs = opponentDAL.defenceLegs == null?0:opponentDAL.defenceLegs;
 		
 		int[] damages = calculateDamage(yourAction, opponentActions, userID, opponentDAL.userId); //CalculateDamage :)
