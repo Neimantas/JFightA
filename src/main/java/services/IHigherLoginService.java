@@ -8,4 +8,6 @@ import models.dto.UserLoginDataDTO;
 public interface IHigherLoginService {
 	PlayerDalDTO login(UserLoginData user);
 	UserLoginDataDTO registration(UserRegIn userRegIn);
+	String hashPassword (String password);
+	boolean passwordCheck(String password, String paswordInDB);
 }
