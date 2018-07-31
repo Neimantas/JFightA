@@ -9,6 +9,7 @@ import models.constant.DefaultDamagePoints;
 import models.constant.Error;
 import models.constant.ItemType;
 import models.constant.Settings;
+import models.constant.Time;
 import models.dal.FightDataDAL;
 import models.dal.ItemDAL;
 import models.dto.ListDTO;
@@ -147,7 +148,7 @@ public class FightEngineImpl implements IFightEngine {
 		
 		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
 		
-		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Settings.ONE_SECOND;
+		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Time.SECOND.getMilliseconds();
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userID);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
 			if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {			//needs upgrade, if data not received - autoWin for waiting user.
