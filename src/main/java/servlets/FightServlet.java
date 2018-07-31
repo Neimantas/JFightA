@@ -20,6 +20,7 @@ import services.impl.ImageImpl;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.business.Actions;
+import models.constant.UserStatus;
 import models.dal.FightDataDAL;
 
 /**
@@ -163,10 +164,13 @@ public class FightServlet extends HttpServlet {
 			response.addCookie(new Cookie("health", Integer.toString(healthI))); //add health cookie
 			
 			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
+				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(playerBHealth<=0) {
+				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("win.jsp").forward(request, response);
 			} else if(playerAHealth<=0) {
+				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
 			}
 			
