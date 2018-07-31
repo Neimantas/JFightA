@@ -237,21 +237,22 @@ public class FightEngineImpl implements IFightEngine {
 //						+ (opponentActions.defenceArms - yourActions.attackArms) * CharacterBodyPart.HANDS.getDamagePoints()
 //						+ (opponentActions.defenceLegs - yourActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
 		
-		if(yourActions.attackHead > 0 && (opponentActions.defenceHead - yourActions.attackHead) == -1) {
-			givenDamage += DefaultDamagePoints.HEAD.getDamagePoints() + 
-					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
+		
+		if (yourActions.attackHead > 0) {
+			givenDamage += countDamage(yourActions.attackHead, opponentActions.defenceHead, DefaultDamagePoints.HEAD.getDamagePoints(), 
+					yourItems.get(ItemType.ATTACK).attackPoints, opponentItems.get(ItemType.DEFENCE).defencePoints);
 		}
-		if(yourActions.attackBody > 0 && (opponentActions.defenceBody - yourActions.attackBody) == -1) {
-			givenDamage += DefaultDamagePoints.BODY.getDamagePoints() + 
-					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
+		if (yourActions.attackBody > 0) {
+			givenDamage += countDamage(yourActions.attackBody, opponentActions.defenceBody, DefaultDamagePoints.BODY.getDamagePoints(), 
+					yourItems.get(ItemType.ATTACK).attackPoints, opponentItems.get(ItemType.DEFENCE).defencePoints);
 		}
-		if(yourActions.attackArms > 0 && (opponentActions.defenceArms - yourActions.attackArms) == -1) {
-			givenDamage += DefaultDamagePoints.HANDS.getDamagePoints() + 
-					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
+		if (yourActions.attackArms > 0) {
+			givenDamage += countDamage(yourActions.attackArms, opponentActions.defenceArms, DefaultDamagePoints.ARMS.getDamagePoints(), 
+					yourItems.get(ItemType.ATTACK).attackPoints, opponentItems.get(ItemType.DEFENCE).defencePoints);
 		}
-		if(yourActions.attackLegs > 0 && (opponentActions.defenceLegs - yourActions.attackLegs) == -1) {
-			givenDamage += DefaultDamagePoints.LEGS.getDamagePoints() + 
-					yourItems.get(ItemType.ATTACK).attackPoints - opponentItems.get(ItemType.DEFENCE).defencePoints;
+		if (yourActions.attackLegs > 0) {
+			givenDamage += countDamage(yourActions.attackLegs, opponentActions.defenceLegs, DefaultDamagePoints.LEGS.getDamagePoints(), 
+					yourItems.get(ItemType.ATTACK).attackPoints, opponentItems.get(ItemType.DEFENCE).defencePoints);
 		}
 		
 		int takenDamage = 0;
@@ -261,22 +262,24 @@ public class FightEngineImpl implements IFightEngine {
 //						+ (yourActions.defenceArms - opponentActions.attackArms) * CharacterBodyPart.HANDS.getDamagePoints()
 //						+ (yourActions.defenceLegs - opponentActions.attackLegs) * CharacterBodyPart.LEGS.getDamagePoints();
 		
-		if(opponentActions.attackHead > 0 && (yourActions.defenceHead - opponentActions.attackHead) == -1) {
-			takenDamage += DefaultDamagePoints.HEAD.getDamagePoints() + 
-					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
+		
+		if (opponentActions.attackHead > 0) {
+			takenDamage += countDamage(opponentActions.attackHead, yourActions.defenceHead, DefaultDamagePoints.HEAD.getDamagePoints(), 
+					opponentItems.get(ItemType.ATTACK).attackPoints, yourItems.get(ItemType.DEFENCE).defencePoints);
 		}
-		if(opponentActions.attackBody > 0 && (yourActions.defenceBody - opponentActions.attackBody) == -1) {
-			takenDamage += DefaultDamagePoints.BODY.getDamagePoints() + 
-					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
+		if (opponentActions.attackBody > 0) {
+			takenDamage += countDamage(opponentActions.attackBody, yourActions.defenceBody, DefaultDamagePoints.BODY.getDamagePoints(), 
+					opponentItems.get(ItemType.ATTACK).attackPoints, yourItems.get(ItemType.DEFENCE).defencePoints);
 		}
-		if(opponentActions.attackArms > 0 && (yourActions.defenceArms - opponentActions.attackArms) == -1) {
-			takenDamage += DefaultDamagePoints.HANDS.getDamagePoints() + 
-					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
+		if (opponentActions.attackArms > 0) {
+			takenDamage += countDamage(opponentActions.attackArms, yourActions.defenceArms, DefaultDamagePoints.ARMS.getDamagePoints(), 
+					opponentItems.get(ItemType.ATTACK).attackPoints, yourItems.get(ItemType.DEFENCE).defencePoints);
 		}
-		if(opponentActions.attackLegs > 0 && (yourActions.defenceLegs - opponentActions.attackLegs) == -1) {
-			takenDamage += DefaultDamagePoints.LEGS.getDamagePoints() + 
-					opponentItems.get(ItemType.ATTACK).attackPoints - yourItems.get(ItemType.DEFENCE).defencePoints;
+		if (opponentActions.attackLegs > 0) {
+			takenDamage += countDamage(opponentActions.attackLegs, yourActions.defenceLegs, DefaultDamagePoints.LEGS.getDamagePoints(), 
+					opponentItems.get(ItemType.ATTACK).attackPoints, yourItems.get(ItemType.DEFENCE).defencePoints);
 		}
+		
 		System.out.println(givenDamage);
 		System.out.println(takenDamage);
 		int[] ret = {givenDamage, takenDamage};
@@ -284,5 +287,12 @@ public class FightEngineImpl implements IFightEngine {
 		return ret;
 	}
 	
+	private int countDamage(int attackAction, int defenceAction, int defaultDamagePoint, int itemAttackPoints, int itemDefencePoints) {
+		if (attackAction - defenceAction == 1) {
+			return defaultDamagePoint + itemAttackPoints;
+		} else {
+			return itemAttackPoints - itemDefencePoints;
+		}
+	}
 	
 }
