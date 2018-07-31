@@ -27,6 +27,7 @@
 <link rel="stylesheet" type="text/css"
 	href="resources/vendor/select2/select2.min.css">
 <!--===============================================================================================-->
+<link rel="stylesheet" type="text/css" href="resources/css/result.css">
 <link rel="stylesheet" type="text/css" href="resources/css/util.css">
 <link rel="stylesheet" type="text/css" href="resources/css/main.css">
 <!--===============================================================================================-->
@@ -46,7 +47,7 @@
 					<a class="dropdown-item" href="/JFight/user?log=false">Character
 						Info</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="/JFight/LogOutServlet"><i class="fa fa-sign-out"
+					<a class="dropdown-item" href="/JFight/logout"><i class="fa fa-sign-out"
 						aria-hidden="true"></i>Logout</a>
 				</div></li>
 		</ul>

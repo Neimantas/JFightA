@@ -92,48 +92,48 @@
 						<div class="col-sm-6 border border-dark rounded text-center">
 							Attack:
 							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
+								<input class="form-check-input attack mx-1" type="checkbox"
 									name="attackHead" id="attackAction1" value="head"> <label
-									class="form-check-label" for="attackAction1"> Head </label>
+									class="form-check-label ml-0" for="attackAction1">Head</label>
 							</div>
 							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
+								<input class="form-check-input attack mx-1" type="checkbox"
 									name="attackBody" id="attackAction2" value="body"> <label
-									class="form-check-label" for="attackAction2"> Body </label>
+									class="form-check-label ml-0" for="attackAction2">Body</label>
 							</div>
 							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
+								<input class="form-check-input attack mx-1" type="checkbox"
 									name="attackArms" id="attackAction3" value="arms"> <label
-									class="form-check-label" for="attackAction3"> Arms </label>
+									class="form-check-label ml-0" for="attackAction3">Arms</label>
 							</div>
 							<div class="form-check">
-								<input class="form-check-input attack" type="checkbox"
+								<input class="form-check-input attack mx-1" type="checkbox"
 									name="attackLegs" id="attackAction4" value="legs"> <label
-									class="form-check-label" for="attackAction4"> Legs </label>
+									class="form-check-label ml-0" for="attackAction4">Legs</label>
 							</div>
 						</div>
 
 						<div class="col-sm-6 border border-dark rounded text-center">
 							Defend:
 							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
+								<input class="form-check-input defence mx-1" type="checkbox"
 									name="defenceHead" id="defenceAction1" value="head"> <label
-									class="form-check-label" for="defenceAction1"> Head </label>
+									class="form-check-label" for="defenceAction1">Head</label>
 							</div>
 							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
+								<input class="form-check-input defence mx-1" type="checkbox"
 									name="defenceBody" id="defenceAction2" value="body"> <label
-									class="form-check-label" for="defenceAction2"> Body </label>
+									class="form-check-label" for="defenceAction2">Body</label>
 							</div>
 							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
+								<input class="form-check-input defence mx-1" type="checkbox"
 									name="defenceArms" id="defenceAction3" value="arms"> <label
-									class="form-check-label" for="defenceAction3"> Arms </label>
+									class="form-check-label" for="defenceAction3">Arms</label>
 							</div>
 							<div class="form-check">
-								<input class="form-check-input defence" type="checkbox"
+								<input class="form-check-input defence mx-1" type="checkbox"
 									name="defenceLegs" id="defenceAction4" value="legs"> <label
-									class="form-check-label" for="defenceAction4"> Legs </label>
+									class="form-check-label" for="defenceAction4">Legs</label>
 							</div>
 						</div>
 					</div>
@@ -146,13 +146,14 @@
 				</form>
 				<div class="row mb-1">
 					<div class="col-12 text-center" id="timer">30</div>
-					<div class="col-12 text-center" id="wait" style="visibility: hidden;">
-						WAITING</div>
+					<div class="col-12 text-center" id="wait"
+						style="visibility: hidden;">WAITING</div>
 				</div>
 			</div>
 			<div class="col-sm-4">
 				<div class="row mb-1">
-					<div class="col border border-dark rounded text-center font-weight-bold">${playerBName}</div>
+					<div
+						class="col border border-dark rounded text-center font-weight-bold">${playerBName}</div>
 				</div>
 				<div class="row mb-1">
 					<div class="col border border-dark rounded py-1">

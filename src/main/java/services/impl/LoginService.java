@@ -79,7 +79,7 @@ public class LoginService implements ILoginService {
 	public void logout(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
-		for (int i = cookies.length-1; i <= 0; i--) {
+		for (int i = cookies.length-1; i >= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(0);

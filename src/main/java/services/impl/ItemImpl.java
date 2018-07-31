@@ -3,8 +3,10 @@ package services.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import models.constant.Error;
 import models.constant.ImageType;
 import models.constant.ItemType;
+import models.constant.Success;
 import models.dal.ItemDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
@@ -36,7 +38,7 @@ public class ItemImpl implements IItem {
 		ObjectDTO<ItemDAL> itemDTO = new ObjectDTO<>();
 		if (_cache.getItem(itemId) != null) {
 			itemDTO.transferData = _cache.getItem(itemId);
-			itemDTO.message = "Item is taken from the cache.";
+			itemDTO.message = Success.ITEM_IS_TAKEN_FROM_CACHE.getMessage();
 			itemDTO.success = true;
 			return itemDTO;
 		}
@@ -147,7 +149,7 @@ public class ItemImpl implements IItem {
 			itemDTO.success = true;
 			return itemDTO;
 		} else {
-			_log.writeWarningMessage("Item No " + itemId + " wasn't downloaded from the database.", true,
+			_log.writeWarningMessage(Error.ITEM_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "Item No " + itemId,
 					"Class: CacheImpl, method: private boolean downloadItemFromDatabase(int itemId).",
 					"crud read message: " + listDTO.message);
 			itemDTO.message = listDTO.message;
@@ -165,8 +167,8 @@ public class ItemImpl implements IItem {
 
 	private ObjectDTO<Integer> createInputParameterErrorDTO(String methodName) {
 		ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
-		objectDTO.message = "Wrong input parameter. minCharacterLevel should be not less than one.";
-		_log.writeWarningMessage(objectDTO.message, true,
+		objectDTO.message = Error.ITEM_CREATE_WRONG_MIN_CHARACTER_LEVEL.getMessage();
+		_log.writeWarningMessage(Error.ITEM_CREATE_WRONG_MIN_CHARACTER_LEVEL.getMessage(), true,
 				"Class: ItemImpl, Method: " + methodName + "(input parameters)");
 		return objectDTO;
 	}

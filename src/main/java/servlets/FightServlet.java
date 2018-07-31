@@ -12,12 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
+import services.ICache;
 import services.IFightEngine;
+import services.impl.CacheImpl;
 import services.impl.FightEngineImpl;
 import services.impl.ImageImpl;
-import models.dto.ActionsDTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
+import models.business.Actions;
 import models.dal.FightDataDAL;
 
 /**
@@ -66,10 +68,11 @@ public class FightServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 //		doGet(request, response);
 		IFightEngine _engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
-		String userId = "";
+		String playerAUserId = "";
 		String fightId = "";
 		String round = "";
 		String health = "";
+		ICache cache = CacheImpl.getInstance();
 		
 		Cookie[] cookies = request.getCookies();
 		if (cookies == null)
@@ -77,7 +80,7 @@ public class FightServlet extends HttpServlet {
 		
 		for(Cookie c : cookies) {
 			if (c.getName().equals("userId"))
-				userId = c.getValue();
+				playerAUserId = c.getValue();
 			if (c.getName().equals("fightId"))
 				fightId = c.getValue();
 			if(c.getName().equals("round"))
@@ -85,7 +88,7 @@ public class FightServlet extends HttpServlet {
 			if(c.getName().equals("health"))
 				health = c.getValue();
 		} 
-		if(userId == "" || fightId == "" || round == "" || health == "") {
+		if(playerAUserId == "" || fightId == "" || round == "" || health == "") {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
 			
@@ -100,7 +103,7 @@ public class FightServlet extends HttpServlet {
 		String defenceArms = request.getParameter("defenceArms");
 		String defenceLegs = request.getParameter("defenceLegs");
 		
-		ActionsDTO action = new ActionsDTO();
+		Actions action = new Actions();
 		
 		action.attackArms = attackArms == null?0:1;
 		action.attackBody = attackBody == null?0:1;
@@ -114,7 +117,7 @@ public class FightServlet extends HttpServlet {
 		
 		int roundI = Integer.parseInt(round);
 		int healthI = Integer.parseInt(health);
-		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(fightId), roundI, healthI, userId, action); //Sending info to fight engine.
+		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(fightId), roundI, healthI, Integer.parseInt(playerAUserId), action); //Sending info to fight engine.
 		
 		if(!dto.success) {
 			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
@@ -128,18 +131,33 @@ public class FightServlet extends HttpServlet {
 			
 			int playerAHealth = dals.get(0).healthPoints;
 			healthI = playerAHealth;
-			String playerBName = Integer.toString(dals.get(1).userId);
+			int playerBUserId = dals.get(1).userId;
 			int playerBHealth = dals.get(1).healthPoints;
 			
-			System.out.println("UserId " + userId);
+//			System.out.println("UserId" + playerAUserId);
+//			System.out.println(cache);
+//			System.out.println(cache.getPlayer(Integer.parseInt(playerAUserId)).user.name);
+			String playerAName = cache.getPlayer(Integer.parseInt(playerAUserId)).user.name;
+			String playerBName = cache.getPlayer(playerBUserId).user.name;
 			
-			request.setAttribute("playerAName", userId);								//Sending refreshed info to page.
+			int attackItemAId = cache.getPlayer(Integer.parseInt(playerAUserId)).characterInfo.attackItemId;
+			int defenceItemAId = cache.getPlayer(Integer.parseInt(playerAUserId)).characterInfo.defenceItemId;
+			
+			int attackItemBId = cache.getPlayer(playerBUserId).characterInfo.attackItemId;
+			int defenceItemBId = cache.getPlayer(playerBUserId).characterInfo.defenceItemId;
+			
+			request.setAttribute("playerAName", playerAName);								//Sending refreshed info to page.
 			request.setAttribute("playerBName", playerBName);
 			request.setAttribute("healthA", playerAHealth);
 			request.setAttribute("healthB", playerBHealth);
 			//avatar id
-			request.setAttribute("idA", 1);													//Picture ID. Still hardcoded.
-			request.setAttribute("idB", 2);
+			request.setAttribute("idA", playerAUserId);													//Picture ID. Still hardcoded.
+			request.setAttribute("idB", playerBUserId);
+			request.setAttribute("attackItemA", attackItemAId);
+			request.setAttribute("defenceItemA", defenceItemAId);
+			request.setAttribute("attackItemB", attackItemBId);
+			request.setAttribute("defenceItemB", defenceItemBId);
+			
 			
 			response.addCookie(new Cookie("round", Integer.toString(roundI))); //add round cookie
 			response.addCookie(new Cookie("health", Integer.toString(healthI))); //add health cookie
