@@ -172,9 +172,11 @@ public class FightServlet extends HttpServlet {
 			} else if(playerAHealth<=0) {
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
+			} else {
+				request.getRequestDispatcher("fight.jsp").forward(request, response);			//if fight is not finised - refresh page with new data.
 			}
 			
-			request.getRequestDispatcher("fight.jsp").forward(request, response);			//if fight is not finised - refresh page with new data.
+			
 //			request.getRequestDispatcher("NewFile.jsp").forward(request, response);
 		}
 		
