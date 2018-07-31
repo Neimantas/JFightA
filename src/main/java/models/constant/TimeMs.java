@@ -1,12 +1,12 @@
 package models.constant;
 
-public enum Time {
+public enum TimeMs {
 	
 	SECOND(1000), MINUTE(60000), HOUR(3600000);
 	
 	private int _milliseconds;
 	
-	private Time(int milliseconds) {
+	private TimeMs(int milliseconds) {
 		_milliseconds = milliseconds;
 	}
 
