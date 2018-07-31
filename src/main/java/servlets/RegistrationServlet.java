@@ -53,7 +53,7 @@ public class RegistrationServlet extends HttpServlet {
 		if(dto.success) {
 			UserLoginData userLogin=new UserLoginData();
 			userLogin.name=dto.userloginData.name;
-			userLogin.password=dto.userloginData.password;
+			userLogin.password=userRegInfo.password;
 			DTO playerDTO=_logService.login(response,userLogin);
 			if (playerDTO.success) {
 				request.getRequestDispatcher("News.jsp").forward(request, response);

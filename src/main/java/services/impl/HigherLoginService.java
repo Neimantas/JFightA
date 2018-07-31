@@ -62,10 +62,11 @@ public class HigherLoginService implements IHigherLoginService {
 	public UserLoginDataDTO registration(UserRegIn userRegIn) {
 		// Fills new user info
 		UserDAL userInDal = new UserDAL();
+		userInDal.name=userRegIn.name;
 		userInDal.password = hashPassword(userRegIn.password);
 		userInDal.eMail = userRegIn.mail;
 		userInDal.accessLevel = 1;
-		userInDal.imageId = 20;
+//		userInDal.imageId = 20;
 		// Creates new user
 		crud.create(userInDal);
 		// Read new created user
