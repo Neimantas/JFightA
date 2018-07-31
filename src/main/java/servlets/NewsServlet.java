@@ -59,10 +59,12 @@ public class NewsServlet extends HttpServlet {
 			request.setAttribute("userName", player.user.name);
 
 			String param = request.getParameter("button");
-			
-			//Check if there is button params in url.
+
+			// Check if there is button params in url.
 			if (param != null) {
-				//refresh page on demand.
+				// refresh page on demand. (Yes i know, 3x "if" steps deep, but these check must
+				// be done in this order, otherwise best case scenario will not work Ready/notready
+				// message, worst case scenario - RuntimeError)
 				if (param.equals("refresh")) {
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
@@ -70,31 +72,31 @@ public class NewsServlet extends HttpServlet {
 				// If player press Play button, check if player hasn't selected himself
 				if (param.equals("play")
 						&& player.user.userId != Integer.parseInt(request.getParameter("selectedPlayer"))) {
-					
-					//After Play button is pressed, set remote player from list status as playing.
+
+					// After Play button is pressed, set remote player from list status as playing.
 					cache.getPlayer(
 							Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
-					//set current player as playing.
+					// set current player as playing.
 					player.userStatus = UserStatus.PLAYING;
 					ResultDAL resultdal = new ResultDAL();
 					ICRUD crud = new CRUDImpl();
-					//Get unused fightID from DB.
+					// Get unused fightID from DB.
 					Integer lastFightID = crud.create(resultdal).transferData;
-					//Set in what FightID should remote player be transfered.
+					// Set in what FightID should remote player be transfered.
 					cache.getPlayer(
 							Integer.parseInt(request.getParameter("selectedPlayer"))).currentFightID = lastFightID;
-					//Set and Redirect current player to Fight.jsp with FightID.
+					// Set and Redirect current player to Fight.jsp with FightID.
 					String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + lastFightID;
 					response.sendRedirect(url);
 
-				//If there is no params, set player as notReady.
+					// If there is no params, set player as notReady.
 				} else {
 					player.userStatus = UserStatus.NOT_READY;
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
 			}
 
-			//Checking Player status, writing message and button text accordingly.
+			// Checking Player status, writing message and button text accordingly.
 			else {
 				Boolean ready = request.getParameter("ready") == null ? false
 						: Boolean.valueOf(request.getParameter("ready"));
