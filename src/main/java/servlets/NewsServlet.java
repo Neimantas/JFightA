@@ -60,7 +60,7 @@ public class NewsServlet extends HttpServlet {
 
 			String param = request.getParameter("button");
 			
-			//Check if there is params in url.
+			//Check if there is button params in url.
 			if (param != null) {
 				//refresh page on demand.
 				if (param.equals("refresh")) {
@@ -94,7 +94,7 @@ public class NewsServlet extends HttpServlet {
 				}
 			}
 
-			//Checking Player status and reting message and button text accordingly.
+			//Checking Player status, writing message and button text accordingly.
 			else {
 				Boolean ready = request.getParameter("ready") == null ? false
 						: Boolean.valueOf(request.getParameter("ready"));
@@ -104,7 +104,7 @@ public class NewsServlet extends HttpServlet {
 					player.userStatus = UserStatus.NOT_READY;
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 
-					// Skip this step if player is set to play, in this case player can't set no
+					// Skip this step if player is set to playing, in this case player can't set not
 					// ready and will be redirected to fight engine.
 				} else if (ready == true && player.userStatus != UserStatus.PLAYING) {
 					request.setAttribute("ReadyMessage", "YOU ARE READY");
@@ -112,9 +112,6 @@ public class NewsServlet extends HttpServlet {
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
 			}
-
-			// }
-			// doPost(request, response);
 		}
 
 	}
