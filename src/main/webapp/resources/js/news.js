@@ -5,6 +5,9 @@ function clicker(btnName){															//For Play and Logout functions.
 			location.href = url;
 
 	}
+function info(){
+	
+}
 function play(){
 	var readyPlayers = document.getElementById("readyPlayers");
 	var selectas = readyPlayers.options[readyPlayers.selectedIndex];

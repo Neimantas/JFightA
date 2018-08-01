@@ -44,7 +44,7 @@ public class NewsServlet extends HttpServlet {
 			movePlayerToFight(response, player);
 		}
 
-		// If player Is not playing, execute other stuff.
+		// If player Is not playing and not moved to Fight, execute other stuff.
 		else {
 			Map<Integer, String> listPlayers = getReadyPlayers();
 			request.setAttribute("readyPlayers", listPlayers);
