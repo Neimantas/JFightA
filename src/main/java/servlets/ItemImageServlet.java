@@ -30,8 +30,7 @@ public class ItemImageServlet extends HttpServlet {
 		ObjectDTO<Item> objectDTO = _item.getItem(Integer.parseInt(request.getParameter("itemId")));
 		if (objectDTO.success && objectDTO.transferData != null) {
 
-			String imageFormat = objectDTO.transferData.itemName
-					.substring(objectDTO.transferData.itemName.lastIndexOf(".") + 1);
+			String imageFormat = objectDTO.transferData.imageFormat.getImageExtension().substring(1);
 
 			response.setContentType("/image" + imageFormat);
 

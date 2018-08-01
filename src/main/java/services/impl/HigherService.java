@@ -3,10 +3,13 @@ package services.impl;
 
 import models.business.DefaultCharacter;
 import models.business.Item;
+import models.business.ProfileImage;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.constant.Error;
+import models.constant.Success;
 import models.dal.CharacterDAL;
+import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dal.PlayerDAL;
 import models.dal.ResultDAL;
@@ -136,6 +139,43 @@ public class HigherService implements IHigherService {
 	}
 
 	@Override
+	public ObjectDTO<UserDAL> getUser(int userId) {
+		UserDAL userDAL = new UserDAL();
+		userDAL.userId = userId;
+		ListDTO<UserDAL> listDTO = _crud.read(userDAL);
+		ObjectDTO<UserDAL> userDTO = new ObjectDTO<>();
+		if (listDTO.success && !listDTO.transferDataList.isEmpty()) {
+			userDTO.transferData = listDTO.transferDataList.get(0);
+			userDTO.message = listDTO.message;
+			userDTO.success = true;
+			return userDTO;
+		} else {
+			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "User No " + userId,
+					"Class: HigherService, method: ObjectDTO<UserDAL> getUser(int userId).",
+					"crud read message: " + listDTO.message);
+			userDTO.message = listDTO.message;
+			return userDTO;
+		}
+	}
+
+	@Override
+	public ObjectDTO<UserDAL> updateUserImageId(int userId, int imageId) {
+		ObjectDTO<UserDAL> userDTO = getUser(userId);
+		if (userDTO.success) {
+			UserDAL userDAL = userDTO.transferData;
+			userDAL.imageId = imageId;
+			DTO dto = _crud.update(userDAL);
+			if (dto.success) {
+				userDTO.transferData = userDAL;
+			}
+			userDTO.message = dto.message;
+			userDTO.success = dto.success;
+			return userDTO;
+		}
+		return userDTO;
+	}
+
+	@Override
 	public ObjectDTO<ItemDAL> getItem(int itemId) {
 		ItemDAL itemDAL = new ItemDAL();
 		itemDAL.itemId = itemId;
@@ -166,22 +206,92 @@ public class HigherService implements IHigherService {
 	}
 
 	@Override
-	public DTO deleteItem(Item item) {
-		return _crud.delete(itemToItemDAL(item));
+	public DTO deleteItem(int itemId) {
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		return _crud.delete(itemDAL);
+	}
+
+	@Override
+	public ObjectDTO<ImageDAL> getImage(int imageId) {
+		ObjectDTO<ImageDAL> imageDTO = new ObjectDTO<>();
+		ImageDAL imageDAL = new ImageDAL();
+		imageDAL.imageId = imageId;
+		ListDTO<ImageDAL> imageListDTO = _crud.read(imageDAL);
+		if (imageListDTO.success == true && !imageListDTO.transferDataList.isEmpty()) {
+			imageDTO.transferData = imageListDTO.transferDataList.get(0);
+		}
+		imageDTO.message = imageListDTO.message;
+		imageDTO.success = imageListDTO.success;
+		return imageDTO;
+	}
+
+	@Override
+	public ObjectDTO<Integer> getImageId(int userId) {
+		ObjectDTO<Integer> imageIdDTO = new ObjectDTO<>();
+		UserDAL userDAL = new UserDAL();
+		userDAL.userId = userId;
+		ListDTO<UserDAL> listDTO = _crud.read(userDAL);
+		if (listDTO.success) {
+			if (!listDTO.transferDataList.isEmpty() && listDTO.transferDataList.get(0).imageId != null) {
+				imageIdDTO.transferData = listDTO.transferDataList.get(0).imageId;
+				imageIdDTO.message = Success.USER_HAS_AN_IMAGE.getMessage();
+				imageIdDTO.success = true;
+				return imageIdDTO;
+			}
+			imageIdDTO.message = Error.USER_HAS_NO_IMAGE.getMessage();
+			return imageIdDTO;
+		}
+		imageIdDTO.message = listDTO.message;
+		return imageIdDTO;
+	}
+
+	@Override
+	public ObjectDTO<Integer> createNewImage(ProfileImage profileImage) {
+		return _crud.create(profileImageToImageDAL(profileImage));
+	}
+
+	@Override
+	public DTO updateImage(ProfileImage profileImage) {
+		return _crud.update(profileImageToImageDAL(profileImage));
+	}
+
+	@Override
+	public DTO deleteImage(int imageId) {
+		ImageDAL imageDAL = new ImageDAL();
+		imageDAL.imageId = imageId;
+		return _crud.delete(imageDAL);
 	}
 
 	private ItemDAL itemToItemDAL(Item item) {
 		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemId = item.itemId != 0 ? item.itemId : null;
-		itemDAL.itemName = item.itemName;
-		itemDAL.itemImage = item.itemImage;
-		itemDAL.imageFormat = item.imageFormat.getImageExtension();
-		itemDAL.itemType = item.itemType;
-		itemDAL.description = (item.description != null && !item.description.equals("")) ? item.description : null;
-		itemDAL.minCharacterLevel = item.minCharacterLevel != 0 ? item.minCharacterLevel : null;
-		itemDAL.attackPoints = item.attackPoints != 0 ? item.attackPoints : null;
-		itemDAL.defencePoints = item.defencePoints != 0 ? item.defencePoints : null;
+		if (item != null) {
+			itemDAL.itemId = item.itemId != 0 ? item.itemId : null;
+			itemDAL.itemName = (item.itemName != null && !item.itemName.equals("")) ? item.itemName : null;
+			itemDAL.itemImage = item.itemImage;
+			itemDAL.imageFormat = item.imageFormat.getImageExtension();
+			itemDAL.itemType = item.itemType;
+			itemDAL.description = (item.description != null && !item.description.equals("")) ? item.description : null;
+			itemDAL.minCharacterLevel = item.minCharacterLevel != 0 ? item.minCharacterLevel : null;
+			itemDAL.attackPoints = item.attackPoints != 0 ? item.attackPoints : null;
+			itemDAL.defencePoints = item.defencePoints != 0 ? item.defencePoints : null;
+		}
 		return itemDAL;
+	}
+
+	private ImageDAL profileImageToImageDAL(ProfileImage profileImage) {
+		ImageDAL imageDAL = new ImageDAL();
+		if (profileImage != null) {
+			imageDAL.imageId = profileImage.imageId != 0 ? profileImage.imageId : null;
+			imageDAL.userId = profileImage.userId != 0 ? profileImage.userId : null;
+			imageDAL.image = profileImage.image;
+			imageDAL.imageName = (profileImage.imageName != null ? profileImage.imageName : "")
+					+ (profileImage.imageType != null ? profileImage.imageType.getImageExtension() : "");
+			if (imageDAL.imageName.equals("")) {
+				imageDAL.imageName = null;
+			}
+		}
+		return imageDAL;
 	}
 
 }

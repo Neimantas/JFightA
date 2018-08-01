@@ -46,6 +46,7 @@ public class ItemImpl implements IItem {
 		if (itemDALdto.success || itemId == 1) {
 			if (itemDALdto.success) {
 				_cache.addItem(itemDALdto.transferData);
+				itemDTO.transferData = itemDALtoItem(itemDALdto.transferData);
 			}
 			itemDTO.message = itemDALdto.message;
 			itemDTO.success = itemDALdto.success;
@@ -90,6 +91,9 @@ public class ItemImpl implements IItem {
 	public ObjectDTO<Integer> createNewItem(String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
 			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
 
+		if (itemName == null || itemName.equals("")) {
+			return createInputParameterErrorDTO(Error.ITEM_EMPTY_NAME, "createNewItem");
+		}
 		if (minCharacterLevel < 1) {
 			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, "createNewItem");
 		}
@@ -110,6 +114,12 @@ public class ItemImpl implements IItem {
 	public DTO editItem(int itemId, String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
 			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
 
+		if (itemId < 1) {
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, "editItem");
+		}
+		if (itemName == null || itemName.equals("")) {
+			return createInputParameterErrorDTO(Error.ITEM_EMPTY_NAME, "editItem");
+		}
 		if (minCharacterLevel < 1) {
 			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, "editItem");
 		}
@@ -135,15 +145,11 @@ public class ItemImpl implements IItem {
 
 	@Override
 	public DTO deleteItem(int itemId) {
-
 		if (itemId < 1) {
 			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, "deleteItem");
 		}
 
-		Item item = new Item();
-		item.itemId = itemId;
-
-		DTO deleteDTO = _higherService.deleteItem(item);
+		DTO deleteDTO = _higherService.deleteItem(itemId);
 		if (deleteDTO.success) {
 			_cache.removeItem(itemId);
 		}
@@ -169,15 +175,18 @@ public class ItemImpl implements IItem {
 
 	private Item itemDALtoItem(ItemDAL itemDAL) {
 		Item item = new Item();
-		item.itemId = itemDAL.itemId;
-		item.itemName = itemDAL.itemName;
-		item.itemImage = itemDAL.itemImage;
-		item.imageFormat = ImageType.getByImageExtension(itemDAL.imageFormat);
-		item.itemType = itemDAL.itemType;
-		item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description : "";
-		item.minCharacterLevel = itemDAL.minCharacterLevel != null ? itemDAL.minCharacterLevel : 0;
-		item.attackPoints = itemDAL.attackPoints != null ? itemDAL.attackPoints : 0;
-		item.defencePoints = itemDAL.defencePoints != null ? itemDAL.defencePoints : 0;
+		if (itemDAL != null) {
+			item.itemId = itemDAL.itemId;
+			item.itemName = itemDAL.itemName;
+			item.itemImage = itemDAL.itemImage;
+			item.imageFormat = ImageType.getByImageExtension(itemDAL.imageFormat);
+			item.itemType = itemDAL.itemType;
+			item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description
+					: "";
+			item.minCharacterLevel = itemDAL.minCharacterLevel != null ? itemDAL.minCharacterLevel : 0;
+			item.attackPoints = itemDAL.attackPoints != null ? itemDAL.attackPoints : 0;
+			item.defencePoints = itemDAL.defencePoints != null ? itemDAL.defencePoints : 0;
+		}
 		return item;
 	}
 

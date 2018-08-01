@@ -10,27 +10,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
-import eu.lestard.easydi.EasyDI;
-import models.dal.ImageDAL;
+import models.business.ProfileImage;
 import models.dto.ObjectDTO;
 import services.IImage;
-import services.impl.CRUDImpl;
-import services.impl.DatabaseImpl;
 import services.impl.ImageImpl;
 
 @WebServlet(urlPatterns = "/imageServlet")
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+
 	private IImage image;
-	
+
 	public ImageServlet() {
 		image = StartupContainer.easyDI.getInstance(ImageImpl.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		String id = request.getParameter("id");
 		String user = request.getParameter("user");
 
@@ -38,7 +35,7 @@ public class ImageServlet extends HttpServlet {
 			id = "0";
 		}
 
-		ObjectDTO<ImageDAL> objectDTO;
+		ObjectDTO<ProfileImage> objectDTO;
 		if (user != null && user.equalsIgnoreCase("b")) {
 			objectDTO = image.getUserBImage(Integer.parseInt(id));
 		} else {
@@ -47,15 +44,16 @@ public class ImageServlet extends HttpServlet {
 
 		if (objectDTO.success && objectDTO.transferData != null) {
 
-			String imageFormat = objectDTO.transferData.imageName
-					.substring(objectDTO.transferData.imageName.lastIndexOf(".") + 1);
+			String imageFormat = objectDTO.transferData.imageType != null
+					? objectDTO.transferData.imageType.getImageExtension().substring(1)
+					: "";
 
 			response.setContentType("image/" + imageFormat);
 
 			ServletOutputStream servletOutputStream = response.getOutputStream();
 			servletOutputStream.write(objectDTO.transferData.image);
 			response.getOutputStream().close();
-			
+
 		} else {
 			response.getWriter().println(objectDTO.message);
 			response.getWriter().close();
