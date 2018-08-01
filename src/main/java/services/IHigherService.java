@@ -12,7 +12,6 @@ import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
-import models.dto.ObjectDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserLoginDataDTO;
 

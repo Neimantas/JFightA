@@ -1,11 +1,6 @@
 
 package services.impl;
 
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import models.business.DefaultCharacter;
 import models.business.Item;
 import models.business.ProfileImage;
@@ -15,6 +10,8 @@ import models.constant.Error;
 import models.constant.Success;
 import models.dal.CharacterDAL;
 import models.dal.FightDataDAL;
+import models.dal.ImageDAL;
+import models.dal.ItemDAL;
 import models.dal.LogDAL;
 import models.dal.PlayerDAL;
 import models.dal.ResultDAL;
@@ -25,19 +22,16 @@ import models.dto.ObjectDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserLoginDataDTO;
 import services.ICRUD;
-import services.ICache;
 import services.IHigherService;
 import services.ILog;
 
 public class HigherService implements IHigherService {
 
 	private ICRUD _crud;
-	private ICache _cache;
 	private ILog _log;
 
 	public HigherService(CRUDImpl inputCrud) {
 		_crud = inputCrud;
-		_cache = CacheImpl.getInstance();
 		_log = LogImpl.getInstance();
 	}
 
@@ -145,7 +139,7 @@ public class HigherService implements IHigherService {
 		// Get unused fightID from DB.
 		return crud.create(resultdal).transferData;
 	}
-	
+
 	@Override
 	public ListDTO<FightDataDAL> logFightDataDAL(int fightId) {
 
@@ -163,14 +157,14 @@ public class HigherService implements IHigherService {
 
 		dalL.user1Id = userIdA;
 		dalL.user2Id = userIdB;
-		
+
 		ListDTO<LogDAL> dtoLog = _crud.<LogDAL>read(dalL);
 		return dtoLog;
 	}
 
 	@Override
 	public void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw) {
-		if(!draw) {
+		if (!draw) {
 			ResultDAL result = new ResultDAL();
 			result.fightId = fightId;
 			result.winUserId = winPlayerId;
@@ -183,7 +177,7 @@ public class HigherService implements IHigherService {
 			result.tieUser2Id = losePlayerId;
 			_crud.update(result);
 		}
-
+	}
 
 	@Override
 	public ObjectDTO<UserDAL> getUser(int userId) {
@@ -222,7 +216,7 @@ public class HigherService implements IHigherService {
 		return userDTO;
 	}
 
-				@Override
+	@Override
 	public ObjectDTO<ItemDAL> getItem(int itemId) {
 		ItemDAL itemDAL = new ItemDAL();
 		itemDAL.itemId = itemId;
