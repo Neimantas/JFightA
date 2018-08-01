@@ -40,6 +40,7 @@ public class FightServlet extends HttpServlet {
     
 	private IHigherService _hService; //should test if it work with multiple users
 	private ILogger _logger;
+	private ICache _cache;
 //	private String _playerAName;
 //	private String _playerBName;
 //	private String _fightId;
@@ -54,6 +55,7 @@ public class FightServlet extends HttpServlet {
 //        _engine = new FightEngineImpl();
     	_hService = StartupContainer.easyDI.getInstance(HigherService.class);
     	_logger =  StartupContainer.easyDI.getInstance(LoggerImpl.class);
+    	_cache = CacheImpl.getInstance();
     }
 
 	/**
@@ -81,27 +83,28 @@ public class FightServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 //		doGet(request, response);
 		IFightEngine _engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
-		String playerAUserId = "";
-		String fightId = "";
-		String round = "";
-		String health = "";
-		ICache cache = CacheImpl.getInstance();
-		
+		String playerAUserIdString = "";
+		String fightIdString = "";
+		String roundString = "";
+		String playerAHealthString = "";
+//		ICache cache = CacheImpl.getInstance();
+		//need to add validation method
 		Cookie[] cookies = request.getCookies();
-		if (cookies == null)
-			response.sendRedirect("index.jsp");
+		if (cookies == null) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+		}
 		
 		for(Cookie c : cookies) {
 			if (c.getName().equals("userId"))
-				playerAUserId = c.getValue();
+				playerAUserIdString = c.getValue();
 			if (c.getName().equals("fightId"))
-				fightId = c.getValue();
+				fightIdString = c.getValue();
 			if(c.getName().equals("round"))
-				round = c.getValue();
+				roundString = c.getValue();
 			if(c.getName().equals("health"))
-				health = c.getValue();
+				playerAHealthString = c.getValue();
 		} 
-		if(playerAUserId == "" || fightId == "" || round == "" || health == "") {
+		if(playerAUserIdString == "" || fightIdString == "" || roundString == "" || playerAHealthString == "") {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
 			
@@ -128,78 +131,75 @@ public class FightServlet extends HttpServlet {
 		action.defenceHead = defenceHead == null?0:1;
 		action.defenceLegs = defenceLegs == null?0:1;
 		
-		int roundI = Integer.parseInt(round);
-		int healthI = Integer.parseInt(health);
-		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(fightId), roundI, healthI, Integer.parseInt(playerAUserId), action); //Sending info to fight engine.
+		int round = Integer.parseInt(roundString);
+		int playerAHealth = Integer.parseInt(playerAHealthString);
+		int fightId = Integer.parseInt(fightIdString);
+		int playerAUserId = Integer.parseInt(playerAUserIdString);
+		
+		ListDTO<FightDataDAL> dto = _engine.engine(fightId, round, playerAHealth, playerAUserId, action); //Sending info to fight engine.
 		
 		if(!dto.success && dto.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {
 //			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
 			//when DB didn't find opponent data, it means that player closed his browser. Then auto win
-			cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
+			_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
+			//Other player did't found, so his id will be -1.
+			_hService.writeFightResult(fightId, playerAUserId, -1, false);
 			request.getRequestDispatcher("win.jsp").forward(request, response);
 		} else {
 			//first sent round param 0, then get heatl results from figth table
 			//engine - returns healhtA and healthB
 			//
-			roundI++; //after success increment round counter
+			round++; //after success increment round counter
 			
 			List<FightDataDAL> dals = dto.transferDataList; //index:0-you, index:1-opponent
-			
-			int playerAHealth = dals.get(0).healthPoints;
-			healthI = playerAHealth;
+		
+	
+			playerAHealth = dals.get(0).healthPoints;
 			int playerBUserId = dals.get(1).userId;
 			int playerBHealth = dals.get(1).healthPoints;
 			
 //			System.out.println("UserId" + playerAUserId);
 //			System.out.println(cache);
 //			System.out.println(cache.getPlayer(Integer.parseInt(playerAUserId)).user.name);
-			String playerAName = cache.getPlayer(Integer.parseInt(playerAUserId)).user.name;
-			String playerBName = cache.getPlayer(playerBUserId).user.name;
+			String playerAName = _cache.getPlayer(playerAUserId).user.name;
+			String playerBName = _cache.getPlayer(playerBUserId).user.name;
 			
-			int attackItemAId = cache.getPlayer(Integer.parseInt(playerAUserId)).characterInfo.attackItemId;
-			int defenceItemAId = cache.getPlayer(Integer.parseInt(playerAUserId)).characterInfo.defenceItemId;
+			int attackItemAId = _cache.getPlayer(playerAUserId).characterInfo.attackItemId;
+			int defenceItemAId = _cache.getPlayer(playerAUserId).characterInfo.defenceItemId;
 			
-			int attackItemBId = cache.getPlayer(playerBUserId).characterInfo.attackItemId;
-			int defenceItemBId = cache.getPlayer(playerBUserId).characterInfo.defenceItemId;
+			int attackItemBId = _cache.getPlayer(playerBUserId).characterInfo.attackItemId;
+			int defenceItemBId = _cache.getPlayer(playerBUserId).characterInfo.defenceItemId;
 			
 			request.setAttribute("playerAName", playerAName);								//Sending refreshed info to page.
 			request.setAttribute("playerBName", playerBName);
 			request.setAttribute("healthA", playerAHealth);
 			request.setAttribute("healthB", playerBHealth);
 			//avatar id
-			request.setAttribute("idA", playerAUserId);													//Picture ID. Still hardcoded.
+			request.setAttribute("idA", playerAUserId);													
 			request.setAttribute("idB", playerBUserId);
 			request.setAttribute("attackItemA", attackItemAId);
 			request.setAttribute("defenceItemA", defenceItemAId);
 			request.setAttribute("attackItemB", attackItemBId);
 			request.setAttribute("defenceItemB", defenceItemBId);
 			
-			
-			response.addCookie(new Cookie("round", Integer.toString(roundI))); //add round cookie
-			response.addCookie(new Cookie("health", Integer.toString(healthI))); //add health cookie
+			response.addCookie(new Cookie("round", Integer.toString(round))); //add round cookie
+			response.addCookie(new Cookie("health", Integer.toString(playerAHealth))); //add health cookie
 			
 			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
-				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
-				_hService.writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, true);
-				
+				_cache.getPlayer(Integer.parseInt(playerAUserIdString)).userStatus = UserStatus.NOT_READY;
+				_hService.writeFightResult(Integer.parseInt(fightIdString), Integer.parseInt(playerAUserIdString), playerBUserId, true);
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(playerBHealth<=0) {
-				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
-				_hService.writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, false);
-				_logger.logFightData(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId);
+				_cache.getPlayer(Integer.parseInt(playerAUserIdString)).userStatus = UserStatus.NOT_READY;
+				_hService.writeFightResult(Integer.parseInt(fightIdString), Integer.parseInt(playerAUserIdString), playerBUserId, false);
+				_logger.logFightData(Integer.parseInt(fightIdString), Integer.parseInt(playerAUserIdString), playerBUserId);
 				request.getRequestDispatcher("win.jsp").forward(request, response);
-				
-				
 			} else if(playerAHealth<=0) {
-				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
+				_cache.getPlayer(Integer.parseInt(playerAUserIdString)).userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
 			} else {
 				request.getRequestDispatcher("fight.jsp").forward(request, response);			//if fight is not finised - refresh page with new data.
 			}
-			
-			
-//			request.getRequestDispatcher("NewFile.jsp").forward(request, response);
 		}
-			
 	}
 }
