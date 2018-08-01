@@ -19,10 +19,10 @@ import services.ILoginService;
 
 public class LoginService implements ILoginService {
 
-	HigherLoginService hService;
+	HigherService hService;
 	ICache cache;
 
-	public LoginService(HigherLoginService hServiceImpl) {
+	public LoginService(HigherService hServiceImpl) {
 		hService = hServiceImpl;
 		cache = CacheImpl.getInstance();
 	}

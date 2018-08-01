@@ -13,16 +13,19 @@ import models.dto.PlayerDalDTO;
 import models.dto.UserLoginDataDTO;
 import services.ICRUD;
 import services.ICache;
-import services.IHigherLoginService;
+import services.IHigherService;
+import services.ILog;
 
-public class HigherLoginService implements IHigherLoginService {
+public class HigherService implements IHigherService {
 
-	ICRUD crud;
-	ICache cashe;
+	private ICRUD _crud;
+	private ICache _cache;
+	private ILog _log;
 
-	public HigherLoginService(CRUDImpl inputCrud) {
-		crud = inputCrud;
-		cashe = CacheImpl.getInstance();
+	public HigherService(CRUDImpl inputCrud) {
+		_crud = inputCrud;
+		_cache = CacheImpl.getInstance();
+		_log = LogImpl.getInstance();
 	}
 
 	@Override
@@ -31,7 +34,7 @@ public class HigherLoginService implements IHigherLoginService {
 		userInDal.name = userIn.name;
 		// userInDal.password = userIn.password;
 
-		ListDTO<UserDAL> userDTO = crud.read(userInDal);
+		ListDTO<UserDAL> userDTO = _crud.read(userInDal);
 
 		// Takes UserDal
 		if (userDTO.success && !userDTO.transferDataList.isEmpty()) {
@@ -41,7 +44,7 @@ public class HigherLoginService implements IHigherLoginService {
 				// Makes charDal and fills just userID field, it need to get chat form CRUD
 				CharacterDAL takeCharacterData = new CharacterDAL();
 				takeCharacterData.userId = userDal.userId;
-				ListDTO<CharacterDAL> charDTO = crud.read(takeCharacterData);
+				ListDTO<CharacterDAL> charDTO = _crud.read(takeCharacterData);
 				// Takes charDal
 				if (charDTO.success) {
 					CharacterDAL charDal = charDTO.transferDataList.get(0);
@@ -66,11 +69,10 @@ public class HigherLoginService implements IHigherLoginService {
 		userInDal.password = hashPassword(userRegIn.password);
 		userInDal.eMail = userRegIn.mail;
 		userInDal.accessLevel = 1;
-//		userInDal.imageId = 20;
 		// Creates new user
-		crud.create(userInDal);
+		_crud.create(userInDal);
 		// Read new created user
-		ListDTO<UserDAL> newUserDto = crud.read(userInDal);
+		ListDTO<UserDAL> newUserDto = _crud.read(userInDal);
 		if (newUserDto.success) {
 			// Fills new char info
 			userInDal.userId = newUserDto.transferDataList.get(0).userId;
@@ -84,7 +86,7 @@ public class HigherLoginService implements IHigherLoginService {
 			newCharacter.attackItemId = defaul.attackItemId;
 			newCharacter.defenceItemId = defaul.defenceItemId;
 			// Creates mew char
-			ObjectDTO<Integer> characterCreat = crud.create(newCharacter);
+			ObjectDTO<Integer> characterCreat = _crud.create(newCharacter);
 			if (characterCreat.success) {
 				System.out.println("pateko");
 				UserLoginData user = new UserLoginData();
@@ -104,8 +106,7 @@ public class HigherLoginService implements IHigherLoginService {
 		try {
 			passwordHased = hashPassword.getSaltedHash(password);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_log.writeErrorMessage(e, true);
 		}
 		return passwordHased;
 
@@ -119,8 +120,7 @@ public class HigherLoginService implements IHigherLoginService {
 				return true;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_log.writeErrorMessage(e, true);
 		}
 		return false;
 	}
