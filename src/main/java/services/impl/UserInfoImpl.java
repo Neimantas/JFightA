@@ -54,7 +54,6 @@ public class UserInfoImpl implements IUserInfo {
 	}
 
 	public ObjectDTO<Player> getCacheUserInfo(HttpServletRequest request) {
-		Player player = new Player();
 		ObjectDTO<Player> ret = new ObjectDTO();
 
 		Cookie[] cookies = request.getCookies();
@@ -66,17 +65,17 @@ public class UserInfoImpl implements IUserInfo {
 		}
 		for (Entry<Integer, Player> entry : _cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
-				player = _cache.getPlayer(entry.getValue().user.userId);
+				Player player = _cache.getPlayer(entry.getValue().user.userId);
 
 				ret.success = true;
 				ret.message = "User exists in DB."; // Needs ENUM
 				ret.transferData = player;
-			} else {
-				ret.success = false;
-				ret.message = "Error! No such user."; // Needs ENUM
+				return ret;
 			}
 
 		}
+		ret.success = false;
+		ret.message = "Error! No cache user."; // Needs ENUM
 		return ret;
 	}
 
