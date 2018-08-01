@@ -71,7 +71,6 @@
 	</nav>
 
 	<div class="container">
-		<form method="post" action="/user">
 			<div class="row">
 				<div class="col-6">
 					<div class="row justify-content-center" id="message">${ReadyMessage}</div>
@@ -92,9 +91,7 @@
 						<button class="btn-default" id="play" onclick="play()">Play</button>
 						<button class="btn-default" id="ready"
 							onclick="rdyBtn(this.innerText)">${Ready}</button>
-
 						<button class="btn-default" id="info" onclick="info()">Info</button>
-
 						<button class="btn-default" id="refresh"
 							onclick="clicker(this.id)">Refresh</button>
 					</div>
@@ -102,7 +99,6 @@
 						from admin</div>
 				</div>
 			</div>
-		</form>
 	</div>
 
 	<input id="slaptas" type="hidden"
