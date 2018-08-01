@@ -11,24 +11,24 @@ import models.dal.LogDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
+import services.IHigherService;
 import services.ILogger;
 
 public class LoggerImpl implements ILogger {
 
 	private ICRUD _crud;
+	private IHigherService _hService;
 
-	public LoggerImpl(CRUDImpl crud) {
+	public LoggerImpl(CRUDImpl crud, HigherService hService) {
 		_crud = crud;
+		_hService = hService;
 	}
 
 	@Override
 	public ObjectDTO<FightDataDAL> logFightData(int fightId, int userIdA, int userIdB) {
 		JSONArray json = new JSONArray();
 
-		FightDataDAL dalF = new FightDataDAL();
-
-		dalF.fightId = fightId;
-		ListDTO<FightDataDAL> dtoF = _crud.<FightDataDAL>read(dalF);
+		ListDTO<FightDataDAL> dtoF = _hService.logFightDataDAL(fightId);
 		if (dtoF.success) {
 			List<FightDataDAL> list = dtoF.transferDataList;
 			for (FightDataDAL d : list) {
@@ -81,13 +81,8 @@ public class LoggerImpl implements ILogger {
 
 	@Override
 	public ListDTO<String> getLogs(int userIdA, int userIdB) {
-
-		LogDAL dalL = new LogDAL();
-
-		dalL.user1Id = userIdA;
-		dalL.user2Id = userIdB;
-
-		ListDTO<LogDAL> dtoLog = _crud.<LogDAL>read(dalL);
+		
+		ListDTO<LogDAL> dtoLog = _hService.logInfoDAL(userIdA, userIdB);
 		if (dtoLog.success) {
 			
 			List<String> returnList = makeTableFromFightData(dtoLog);

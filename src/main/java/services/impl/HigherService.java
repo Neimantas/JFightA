@@ -1,10 +1,17 @@
 
 package services.impl;
 
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import models.business.DefaultCharacter;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.CharacterDAL;
+import models.dal.FightDataDAL;
+import models.dal.LogDAL;
 import models.dal.PlayerDAL;
 import models.dal.ResultDAL;
 import models.dal.UserDAL;
@@ -132,6 +139,28 @@ public class HigherService implements IHigherService {
 		ICRUD crud = new CRUDImpl();
 		//Get unused fightID from DB.
 		return crud.create(resultdal).transferData;
+	}
+	
+	@Override
+	public ListDTO<FightDataDAL> logFightDataDAL(int fightId) {
+
+		FightDataDAL dalF = new FightDataDAL();
+
+		dalF.fightId = fightId;
+		ListDTO<FightDataDAL> dtoF = _crud.<FightDataDAL>read(dalF);
+
+		return dtoF;
+	}
+
+	@Override
+	public ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB) {
+		LogDAL dalL = new LogDAL();
+
+		dalL.user1Id = userIdA;
+		dalL.user2Id = userIdB;
+		
+		ListDTO<LogDAL> dtoLog = _crud.<LogDAL>read(dalL);
+		return dtoLog;
 	}
 
 }

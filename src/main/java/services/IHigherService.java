@@ -2,6 +2,10 @@ package services;
 
 import models.business.UserLoginData;
 import models.business.UserRegIn;
+import models.dal.FightDataDAL;
+import models.dal.LogDAL;
+import models.dto.ListDTO;
+import models.dto.ObjectDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserLoginDataDTO;
 
@@ -11,4 +15,6 @@ public interface IHigherService {
 	String hashPassword (String password);
 	boolean passwordCheck(String password, String paswordInDB);
 	Integer getNewFightId();
+	ListDTO<FightDataDAL> logFightDataDAL(int fightId);
+	ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB);
 }
