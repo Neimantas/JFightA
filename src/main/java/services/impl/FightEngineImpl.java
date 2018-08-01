@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import models.business.Actions;
+import models.business.Item;
 import models.constant.DefaultDamagePoints;
 import models.constant.Error;
 import models.constant.ItemType;
 import models.constant.Settings;
 import models.constant.TimeMs;
 import models.dal.FightDataDAL;
-import models.dal.ItemDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ICRUD;
@@ -228,8 +228,8 @@ public class FightEngineImpl implements IFightEngine {
 		
 		
 		//Calculating damage of round's.
-		Map<ItemType, ItemDAL> yourItems = _item.getUserItems(yourUserId);
-		Map<ItemType, ItemDAL> opponentItems = _item.getUserItems(opponentUserId);
+		Map<ItemType, Item> yourItems = _item.getUserItems(yourUserId);
+		Map<ItemType, Item> opponentItems = _item.getUserItems(opponentUserId);
 		int givenDamage = 0;
 		
 		//how much damage you given

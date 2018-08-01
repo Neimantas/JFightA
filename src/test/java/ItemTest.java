@@ -1,6 +1,7 @@
 import java.util.Map;
 
 import models.business.CharacterInfo;
+import models.business.Item;
 import models.business.Player;
 import models.business.User;
 import models.constant.ItemType;
@@ -14,6 +15,7 @@ import services.ICache;
 import services.IItem;
 import services.impl.CRUDImpl;
 import services.impl.CacheImpl;
+import services.impl.HigherService;
 import services.impl.ItemImpl;
 
 public class ItemTest {
@@ -27,7 +29,7 @@ public class ItemTest {
 
 		ICRUD crud = new CRUDImpl();
 		ICache cache = CacheImpl.getInstance();
-		IItem item = new ItemImpl(new CRUDImpl());
+		IItem item = new ItemImpl(new HigherService(new CRUDImpl()));
 
 		UserDAL userDAL = new UserDAL();
 		userDAL.name = "labas";
@@ -52,7 +54,7 @@ public class ItemTest {
 
 		cache.addPlayer(player);
 
-		Map<ItemType, ItemDAL> items = item.getUserItems(player.user.userId);
+		Map<ItemType, Item> items = item.getUserItems(player.user.userId);
 
 		System.out.println(items.get(ItemType.ATTACK).itemId);
 		System.out.println(items.get(ItemType.DEFENCE).itemId);
