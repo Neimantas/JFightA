@@ -142,7 +142,7 @@ public class HigherService implements IHigherService {
 	}
 	
 	@Override
-	public ListDTO<FightDataDAL> logFightDataDAL(int fightId) {
+	public ListDTO<FightDataDAL> getFightDataDAL(int fightId) {
 
 		FightDataDAL dalF = new FightDataDAL();
 
@@ -178,6 +178,19 @@ public class HigherService implements IHigherService {
 			result.tieUser2Id = losePlayerId;
 			_crud.update(result);
 		}
+	}
+
+	@Override
+	public ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json) {
+		LogDAL dalL = new LogDAL();
+
+		dalL.fightId = fightId;
+		dalL.user1Id = userIdA;
+		dalL.user2Id = userIdB;
+		dalL.log = json;
+
+		ObjectDTO<Integer> dtoCreate = _crud.<LogDAL>create(dalL);
+		return dtoCreate;
 	}
 
 }

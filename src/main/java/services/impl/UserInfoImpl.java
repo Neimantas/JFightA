@@ -1,59 +1,44 @@
 package services.impl;
 
-import java.util.List;
 import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import configuration.StartupContainer;
 import models.business.Player;
-import models.dal.CharacterDAL;
-import models.dto.ListDTO;
 import models.dto.ObjectDTO;
-import services.ICRUD;
 import services.ICache;
 import services.IUserInfo;
 
 public class UserInfoImpl implements IUserInfo {
 
-	private ICRUD _crud;
-	private CharacterDAL _cDAL;
 	private ICache _cache;
 
 	public UserInfoImpl(CRUDImpl crud) {
-		_crud = crud;
 		_cache = CacheImpl.getInstance();
 	}
 
 	@Override
-	public ObjectDTO<CharacterDAL> getUserInfo(int userId) {
+	public ObjectDTO<Player> getUserInfo(int userId) {
 
-		CharacterDAL dal = new CharacterDAL();
-
-		dal.userId = userId;
-
-		ListDTO<CharacterDAL> dto = _crud.<CharacterDAL>read(dal);
-		if (dto.success) {
-
-			_cDAL = dto.transferDataList.get(0);
-
-			ObjectDTO<CharacterDAL> retSuccess = new ObjectDTO();
+		Player player = _cache.getPlayer(userId);
+		if (player != null) {
+			ObjectDTO<Player> retSuccess = new ObjectDTO();
 			retSuccess.success = true;
-			retSuccess.message = "User exists in DB."; // Needs ENUM
-			retSuccess.transferData = _cDAL;
+			retSuccess.message = "User exists in DB.";
+			retSuccess.transferData = player;
 
 			return retSuccess;
 		}
 
-		ObjectDTO<CharacterDAL> retFailure = new ObjectDTO();
+		ObjectDTO<Player> retFailure = new ObjectDTO();
 		retFailure.success = false;
-		retFailure.message = "Error! No such user."; // Needs ENUM
+		retFailure.message = "Error! No such user.";
 
 		return retFailure;
 	}
 
-	public ObjectDTO<Player> getCacheUserInfo(HttpServletRequest request) {
+	public ObjectDTO<Player> getLoggedUserInfo(HttpServletRequest request) {
 		ObjectDTO<Player> ret = new ObjectDTO();
 
 		Cookie[] cookies = request.getCookies();
@@ -68,14 +53,14 @@ public class UserInfoImpl implements IUserInfo {
 				Player player = _cache.getPlayer(entry.getValue().user.userId);
 
 				ret.success = true;
-				ret.message = "User exists in DB."; // Needs ENUM
+				ret.message = "User exists in cache.";
 				ret.transferData = player;
 				return ret;
 			}
 
 		}
 		ret.success = false;
-		ret.message = "Error! No cache user."; // Needs ENUM
+		ret.message = "Error! No cached user.";
 		return ret;
 	}
 
