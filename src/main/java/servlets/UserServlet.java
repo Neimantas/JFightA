@@ -24,12 +24,10 @@ public class UserServlet extends HttpServlet {
 
 	private IUserInfo _userInfo;
 	private ILogger _logger;
-	private Player _player;
 
 	public UserServlet() {
 		_userInfo = StartupContainer.easyDI.getInstance(UserInfoImpl.class);
 		_logger = StartupContainer.easyDI.getInstance(LoggerImpl.class);
-		_player = StartupContainer.easyDI.getInstance(Player.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,9 +37,12 @@ public class UserServlet extends HttpServlet {
 		// request.getRequestDispatcher("index.jsp").forward(request, response);
 		// }
 
+		Player _player = StartupContainer.easyDI.getInstance(Player.class);
+
 		String userId = request.getParameter("userId");
 
 		ObjectDTO<Player> dtoPlayer = _userInfo.getCacheUserInfo(request);
+
 		if (dtoPlayer.success) {
 			_player = dtoPlayer.transferData;
 		} else {

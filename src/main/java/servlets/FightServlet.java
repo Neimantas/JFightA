@@ -12,16 +12,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
+import services.ICRUD;
 import services.ICache;
 import services.IFightEngine;
+import services.impl.CRUDImpl;
 import services.impl.CacheImpl;
 import services.impl.FightEngineImpl;
 import services.impl.ImageImpl;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.business.Actions;
+import models.constant.Error;
 import models.constant.UserStatus;
 import models.dal.FightDataDAL;
+import models.dal.ResultDAL;
 
 /**
  * Servlet implementation class FightServlet
@@ -120,8 +124,11 @@ public class FightServlet extends HttpServlet {
 		int healthI = Integer.parseInt(health);
 		ListDTO<FightDataDAL> dto = _engine.engine(Integer.parseInt(fightId), roundI, healthI, Integer.parseInt(playerAUserId), action); //Sending info to fight engine.
 		
-		if(!dto.success) {
-			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
+		if(!dto.success && dto.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {
+//			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
+			//when DB didn't find opponent data, it means that player closed his browser. Then auto win
+			cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
+			request.getRequestDispatcher("win.jsp").forward(request, response);
 		} else {
 			//first sent round param 0, then get heatl results from figth table
 			//engine - returns healhtA and healthB
@@ -165,10 +172,13 @@ public class FightServlet extends HttpServlet {
 			
 			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
+				writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, true);
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(playerBHealth<=0) {
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
+				writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, false);
 				request.getRequestDispatcher("win.jsp").forward(request, response);
+				
 			} else if(playerAHealth<=0) {
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
@@ -182,6 +192,25 @@ public class FightServlet extends HttpServlet {
 		
 		
 		
+		
+	}
+	
+	private void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw) {
+		
+		ICRUD crud = new CRUDImpl();
+		if(!draw) {
+			ResultDAL result = new ResultDAL();
+			result.fightId = fightId;
+			result.winUserId = winPlayerId;
+			result.lossUserId = losePlayerId;
+			System.out.println(crud.update(result).message);
+		} else {
+			ResultDAL result = new ResultDAL();
+			result.fightId = fightId;
+			result.tieUser1Id = winPlayerId;
+			result.tieUser2Id = losePlayerId;
+			crud.update(result);
+		}
 		
 	}
 
