@@ -5,7 +5,9 @@ import models.business.UserRegIn;
 import models.dto.PlayerDalDTO;
 import models.dto.UserLoginDataDTO;
 
-public interface IHigherLoginService {
+public interface IHigherService {
 	PlayerDalDTO login(UserLoginData user);
 	UserLoginDataDTO registration(UserRegIn userRegIn);
+	String hashPassword (String password);
+	boolean passwordCheck(String password, String paswordInDB);
 }

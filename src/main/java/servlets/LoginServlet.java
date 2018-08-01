@@ -16,7 +16,7 @@ import models.dto.PlayerDTO;
 import models.dto.UserDTO;
 import models.dto.UserFrontDTO;
 import services.ILoginService;
-import services.impl.HigherLoginService;
+import services.impl.HigherService;
 import services.impl.LoginService;
 
 /**

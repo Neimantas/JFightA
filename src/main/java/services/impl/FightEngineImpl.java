@@ -9,7 +9,7 @@ import models.constant.DefaultDamagePoints;
 import models.constant.Error;
 import models.constant.ItemType;
 import models.constant.Settings;
-import models.constant.Time;
+import models.constant.TimeMs;
 import models.dal.FightDataDAL;
 import models.dal.ItemDAL;
 import models.dto.ListDTO;
@@ -139,16 +139,16 @@ public class FightEngineImpl implements IFightEngine {
 		insertDAL.healthPoints = health;
 		insertDAL.attackHead = yourAction.attackHead;
 		insertDAL.attackBody = yourAction.attackBody;
-		insertDAL.attackHands = yourAction.attackArms;
+		insertDAL.attackArms = yourAction.attackArms;
 		insertDAL.attackLegs = yourAction.attackLegs;
 		insertDAL.defenceHead = yourAction.defenceHead;
 		insertDAL.defenceBody = yourAction.defenceBody;
-		insertDAL.defenceHands = yourAction.defenceArms;
+		insertDAL.defenceArms = yourAction.defenceArms;
 		insertDAL.defenceLegs = yourAction.defenceLegs;
 		
 		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
 		
-		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * Time.SECOND.getMilliseconds();
+		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * TimeMs.SECOND.getMilliseconds();
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userID);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
 			if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {			//needs upgrade, if data not received - autoWin for waiting user.
@@ -178,12 +178,12 @@ public class FightEngineImpl implements IFightEngine {
 		
 		opponentActions.attackHead = opponentDAL.attackHead == null?0:opponentDAL.attackHead;		//if form DB getting info with null - make it "0".
 		opponentActions.attackBody = opponentDAL.attackBody == null?0:opponentDAL.attackBody;
-		opponentActions.attackArms = opponentDAL.attackHands == null?0:opponentDAL.attackHands;
+		opponentActions.attackArms = opponentDAL.attackArms == null?0:opponentDAL.attackArms;
 		opponentActions.attackLegs = opponentDAL.attackLegs == null?0:opponentDAL.attackLegs;
 		
 		opponentActions.defenceHead = opponentDAL.defenceHead == null?0:opponentDAL.defenceHead;
 		opponentActions.defenceBody = opponentDAL.defenceBody == null?0:opponentDAL.defenceBody;
-		opponentActions.defenceArms = opponentDAL.defenceHands == null?0:opponentDAL.defenceHands;
+		opponentActions.defenceArms = opponentDAL.defenceArms == null?0:opponentDAL.defenceArms;
 		opponentActions.defenceLegs = opponentDAL.defenceLegs == null?0:opponentDAL.defenceLegs;
 		
 		int[] damages = calculateDamage(yourAction, opponentActions, userID, opponentDAL.userId); //CalculateDamage :)

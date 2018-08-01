@@ -19,10 +19,10 @@ import services.ILoginService;
 
 public class LoginService implements ILoginService {
 
-	HigherLoginService hService;
+	HigherService hService;
 	ICache cache;
 
-	public LoginService(HigherLoginService hServiceImpl) {
+	public LoginService(HigherService hServiceImpl) {
 		hService = hServiceImpl;
 		cache = CacheImpl.getInstance();
 	}
@@ -38,7 +38,7 @@ public class LoginService implements ILoginService {
 			userOut.userId = userInDal.userId;
 			userOut.name = userInDal.name;
 			userOut.accessLevel = userInDal.accessLevel;
-			userOut.imageId = userInDal.imageId;
+//			userOut.imageId = userInDal.imageId;
 			userOut.eMail = userInDal.eMail;
 			// Creates new guide and add it to cookies value
 			userOut.cookiesValue = newGuid();

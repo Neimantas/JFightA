@@ -44,11 +44,11 @@ public class LoggerImpl implements ILogger {
 				}
 				jsonOb.put("ah", d.attackHead);
 				jsonOb.put("ab", d.attackBody);
-				jsonOb.put("ahn", d.attackHands);
+				jsonOb.put("ahn", d.attackArms);
 				jsonOb.put("al", d.attackLegs);
 				jsonOb.put("dh", d.defenceHead);
 				jsonOb.put("db", d.defenceBody);
-				jsonOb.put("dhn", d.defenceHands);
+				jsonOb.put("dhn", d.defenceArms);
 				jsonOb.put("dl", d.defenceLegs);
 
 				json.put(jsonOb);
