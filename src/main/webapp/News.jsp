@@ -49,8 +49,8 @@
 				<a class="dropdown-item" href="/JFight/user?log=false">Character
 					Info</a>
 				<div class="dropdown-divider"></div>
-				<a class="dropdown-item" href="/JFight/logout"><i class="fa fa-sign-out"
-					aria-hidden="true"></i>Logout</a>
+				<a class="dropdown-item" href="/JFight/logout"><i
+					class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
 			</div></li>
 	</ul>
 	<button class="navbar-toggler ml-lg-0" type="button"
@@ -71,30 +71,39 @@
 	</nav>
 
 	<div class="container">
-		<div class="row">
-			<div class="col-6">
-				<div class="row justify-content-center" id="message">${ReadyMessage}</div>
-				<div class="row justify-content-center">
-				<div class="col" >
-				<select class="custom-select pLayerSelect" size="100" id="readyPlayers">
-					<c:forEach items="${readyPlayers}" var="players">
-					<option value="${players.key}">${players.value}</option>
-					</c:forEach>
-				</select>
+		<form method="post" action="/user">
+			<div class="row">
+				<div class="col-6">
+					<div class="row justify-content-center" id="message">${ReadyMessage}</div>
+					<div class="row justify-content-center">
+						<div class="col">
+							<select class="custom-select pLayerSelect" size="100"
+								id="readyPlayers">
+								<c:forEach items="${readyPlayers}" var="players">
+									<option value="${players.key}">${players.value}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
 				</div>
-				</div>
-			</div>
 
-			<div class="col-6">
-				<div class="row justify-content-center">
-					<button class="btn-default" id="play" onclick="play()">Play</button>
-					<button class="btn-default" id="ready"
-						onclick="rdyBtn(this.innerText)">${Ready}</button>
-					<button class="btn-default" id="refresh" onclick="clicker(this.id)">Refresh</button>
+				<div class="col-6">
+					<div class="row justify-content-center">
+						<button class="btn-default" id="play" onclick="play()">Play</button>
+						<button class="btn-default" id="ready"
+							onclick="rdyBtn(this.innerText)">${Ready}</button>
+
+						<button class="btn-default" id="info" onclick="info()">Info</button>
+
+						<button class="btn-default" id="refresh"
+							onclick="clicker(this.id)">Refresh</button>
+					</div>
+					<div class="row justify-content-center">put here some text
+						from admin</div>
 				</div>
-				<div class="row justify-content-center">put here some text from admin</div>
 			</div>
-		</div>
+		</form>
+	</div>
 
 	<input id="slaptas" type="hidden"
 		value=${(ready == null) ? false : ready}></input>
@@ -109,6 +118,5 @@
 	<script src="resources/js/main.js"></script>
 	<!--===============================================================================================-->
 	<script src="resources/js/news.js"></script>
-
 </body>
 </html>

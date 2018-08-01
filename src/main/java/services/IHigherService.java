@@ -16,5 +16,6 @@ public interface IHigherService {
 	boolean passwordCheck(String password, String paswordInDB);
 	Integer getNewFightId();
 	ListDTO<FightDataDAL> logFightDataDAL(int fightId);
+	void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw);
 	ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB);
 }
