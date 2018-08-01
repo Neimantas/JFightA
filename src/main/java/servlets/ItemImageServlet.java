@@ -9,10 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
-import models.dal.ItemDAL;
+import models.business.Item;
 import models.dto.ObjectDTO;
 import services.IItem;
-import services.impl.ImageImpl;
 import services.impl.ItemImpl;
 
 @WebServlet("/itemImageServlet")
@@ -28,7 +27,7 @@ public class ItemImageServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		ObjectDTO<ItemDAL> objectDTO = _item.getItem(Integer.parseInt(request.getParameter("itemId")));
+		ObjectDTO<Item> objectDTO = _item.getItem(Integer.parseInt(request.getParameter("itemId")));
 		if (objectDTO.success && objectDTO.transferData != null) {
 
 			String imageFormat = objectDTO.transferData.itemName

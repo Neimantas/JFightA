@@ -2,30 +2,31 @@
 package services.impl;
 
 import models.business.DefaultCharacter;
+import models.business.Item;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
+import models.constant.Error;
 import models.dal.CharacterDAL;
+import models.dal.ItemDAL;
 import models.dal.PlayerDAL;
 import models.dal.ResultDAL;
 import models.dal.UserDAL;
+import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.dto.PlayerDalDTO;
 import models.dto.UserLoginDataDTO;
 import services.ICRUD;
-import services.ICache;
 import services.IHigherService;
 import services.ILog;
 
 public class HigherService implements IHigherService {
 
 	private ICRUD _crud;
-	private ICache _cache;
 	private ILog _log;
 
 	public HigherService(CRUDImpl inputCrud) {
 		_crud = inputCrud;
-		_cache = CacheImpl.getInstance();
 		_log = LogImpl.getInstance();
 	}
 
@@ -66,7 +67,7 @@ public class HigherService implements IHigherService {
 	public UserLoginDataDTO registration(UserRegIn userRegIn) {
 		// Fills new user info
 		UserDAL userInDal = new UserDAL();
-		userInDal.name=userRegIn.name;
+		userInDal.name = userRegIn.name;
 		userInDal.password = hashPassword(userRegIn.password);
 		userInDal.eMail = userRegIn.mail;
 		userInDal.accessLevel = 1;
@@ -130,8 +131,57 @@ public class HigherService implements IHigherService {
 	public Integer getNewFightId() {
 		ResultDAL resultdal = new ResultDAL();
 		ICRUD crud = new CRUDImpl();
-		//Get unused fightID from DB.
+		// Get unused fightID from DB.
 		return crud.create(resultdal).transferData;
+	}
+
+	@Override
+	public ObjectDTO<ItemDAL> getItem(int itemId) {
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		ListDTO<ItemDAL> listDTO = _crud.read(itemDAL);
+		ObjectDTO<ItemDAL> itemDTO = new ObjectDTO<>();
+		if (listDTO.success && !listDTO.transferDataList.isEmpty()) {
+			itemDTO.transferData = listDTO.transferDataList.get(0);
+			itemDTO.message = listDTO.message;
+			itemDTO.success = true;
+			return itemDTO;
+		} else {
+			_log.writeWarningMessage(Error.ITEM_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "Item No " + itemId,
+					"Class: HigherService, method: ObjectDTO<ItemDAL> getItem(int itemId).",
+					"crud read message: " + listDTO.message);
+			itemDTO.message = listDTO.message;
+			return itemDTO;
+		}
+	}
+
+	@Override
+	public ObjectDTO<Integer> createNewItem(Item item) {
+		return _crud.create(itemToItemDAL(item));
+	}
+
+	@Override
+	public DTO editItem(Item item) {
+		return _crud.update(itemToItemDAL(item));
+	}
+
+	@Override
+	public DTO deleteItem(Item item) {
+		return _crud.delete(itemToItemDAL(item));
+	}
+
+	private ItemDAL itemToItemDAL(Item item) {
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = item.itemId != 0 ? item.itemId : null;
+		itemDAL.itemName = item.itemName;
+		itemDAL.itemImage = item.itemImage;
+		itemDAL.imageFormat = item.imageFormat.getImageExtension();
+		itemDAL.itemType = item.itemType;
+		itemDAL.description = (item.description != null && !item.description.equals("")) ? item.description : null;
+		itemDAL.minCharacterLevel = item.minCharacterLevel != 0 ? item.minCharacterLevel : null;
+		itemDAL.attackPoints = item.attackPoints != 0 ? item.attackPoints : null;
+		itemDAL.defencePoints = item.defencePoints != 0 ? item.defencePoints : null;
+		return itemDAL;
 	}
 
 }

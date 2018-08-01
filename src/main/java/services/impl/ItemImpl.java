@@ -3,27 +3,27 @@ package services.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import models.business.Item;
 import models.constant.Error;
 import models.constant.ImageType;
 import models.constant.ItemType;
 import models.constant.Success;
 import models.dal.ItemDAL;
 import models.dto.DTO;
-import models.dto.ListDTO;
 import models.dto.ObjectDTO;
-import services.ICRUD;
 import services.ICache;
+import services.IHigherService;
 import services.IItem;
 import services.ILog;
 
 public class ItemImpl implements IItem {
 
-	private ICRUD _crud;
+	private IHigherService _higherService;
 	private ICache _cache;
 	private ILog _log;
 
-	public ItemImpl(CRUDImpl crud) {
-		_crud = crud;
+	public ItemImpl(HigherService higherService) {
+		_higherService = higherService;
 		_cache = CacheImpl.getInstance();
 		_log = LogImpl.getInstance();
 	}
@@ -34,19 +34,21 @@ public class ItemImpl implements IItem {
 	 * is no item with such Id, method will try get and return item No 1.
 	 */
 	@Override
-	public ObjectDTO<ItemDAL> getItem(int itemId) {
-		ObjectDTO<ItemDAL> itemDTO = new ObjectDTO<>();
+	public ObjectDTO<Item> getItem(int itemId) {
+		ObjectDTO<Item> itemDTO = new ObjectDTO<>();
 		if (_cache.getItem(itemId) != null) {
-			itemDTO.transferData = _cache.getItem(itemId);
+			itemDTO.transferData = itemDALtoItem(_cache.getItem(itemId));
 			itemDTO.message = Success.ITEM_IS_TAKEN_FROM_CACHE.getMessage();
 			itemDTO.success = true;
 			return itemDTO;
 		}
-		itemDTO = downloadItemFromDatabase(itemId);
-		if (itemDTO.success || itemId == 1) {
-			if (itemDTO.success) {
-				_cache.addItem(itemDTO.transferData);
+		ObjectDTO<ItemDAL> itemDALdto = _higherService.getItem(itemId);
+		if (itemDALdto.success || itemId == 1) {
+			if (itemDALdto.success) {
+				_cache.addItem(itemDALdto.transferData);
 			}
+			itemDTO.message = itemDALdto.message;
+			itemDTO.success = itemDALdto.success;
 			return itemDTO;
 		} else {
 			return getItem(1);
@@ -58,7 +60,7 @@ public class ItemImpl implements IItem {
 	 * DEFENCE item No 2.
 	 */
 	@Override
-	public Map<ItemType, ItemDAL> getUserItems(int userId) {
+	public Map<ItemType, Item> getUserItems(int userId) {
 		int attackItemId = 0;
 		int defenceItemId = 0;
 		if (_cache.getPlayer(userId) != null) {
@@ -75,12 +77,12 @@ public class ItemImpl implements IItem {
 			defenceItemId = 2;
 		}
 
-		ItemDAL attackItemDAL = getUserItem(attackItemId);
-		ItemDAL defenceItemDAL = getUserItem(defenceItemId);
+		Item attackItem = getUserItem(attackItemId);
+		Item defenceItem = getUserItem(defenceItemId);
 
-		Map<ItemType, ItemDAL> userItems = new HashMap<>();
-		userItems.put(ItemType.ATTACK, attackItemDAL);
-		userItems.put(ItemType.DEFENCE, defenceItemDAL);
+		Map<ItemType, Item> userItems = new HashMap<>();
+		userItems.put(ItemType.ATTACK, attackItem);
+		userItems.put(ItemType.DEFENCE, defenceItem);
 		return userItems;
 	}
 
@@ -89,19 +91,19 @@ public class ItemImpl implements IItem {
 			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
 
 		if (minCharacterLevel < 1) {
-			return createInputParameterErrorDTO("createNewItem");
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, "createNewItem");
 		}
 
-		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemName = itemName;
-		itemDAL.itemImage = itemImage;
-		itemDAL.imageFormat = imageType.getImageExtension();
-		itemDAL.itemType = itemType;
-		itemDAL.description = !description.equals("") ? description : null;
-		itemDAL.minCharacterLevel = minCharacterLevel;
-		itemDAL.attackPoints = attackPoints;
-		itemDAL.defencePoints = defencePoints;
-		return _crud.create(itemDAL);
+		Item item = new Item();
+		item.itemName = itemName;
+		item.itemImage = itemImage;
+		item.imageFormat = imageType;
+		item.itemType = itemType;
+		item.description = description;
+		item.minCharacterLevel = minCharacterLevel;
+		item.attackPoints = attackPoints;
+		item.defencePoints = defencePoints;
+		return _higherService.createNewItem(item);
 	}
 
 	@Override
@@ -109,21 +111,21 @@ public class ItemImpl implements IItem {
 			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
 
 		if (minCharacterLevel < 1) {
-			return createInputParameterErrorDTO("editItem");
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, "editItem");
 		}
 
-		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemId = itemId;
-		itemDAL.itemName = itemName;
-		itemDAL.itemImage = itemImage;
-		itemDAL.imageFormat = imageType.getImageExtension();
-		itemDAL.itemType = itemType;
-		itemDAL.description = !description.equals("") ? description : null;
-		itemDAL.minCharacterLevel = minCharacterLevel;
-		itemDAL.attackPoints = attackPoints;
-		itemDAL.defencePoints = defencePoints;
+		Item item = new Item();
+		item.itemId = itemId;
+		item.itemName = itemName;
+		item.itemImage = itemImage;
+		item.imageFormat = imageType;
+		item.itemType = itemType;
+		item.description = description;
+		item.minCharacterLevel = minCharacterLevel;
+		item.attackPoints = attackPoints;
+		item.defencePoints = defencePoints;
 
-		DTO updateDTO = _crud.update(itemDAL);
+		DTO updateDTO = _higherService.editItem(item);
 		if (updateDTO.success) {
 			_cache.removeItem(itemId);
 		}
@@ -133,44 +135,50 @@ public class ItemImpl implements IItem {
 
 	@Override
 	public DTO deleteItem(int itemId) {
-		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemId = itemId;
-		return _crud.delete(itemDAL);
-	}
 
-	private ObjectDTO<ItemDAL> downloadItemFromDatabase(int itemId) {
-		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemId = itemId;
-		ListDTO<ItemDAL> listDTO = _crud.read(itemDAL);
-		ObjectDTO<ItemDAL> itemDTO = new ObjectDTO<>();
-		if (listDTO.success && !listDTO.transferDataList.isEmpty()) {
-			itemDTO.transferData = listDTO.transferDataList.get(0);
-			itemDTO.message = listDTO.message;
-			itemDTO.success = true;
-			return itemDTO;
-		} else {
-			_log.writeWarningMessage(Error.ITEM_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "Item No " + itemId,
-					"Class: CacheImpl, method: private boolean downloadItemFromDatabase(int itemId).",
-					"crud read message: " + listDTO.message);
-			itemDTO.message = listDTO.message;
-			return itemDTO;
+		if (itemId < 1) {
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, "deleteItem");
 		}
+
+		Item item = new Item();
+		item.itemId = itemId;
+
+		DTO deleteDTO = _higherService.deleteItem(item);
+		if (deleteDTO.success) {
+			_cache.removeItem(itemId);
+		}
+
+		return deleteDTO;
 	}
 
-	private ItemDAL getUserItem(int itemId) {
+	private Item getUserItem(int itemId) {
 		if (_cache.getItem(itemId) != null) {
-			return _cache.getItem(itemId);
+			return itemDALtoItem(_cache.getItem(itemId));
 		} else {
 			return getItem(itemId).transferData;
 		}
 	}
 
-	private ObjectDTO<Integer> createInputParameterErrorDTO(String methodName) {
+	private ObjectDTO<Integer> createInputParameterErrorDTO(Error error, String methodName) {
 		ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
-		objectDTO.message = Error.ITEM_CREATE_WRONG_MIN_CHARACTER_LEVEL.getMessage();
-		_log.writeWarningMessage(Error.ITEM_CREATE_WRONG_MIN_CHARACTER_LEVEL.getMessage(), true,
+		objectDTO.message = error.getMessage();
+		_log.writeWarningMessage(error.getMessage(), true,
 				"Class: ItemImpl, Method: " + methodName + "(input parameters)");
 		return objectDTO;
+	}
+
+	private Item itemDALtoItem(ItemDAL itemDAL) {
+		Item item = new Item();
+		item.itemId = itemDAL.itemId;
+		item.itemName = itemDAL.itemName;
+		item.itemImage = itemDAL.itemImage;
+		item.imageFormat = ImageType.getByImageExtension(itemDAL.imageFormat);
+		item.itemType = itemDAL.itemType;
+		item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description : "";
+		item.minCharacterLevel = itemDAL.minCharacterLevel != null ? itemDAL.minCharacterLevel : 0;
+		item.attackPoints = itemDAL.attackPoints != null ? itemDAL.attackPoints : 0;
+		item.defencePoints = itemDAL.defencePoints != null ? itemDAL.defencePoints : 0;
+		return item;
 	}
 
 }
