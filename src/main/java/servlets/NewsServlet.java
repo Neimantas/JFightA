@@ -73,7 +73,9 @@ public class NewsServlet extends HttpServlet {
 				
 				// On first page load there is no params, so
 				// If there is no params, set player as notReady.
-			} else {
+			}
+			
+			else {
 				player.userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("News.jsp").forward(request, response);
 			}

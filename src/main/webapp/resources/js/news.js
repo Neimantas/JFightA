@@ -6,7 +6,14 @@ function clicker(btnName){															//For Play and Logout functions.
 
 	}
 function info(){
-	
+	var readyPlayers = document.getElementById("readyPlayers");
+	var selectas = readyPlayers.options[readyPlayers.selectedIndex];
+	if(selectas != undefined){
+		var url2 ="user?userId="+selectas.value;
+		location.href = url2;
+	}else{
+		location.href = url;		//if there is no selection - refresh page
+	}
 }
 function play(){
 	var readyPlayers = document.getElementById("readyPlayers");
