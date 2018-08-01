@@ -113,7 +113,7 @@ public class FightEngineImpl implements IFightEngine {
 				
 			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO<FightDataDAL>();			//If Round is found - fill data to ObjectDTO
 			retSuccess.success = true;
-			retSuccess.message = "message";
+//			retSuccess.message = "message";
 			retSuccess.transferData = retDAL;
 			return retSuccess;
 			}
