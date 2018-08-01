@@ -6,6 +6,7 @@ import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.CharacterDAL;
 import models.dal.PlayerDAL;
+import models.dal.ResultDAL;
 import models.dal.UserDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
@@ -123,6 +124,14 @@ public class HigherService implements IHigherService {
 			_log.writeErrorMessage(e, true);
 		}
 		return false;
+	}
+
+	@Override
+	public Integer getNewFightId() {
+		ResultDAL resultdal = new ResultDAL();
+		ICRUD crud = new CRUDImpl();
+		//Get unused fightID from DB.
+		return crud.create(resultdal).transferData;
 	}
 
 }

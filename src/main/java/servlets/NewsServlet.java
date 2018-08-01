@@ -17,21 +17,22 @@ import javax.servlet.http.HttpServletResponse;
 import configuration.StartupContainer;
 import models.business.Player;
 import models.constant.UserStatus;
-import models.dal.ResultDAL;
-import services.ICRUD;
 import services.ICache;
 import services.impl.CRUDImpl;
 import services.impl.CacheImpl;
+import services.impl.HigherService;
 import services.impl.LoginService;
 
 @WebServlet(urlPatterns = "/News")
 public class NewsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private LoginService _logService;
+	private HigherService _hService;
 
 	public NewsServlet() {
 		super();
 		_logService = StartupContainer.easyDI.getInstance(LoginService.class);
+		_hService=StartupContainer.easyDI.getInstance(HigherService.class);
 
 	}
 
@@ -59,10 +60,10 @@ public class NewsServlet extends HttpServlet {
 			request.setAttribute("userName", player.user.name);
 
 			String param = request.getParameter("button");
-			
-			//Check if there is params in url.
+
+			// Check if there is params in url.
 			if (param != null) {
-				//refresh page on demand.
+				// refresh page on demand.
 				if (param.equals("refresh")) {
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
@@ -70,31 +71,30 @@ public class NewsServlet extends HttpServlet {
 				// If player press Play button, check if player hasn't selected himself
 				if (param.equals("play")
 						&& player.user.userId != Integer.parseInt(request.getParameter("selectedPlayer"))) {
-					
-					//After Play button is pressed, set remote player from list status as playing.
+
+					// After Play button is pressed, set remote player from list status as playing.
 					cache.getPlayer(
 							Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
-					//set current player as playing.
+					// set current player as playing.
 					player.userStatus = UserStatus.PLAYING;
-					ResultDAL resultdal = new ResultDAL();
-					ICRUD crud = new CRUDImpl();
-					//Get unused fightID from DB.
-					Integer lastFightID = crud.create(resultdal).transferData;
-					//Set in what FightID should remote player be transfered.
+
+					// Get unused fightID
+					Integer lastFightID = _hService.getNewFightId();
+					// Set in what FightID should remote player be transfered.
 					cache.getPlayer(
 							Integer.parseInt(request.getParameter("selectedPlayer"))).currentFightID = lastFightID;
-					//Set and Redirect current player to Fight.jsp with FightID.
+					// Set and Redirect current player to Fight.jsp with FightID.
 					String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + lastFightID;
 					response.sendRedirect(url);
 
-				//If there is no params, set player as notReady.
+					// If there is no params, set player as notReady.
 				} else {
 					player.userStatus = UserStatus.NOT_READY;
 					request.getRequestDispatcher("News.jsp").forward(request, response);
 				}
 			}
 
-			//Checking Player status and reting message and button text accordingly.
+			// Checking Player status and reting message and button text accordingly.
 			else {
 				Boolean ready = request.getParameter("ready") == null ? false
 						: Boolean.valueOf(request.getParameter("ready"));

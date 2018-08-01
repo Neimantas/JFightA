@@ -10,4 +10,5 @@ public interface IHigherService {
 	UserLoginDataDTO registration(UserRegIn userRegIn);
 	String hashPassword (String password);
 	boolean passwordCheck(String password, String paswordInDB);
+	Integer getNewFightId();
 }
