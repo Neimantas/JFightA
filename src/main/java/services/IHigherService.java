@@ -11,4 +11,5 @@ public interface IHigherService {
 	String hashPassword (String password);
 	boolean passwordCheck(String password, String paswordInDB);
 	Integer getNewFightId();
+	void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw);
 }

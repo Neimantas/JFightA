@@ -134,4 +134,21 @@ public class HigherService implements IHigherService {
 		return crud.create(resultdal).transferData;
 	}
 
+	@Override
+	public void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw) {
+		if(!draw) {
+			ResultDAL result = new ResultDAL();
+			result.fightId = fightId;
+			result.winUserId = winPlayerId;
+			result.lossUserId = losePlayerId;
+			System.out.println(_crud.update(result).message);
+		} else {
+			ResultDAL result = new ResultDAL();
+			result.fightId = fightId;
+			result.tieUser1Id = winPlayerId;
+			result.tieUser2Id = losePlayerId;
+			_crud.update(result);
+		}
+	}
+
 }

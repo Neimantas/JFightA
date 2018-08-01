@@ -15,10 +15,14 @@ import configuration.StartupContainer;
 import services.ICRUD;
 import services.ICache;
 import services.IFightEngine;
+import services.IHigherService;
+import services.ILogger;
 import services.impl.CRUDImpl;
 import services.impl.CacheImpl;
 import services.impl.FightEngineImpl;
+import services.impl.HigherService;
 import services.impl.ImageImpl;
+import services.impl.LoggerImpl;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.business.Actions;
@@ -34,6 +38,8 @@ import models.dal.ResultDAL;
 public class FightServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
+	private IHigherService _hService; //should test if it work with multiple users
+	private ILogger _logger;
 //	private String _playerAName;
 //	private String _playerBName;
 //	private String _fightId;
@@ -46,6 +52,8 @@ public class FightServlet extends HttpServlet {
     public FightServlet() {
 //    	_engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
 //        _engine = new FightEngineImpl();
+    	_hService = StartupContainer.easyDI.getInstance(HigherService.class);
+    	_logger =  StartupContainer.easyDI.getInstance(LoggerImpl.class);
     }
 
 	/**
@@ -172,12 +180,15 @@ public class FightServlet extends HttpServlet {
 			
 			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
-				writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, true);
+				_hService.writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, true);
+				
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(playerBHealth<=0) {
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
-				writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, false);
+				_hService.writeFightResult(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId, false);
+				_logger.logFightData(Integer.parseInt(fightId), Integer.parseInt(playerAUserId), playerBUserId);
 				request.getRequestDispatcher("win.jsp").forward(request, response);
+				
 				
 			} else if(playerAHealth<=0) {
 				cache.getPlayer(Integer.parseInt(playerAUserId)).userStatus = UserStatus.NOT_READY;
@@ -189,29 +200,6 @@ public class FightServlet extends HttpServlet {
 			
 //			request.getRequestDispatcher("NewFile.jsp").forward(request, response);
 		}
-		
-		
-		
-		
+			
 	}
-	
-	private void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw) {
-		
-		ICRUD crud = new CRUDImpl();
-		if(!draw) {
-			ResultDAL result = new ResultDAL();
-			result.fightId = fightId;
-			result.winUserId = winPlayerId;
-			result.lossUserId = losePlayerId;
-			System.out.println(crud.update(result).message);
-		} else {
-			ResultDAL result = new ResultDAL();
-			result.fightId = fightId;
-			result.tieUser1Id = winPlayerId;
-			result.tieUser2Id = losePlayerId;
-			crud.update(result);
-		}
-		
-	}
-
 }
