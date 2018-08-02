@@ -29,42 +29,10 @@ public class LoggerImpl implements ILogger {
 		if (dtoF.success) {
 			List<FightDataDAL> list = dtoF.transferDataList;
 			for (FightDataDAL d : list) {
-				JSONObject jsonOb = new JSONObject();
-
-				jsonOb.put("u", d.userId);
-				jsonOb.put("r", d.round);
-				jsonOb.put("hp", d.healthPoints);
-				if (d.damage == null) {
-					jsonOb.put("d", 0);
-				} else {
-					jsonOb.put("d", d.damage);
-				}
-				jsonOb.put("ah", d.attackHead);
-				jsonOb.put("ab", d.attackBody);
-				jsonOb.put("ahn", d.attackArms);
-				jsonOb.put("al", d.attackLegs);
-				jsonOb.put("dh", d.defenceHead);
-				jsonOb.put("db", d.defenceBody);
-				jsonOb.put("dhn", d.defenceArms);
-				jsonOb.put("dl", d.defenceLegs);
-
-				json.put(jsonOb);
+				createJsonRecord(json, d);
 			}
 
-			ObjectDTO<Integer> dtoL = _hService.logFightDataDAL(fightId, userIdA, userIdB, json.toString());
-			if (dtoL.success) {
-				ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO<FightDataDAL>();
-				retSuccess.success = true;
-				retSuccess.message = dtoL.message;
-
-				return retSuccess;
-			} else {
-				ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<FightDataDAL>();
-				retFailure.success = false;
-				retFailure.message = dtoL.message;
-
-				return retFailure;
-			}
+			return createLogRecord(fightId, userIdA, userIdB, json);
 		}
 
 		ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<FightDataDAL>();
@@ -99,6 +67,46 @@ public class LoggerImpl implements ILogger {
 		return retFailure;
 	}
 
+	private void createJsonRecord(JSONArray json, FightDataDAL d) {
+		JSONObject jsonOb = new JSONObject();
+
+		jsonOb.put("u", d.userId);
+		jsonOb.put("r", d.round);
+		jsonOb.put("hp", d.healthPoints);
+		if (d.damage == null) {
+			jsonOb.put("d", 0);
+		} else {
+			jsonOb.put("d", d.damage);
+		}
+		jsonOb.put("ah", d.attackHead);
+		jsonOb.put("ab", d.attackBody);
+		jsonOb.put("ahn", d.attackArms);
+		jsonOb.put("al", d.attackLegs);
+		jsonOb.put("dh", d.defenceHead);
+		jsonOb.put("db", d.defenceBody);
+		jsonOb.put("dhn", d.defenceArms);
+		jsonOb.put("dl", d.defenceLegs);
+
+		json.put(jsonOb);
+	}
+
+	private ObjectDTO<FightDataDAL> createLogRecord(int fightId, int userIdA, int userIdB, JSONArray json) {
+		ObjectDTO<Integer> dtoL = _hService.logFightDataDAL(fightId, userIdA, userIdB, json.toString());
+		if (dtoL.success) {
+			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO<FightDataDAL>();
+			retSuccess.success = true;
+			retSuccess.message = dtoL.message;
+
+			return retSuccess;
+		} else {
+			ObjectDTO<FightDataDAL> retFailure = new ObjectDTO<FightDataDAL>();
+			retFailure.success = false;
+			retFailure.message = dtoL.message;
+
+			return retFailure;
+		}
+	}
+
 	private List<String> makeTableFromFightData(ListDTO<LogDAL> dtoLog) {
 		List<String> returnList = new ArrayList<>();
 		List<LogDAL> list = dtoLog.transferDataList;
@@ -107,31 +115,30 @@ public class LoggerImpl implements ILogger {
 
 			String rows = makeAndFillTableRow(json);
 
-			String table = "						<div class=\"container\">\r\n"
-					+ "									<h6>Fight ID: " + l.fightId + ", date of match: " + l.date
-					+ "</h6>\r\n"
-
-					+ "										<table class=\"table-sm table-bordered\">\r\n"
-					+ "											<thead class=\"thead-dark\">\r\n"
-					+ "												<tr>\r\n"
-					+ "													<th scope=\"col\">Round</th>\r\n"
-					+ "													<th scope=\"col\">UserID</th>\r\n"
-					+ "													<th scope=\"col\">Health Points</th>\r\n"
-					+ "													<th scope=\"col\">Damage</th>\r\n"
-					+ "													<th scope=\"col\">Attack Head</th>\r\n"
-					+ "													<th scope=\"col\">Attack Body</th>\r\n"
-					+ "													<th scope=\"col\">Attack Hands</th>\r\n"
-					+ "													<th scope=\"col\">Attack Legs</th>\r\n"
-					+ "													<th scope=\"col\">Defence Head</th>\r\n"
-					+ "													<th scope=\"col\">Defence Body</th>\r\n"
-					+ "													<th scope=\"col\">Defence Hands</th>\r\n"
-					+ "													<th scope=\"col\">Defence Legs</th>\r\n"
-					+ "												</tr>\r\n"
-					+ "											</thead>\r\n"
-					+ "											<tbody>\r\n" + rows
-					+ "											</tbody>\r\n"
-					+ "										</table>\r\n" + "								</div>"
-					+ "                            <br>";
+			String table = "<div class=\"container\">\r\n"
+					+ "			<h6>Fight ID: " + l.fightId + ", date of match: " + l.date + "</h6>\r\n"
+					+ "				<table class=\"table-sm table-bordered\">\r\n"
+					+ "					<thead class=\"thead-dark\">\r\n"
+					+ "						<tr>\r\n"
+					+ "							<th scope=\"col\">Round</th>\r\n"
+					+ "							<th scope=\"col\">UserID</th>\r\n"
+					+ "							<th scope=\"col\">Health Points</th>\r\n"
+					+ "							<th scope=\"col\">Damage</th>\r\n"
+					+ "							<th scope=\"col\">Attack Head</th>\r\n"
+					+ "							<th scope=\"col\">Attack Body</th>\r\n"
+					+ "							<th scope=\"col\">Attack Hands</th>\r\n"
+					+ "							<th scope=\"col\">Attack Legs</th>\r\n"
+					+ "							<th scope=\"col\">Defence Head</th>\r\n"
+					+ "							<th scope=\"col\">Defence Body</th>\r\n"
+					+ "							<th scope=\"col\">Defence Hands</th>\r\n"
+					+ "							<th scope=\"col\">Defence Legs</th>\r\n"
+					+ "						</tr>\r\n"
+					+ "					</thead>\r\n"
+					+ "					<tbody>\r\n" + rows
+					+ "					</tbody>\r\n"
+					+ "				</table>\r\n" 
+					+ "		</div>"
+					+ "     <br>";
 
 			returnList.add(table);
 		}
@@ -143,28 +150,21 @@ public class LoggerImpl implements ILogger {
 		for (int i = 0; i < json.length(); i++) {
 			JSONObject jsonObj = (JSONObject) json.get(i);
 
-			rows += "													<tr>\r\n"
-					+ "														<th scope=\"row\">" + jsonObj.get("r")
-					+ "</th>\r\n" + "														<td>" + jsonObj.get("u")
-					+ "</td>\r\n" + "														<td>" + jsonObj.get("hp")
-					+ "</td>\r\n" + "														<td>" + jsonObj.get("d")
-					+ "</td>\r\n" + "														<td>"
-					+ changeATKChar((Integer) jsonObj.get("ah")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeATKChar((Integer) jsonObj.get("ab")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeATKChar((Integer) jsonObj.get("ahn")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeATKChar((Integer) jsonObj.get("al")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeDEFChar((Integer) jsonObj.get("dh")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeDEFChar((Integer) jsonObj.get("db")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeDEFChar((Integer) jsonObj.get("dhn")) + "</td>\r\n"
-					+ "														<td>"
-					+ changeDEFChar((Integer) jsonObj.get("dl")) + "</td>\r\n"
-					+ "													</tr>";
+			rows +=   "<tr>\r\n"
+					+ " <th scope=\"row\">" + jsonObj.get("r")
+					+ " </th>\r\n" 
+					+ " <td>" + jsonObj.get("u") + "</td>\r\n" 
+					+ " <td>" + jsonObj.get("hp") + "</td>\r\n" 
+					+ " <td>" + jsonObj.get("d") + "</td>\r\n" 
+					+ " <td>" + changeATKChar((Integer) jsonObj.get("ah")) + "</td>\r\n"
+					+ " <td>" + changeATKChar((Integer) jsonObj.get("ab")) + "</td>\r\n"
+					+ " <td>" + changeATKChar((Integer) jsonObj.get("ahn")) + "</td>\r\n"
+					+ " <td>" + changeATKChar((Integer) jsonObj.get("al")) + "</td>\r\n"
+					+ " <td>" + changeDEFChar((Integer) jsonObj.get("dh")) + "</td>\r\n"
+					+ " <td>" + changeDEFChar((Integer) jsonObj.get("db")) + "</td>\r\n"
+					+ " <td>" + changeDEFChar((Integer) jsonObj.get("dhn")) + "</td>\r\n"
+					+ " <td>" + changeDEFChar((Integer) jsonObj.get("dl")) + "</td>\r\n"
+					+ "</tr>";
 		}
 		return rows;
 	}

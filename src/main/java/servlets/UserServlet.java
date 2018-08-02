@@ -12,11 +12,9 @@ import configuration.StartupContainer;
 import models.business.Player;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
-import services.ICache;
 import services.ILogger;
 import services.ILoginService;
 import services.IUserInfo;
-import services.impl.CacheImpl;
 import services.impl.LoggerImpl;
 import services.impl.LoginService;
 import services.impl.UserInfoImpl;
@@ -37,20 +35,27 @@ public class UserServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// Validator
-		if (!_login.userValidator(request)) {
-			request.getRequestDispatcher("index.jsp").forward(request, response);
-		}
-
 		Player _player = StartupContainer.easyDI.getInstance(Player.class);
 
 		String userId = request.getParameter("userId");
 
-		ObjectDTO<Player> dtoPlayer = _userInfo.getLoggedUserInfo(request);
-		if (dtoPlayer.success) {
-			_player = dtoPlayer.transferData;
-		}
+		userValidator(request, response);
 
+		_player = showLoggedUsersInfo(request, _player, userId);
+
+		showOtherUsersInfoAndLog(request, _player, userId);
+
+		request.setAttribute("currentUserName", _player.user.name);
+
+		request.getRequestDispatcher("user.jsp").forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+	private void showOtherUsersInfoAndLog(HttpServletRequest request, Player _player, String userId) {
 		if (request.getParameter("log") == null && userId != null) {
 			ObjectDTO<Player> dtoUser = _userInfo.getUserInfo(Integer.parseInt(userId));
 			if (dtoUser.success) {
@@ -71,6 +76,13 @@ public class UserServlet extends HttpServlet {
 				request.setAttribute("tableString", dtoLog.transferDataList);
 			}
 		}
+	}
+
+	private Player showLoggedUsersInfo(HttpServletRequest request, Player _player, String userId) {
+		ObjectDTO<Player> dtoPlayer = _userInfo.getLoggedUserInfo(request);
+		if (dtoPlayer.success) {
+			_player = dtoPlayer.transferData;
+		}
 
 		if (userId == null) {
 			request.setAttribute("userName", _player.user.name);
@@ -82,14 +94,13 @@ public class UserServlet extends HttpServlet {
 			request.setAttribute("attackItem", _player.characterInfo.attackItemId);
 			request.setAttribute("defenceItem", _player.characterInfo.defenceItemId);
 		}
-
-		request.setAttribute("currentUserName", _player.user.name);
-
-		request.getRequestDispatcher("user.jsp").forward(request, response);
+		return _player;
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	private void userValidator(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		doGet(request, response);
+		if (!_login.userValidator(request, response)) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+		}
 	}
 }

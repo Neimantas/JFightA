@@ -20,27 +20,25 @@ public class UserInfoImpl implements IUserInfo {
 
 	@Override
 	public ObjectDTO<Player> getUserInfo(int userId) {
-
 		Player player = _cache.getPlayer(userId);
+		//Get other logged in user's information from cache
 		if (player != null) {
-			ObjectDTO<Player> retSuccess = new ObjectDTO();
+			ObjectDTO<Player> retSuccess = new ObjectDTO<Player>();
 			retSuccess.success = true;
 			retSuccess.message = "User exists in DB.";
 			retSuccess.transferData = player;
-
 			return retSuccess;
 		}
-
-		ObjectDTO<Player> retFailure = new ObjectDTO();
+		ObjectDTO<Player> retFailure = new ObjectDTO<Player>();
 		retFailure.success = false;
 		retFailure.message = "Error! No such user.";
-
 		return retFailure;
 	}
 
 	public ObjectDTO<Player> getLoggedUserInfo(HttpServletRequest request) {
-		ObjectDTO<Player> ret = new ObjectDTO();
+		ObjectDTO<Player> ret = new ObjectDTO<Player>();
 
+		//Get current logged in user's cookie value
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
 		for (int i = 0; i < cookies.length; i++) {
@@ -48,6 +46,7 @@ public class UserInfoImpl implements IUserInfo {
 				cookieValue = cookies[i].getValue();
 			}
 		}
+		//Get current logged in user's information from cache using cookie value
 		for (Entry<Integer, Player> entry : _cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
 				Player player = _cache.getPlayer(entry.getValue().user.userId);
@@ -57,7 +56,6 @@ public class UserInfoImpl implements IUserInfo {
 				ret.transferData = player;
 				return ret;
 			}
-
 		}
 		ret.success = false;
 		ret.message = "Error! No cached user.";
