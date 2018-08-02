@@ -190,6 +190,17 @@ public class HigherService implements IHigherService {
 			userDTO.message = listDTO.message;
 			userDTO.success = true;
 			return userDTO;
+
+		} else {
+			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "User No " + userId,
+					"Class: HigherService, method: ObjectDTO<UserDAL> getUser(int userId).",
+					"crud read message: " + listDTO.message);
+			userDTO.message = listDTO.message;
+			return userDTO;
+		}
+	}
+
+	@Override
 	public ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json) {
 		LogDAL dalL = new LogDAL();
 
@@ -200,13 +211,6 @@ public class HigherService implements IHigherService {
 
 		ObjectDTO<Integer> dtoCreate = _crud.<LogDAL>create(dalL);
 		return dtoCreate;
-		} else {
-			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "User No " + userId,
-					"Class: HigherService, method: ObjectDTO<UserDAL> getUser(int userId).",
-					"crud read message: " + listDTO.message);
-			userDTO.message = listDTO.message;
-			return userDTO;
-		}
 	}
 
 	@Override
