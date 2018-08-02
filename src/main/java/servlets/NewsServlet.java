@@ -135,7 +135,7 @@ public class NewsServlet extends HttpServlet {
 
 	private void userValidation(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		if (!_logService.userValidator(request)) {
+		if (!_logService.userValidator(request, response)) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
 	}

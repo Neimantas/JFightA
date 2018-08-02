@@ -30,8 +30,8 @@ public class LogOutServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		_logService.logout(request);
-		if(!_logService.userValidator(request)) {
+		_logService.logout(request, response);
+		if(!_logService.userValidator(request, response)) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		};
 		response.getWriter().append("Served at: ").append(request.getContextPath());

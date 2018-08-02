@@ -14,8 +14,8 @@ public interface ILoginService {
 	UserLoginDataDTO registration(UserRegIn userRegIn);
 	void addCookies(HttpServletResponse response,User userWithInfo);
 	void aadCashe(Player player);
-	boolean userValidator (HttpServletRequest request);
-	void logout (HttpServletRequest request);
+	boolean userValidator (HttpServletRequest request, HttpServletResponse response);
+	void logout (HttpServletRequest request, HttpServletResponse response);
 	String newGuid();
 }
 

@@ -21,10 +21,11 @@ public interface IHigherService {
 	String hashPassword (String password);
 	boolean passwordCheck(String password, String paswordInDB);
 	Integer getNewFightId();
-	ListDTO<FightDataDAL> logFightDataDAL(int fightId);
+	ListDTO<FightDataDAL> getFightDataDAL(int fightId);
 	void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw);
 	ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB);
 	ObjectDTO<ItemDAL> getItem(int itemId);
+	ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json);
 	ObjectDTO<Integer> createNewItem(Item item);
 	DTO editItem(Item item);
 	DTO deleteItem(int itemId);

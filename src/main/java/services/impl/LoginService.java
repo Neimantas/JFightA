@@ -76,13 +76,15 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public void logout(HttpServletRequest request) {
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
 		for (int i = cookies.length-1; i >= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
+				System.out.println("pateko i cookies trinima");
 				cookieValue = cookies[i].getValue();
 				cookies[i].setMaxAge(0);
+				response.addCookie(cookies[i]);
 				break;
 			}
 		}
@@ -100,7 +102,7 @@ public class LoginService implements ILoginService {
 	@Override
 	public void addCookies(HttpServletResponse response, User userWithInfo) {
 		Cookie ck = new Cookie("JFightUser", userWithInfo.cookiesValue);
-		ck.setMaxAge(3600);
+		ck.setMaxAge(86400);
 		response.addCookie(ck);
 
 	}
@@ -118,13 +120,16 @@ public class LoginService implements ILoginService {
 	}
 
 	@Override
-	public boolean userValidator(HttpServletRequest request) {
+	public boolean userValidator(HttpServletRequest request, HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
+		if(cookies == null)
+			return false;
 		String cookieValue = "";
 		for (int i = cookies.length-1; i >= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
 				cookieValue = cookies[i].getValue();
-				cookies[i].setMaxAge(3600);
+//				cookies[i].setMaxAge(3600);
+//				response.addCookie(cookies[i]);
 			}
 		}
 		for (Entry<Integer, Player> entry : cache.getPlayers().entrySet()) {

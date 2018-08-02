@@ -141,7 +141,7 @@ public class HigherService implements IHigherService {
 	}
 
 	@Override
-	public ListDTO<FightDataDAL> logFightDataDAL(int fightId) {
+	public ListDTO<FightDataDAL> getFightDataDAL(int fightId) {
 
 		FightDataDAL dalF = new FightDataDAL();
 
@@ -190,6 +190,7 @@ public class HigherService implements IHigherService {
 			userDTO.message = listDTO.message;
 			userDTO.success = true;
 			return userDTO;
+
 		} else {
 			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "User No " + userId,
 					"Class: HigherService, method: ObjectDTO<UserDAL> getUser(int userId).",
@@ -197,6 +198,19 @@ public class HigherService implements IHigherService {
 			userDTO.message = listDTO.message;
 			return userDTO;
 		}
+	}
+
+	@Override
+	public ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json) {
+		LogDAL dalL = new LogDAL();
+
+		dalL.fightId = fightId;
+		dalL.user1Id = userIdA;
+		dalL.user2Id = userIdB;
+		dalL.log = json;
+
+		ObjectDTO<Integer> dtoCreate = _crud.<LogDAL>create(dalL);
+		return dtoCreate;
 	}
 
 	@Override
