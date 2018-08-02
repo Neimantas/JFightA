@@ -10,12 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
 import models.business.Player;
-import models.dal.CharacterDAL;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ILogger;
+import services.ILoginService;
 import services.IUserInfo;
 import services.impl.LoggerImpl;
+import services.impl.LoginService;
 import services.impl.UserInfoImpl;
 
 @WebServlet(urlPatterns = "/user")
@@ -24,49 +25,63 @@ public class UserServlet extends HttpServlet {
 
 	private IUserInfo _userInfo;
 	private ILogger _logger;
+	private ILoginService _login;
 
 	public UserServlet() {
 		_userInfo = StartupContainer.easyDI.getInstance(UserInfoImpl.class);
 		_logger = StartupContainer.easyDI.getInstance(LoggerImpl.class);
+		_login = StartupContainer.easyDI.getInstance(LoginService.class);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// VALIDATOR
-		// if(!_login.userValidator(request)) {
-		// request.getRequestDispatcher("index.jsp").forward(request, response);
-		// }
-
 		Player _player = StartupContainer.easyDI.getInstance(Player.class);
 
 		String userId = request.getParameter("userId");
 
-		ObjectDTO<Player> dtoPlayer = _userInfo.getCacheUserInfo(request);
+		userValidator(request, response);
 
-		if (dtoPlayer.success) {
-			_player = dtoPlayer.transferData;
-		} else {
-			// needs else return
-		}
+		_player = showLoggedUsersInfo(request, _player, userId);
 
+		showOtherUsersInfoAndLog(request, _player, userId);
+
+		request.setAttribute("currentUserName", _player.user.name);
+
+		request.getRequestDispatcher("user.jsp").forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+	private void showOtherUsersInfoAndLog(HttpServletRequest request, Player _player, String userId) {
 		if (request.getParameter("log") == null && userId != null) {
-			ObjectDTO<CharacterDAL> dtoUser = _userInfo.getUserInfo(Integer.parseInt(userId));
+			ObjectDTO<Player> dtoUser = _userInfo.getUserInfo(Integer.parseInt(userId));
 			if (dtoUser.success) {
-				CharacterDAL dal = dtoUser.transferData;
+				Player user = dtoUser.transferData;
 
-				request.setAttribute("userName", dal.userId);
-				request.setAttribute("userId", dal.userId);
-				request.setAttribute("level", dal.level);
-				request.setAttribute("experience", dal.experience);
-				request.setAttribute("healthPoints", dal.healthPoints);
-				request.setAttribute("strenght", dal.strenght);
-				request.setAttribute("attackItem", dal.attackItemId);
-				request.setAttribute("defenceItem", dal.defenceItemId);
+				request.setAttribute("userName", user.user.name);
+				request.setAttribute("userId", user.user.userId);
+				request.setAttribute("level", user.characterInfo.level);
+				request.setAttribute("experience", user.characterInfo.experience);
+				request.setAttribute("healthPoints", user.characterInfo.healthPoints);
+				request.setAttribute("strenght", user.characterInfo.strenght);
+				request.setAttribute("attackItem", user.characterInfo.attackItemId);
+				request.setAttribute("defenceItem", user.characterInfo.defenceItemId);
 			}
+
 			ListDTO<String> dtoLog = _logger.getLogs(_player.characterInfo.userId, Integer.parseInt(userId));
 			if (dtoLog.success) {
 				request.setAttribute("tableString", dtoLog.transferDataList);
 			}
+		}
+	}
+
+	private Player showLoggedUsersInfo(HttpServletRequest request, Player _player, String userId) {
+		ObjectDTO<Player> dtoPlayer = _userInfo.getLoggedUserInfo(request);
+		if (dtoPlayer.success) {
+			_player = dtoPlayer.transferData;
 		}
 
 		if (userId == null) {
@@ -79,21 +94,13 @@ public class UserServlet extends HttpServlet {
 			request.setAttribute("attackItem", _player.characterInfo.attackItemId);
 			request.setAttribute("defenceItem", _player.characterInfo.defenceItemId);
 		}
-
-		request.setAttribute("currentUserName", _player.user.name);
-
-		request.getRequestDispatcher("user.jsp").forward(request, response);
+		return _player;
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	private void userValidator(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		doGet(request, response);
+		if (!_login.userValidator(request, response)) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+		}
 	}
-
-	private String firstLetterToUpper(String str) {
-		str = str.substring(0, 1).toUpperCase() + str.substring(1);
-
-		return str;
-	}
-
 }
