@@ -7,7 +7,7 @@ import models.dto.ObjectDTO;
 
 public interface IFightEngine {
 
-	ObjectDTO<FightDataDAL> getOpponentData(int fightId, String userId);
+	ObjectDTO<FightDataDAL> getOpponentData(int fightId, int round, int userId);
 	ListDTO<FightDataDAL> engine(int fightId, int roundId, int health, int userId, Actions actionDTO);
 
 }
