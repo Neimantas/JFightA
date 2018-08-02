@@ -19,7 +19,6 @@ public class LogImpl implements ILog {
 
 	private SimpleDateFormat _simpleDateFormat;
 	private SimpleDateFormat _simpleDateAndTimeFormat;
-	private static boolean _allowWriteToConsoleGlobal = Settings.WRITE_LOGS_TO_CONSOLE;
 	private static String _logDirectory = Settings.LOG_DIRECTORY;
 
 	private LogImpl() {
@@ -28,8 +27,8 @@ public class LogImpl implements ILog {
 	}
 
 	@Override
-	public void writeErrorMessage(Exception e, boolean allowWriteToConsole, String... additionalMessages) {
-		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
+	public void writeErrorMessage(Exception e, String... additionalMessages) {
+		if (Settings.WRITE_LOGS_TO_CONSOLE) {
 			System.out.println(e.toString());
 		}
 		try (FileWriter fw = new FileWriter(createLogLocation(), true);
@@ -52,9 +51,8 @@ public class LogImpl implements ILog {
 	}
 
 	@Override
-	public void writeWarningMessage(String message, boolean allowWriteToConsole,
-			String... additionalMessages) {
-		if (_allowWriteToConsoleGlobal && allowWriteToConsole) {
+	public void writeWarningMessage(String message, String... additionalMessages) {
+		if (Settings.WRITE_LOGS_TO_CONSOLE) {
 			System.out.println("[WARNING] " + message);
 		}
 		try (FileWriter fw = new FileWriter(createLogLocation(), true);

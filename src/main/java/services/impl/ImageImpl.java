@@ -61,7 +61,7 @@ public class ImageImpl implements IImage {
 			return errorDTO;
 		}
 
-		ObjectDTO<Integer> createImageDTO = _higherService.createNewImage(profileImage);
+		ObjectDTO<Integer> createImageDTO = _higherService.createNewImage(profileImageToImageDAL(profileImage));
 		if (createImageDTO.success) {
 			ObjectDTO<UserDAL> userUpdateDTO = _higherService.updateUserImageId(profileImage.userId,
 					createImageDTO.transferData);
@@ -69,7 +69,14 @@ public class ImageImpl implements IImage {
 				updateUserInCache(userUpdateDTO.transferData);
 				return createImageDTO;
 			} else {
-				_higherService.deleteImage(createImageDTO.transferData);
+				ImageDAL imageDAL = new ImageDAL();
+				imageDAL.imageId = createImageDTO.transferData;
+				DTO deleteDTO = _higherService.deleteImage(imageDAL);
+				if (!deleteDTO.success) {
+					_log.writeWarningMessage(deleteDTO.message, "ImageId: " + createImageDTO.transferData + ".",
+							"Class: ImageImpl, method: addImage(ProfileImage profileImage).");
+				}
+
 				ObjectDTO<Integer> unsuccessfulImageDTO = new ObjectDTO<>();
 				unsuccessfulImageDTO.message = userUpdateDTO.message;
 				return unsuccessfulImageDTO;
@@ -102,7 +109,7 @@ public class ImageImpl implements IImage {
 
 		profileImage.imageId = imageIdDTO.transferData;
 
-		editDTO = _higherService.updateImage(profileImage);
+		editDTO = _higherService.updateImage(profileImageToImageDAL(profileImage));
 		if (editDTO.success) {
 			_cache.removeImage(profileImage.imageId);
 		}
@@ -110,10 +117,9 @@ public class ImageImpl implements IImage {
 	}
 
 	/**
-	 * Changes default image. Removes old default image from cache if exists.
-	 * Method overwrites all image fields. 
-	 * Image Id can be only 1 or 2. User Id must be zero.
-	 * Method should be used by administrators only.
+	 * Changes default image. Removes old default image from cache if exists. Method
+	 * overwrites all image fields. Image Id can be only 1 or 2. User Id must be
+	 * zero. Method should be used by administrators only.
 	 */
 	@Override
 	public DTO editDefaultImage(ProfileImage profileImage) {
@@ -124,7 +130,7 @@ public class ImageImpl implements IImage {
 			return correctInputDTO;
 		}
 
-		editDTO = _higherService.updateImage(profileImage);
+		editDTO = _higherService.updateImage(profileImageToImageDAL(profileImage));
 		if (editDTO.success) {
 			_cache.removeImage(profileImage.imageId);
 		}
@@ -148,7 +154,9 @@ public class ImageImpl implements IImage {
 			return deleteDTO;
 		}
 
-		deleteDTO = _higherService.deleteImage(imageIdDTO.transferData);
+		ImageDAL imageDAL = new ImageDAL();
+		imageDAL.imageId = imageIdDTO.transferData;
+		deleteDTO = _higherService.deleteImage(imageDAL);
 		if (deleteDTO.success) {
 			_cache.removeImage(imageIdDTO.transferData);
 		}
@@ -230,6 +238,21 @@ public class ImageImpl implements IImage {
 		return profileImage;
 	}
 
+	private ImageDAL profileImageToImageDAL(ProfileImage profileImage) {
+		ImageDAL imageDAL = new ImageDAL();
+		if (profileImage != null) {
+			imageDAL.imageId = profileImage.imageId != 0 ? profileImage.imageId : null;
+			imageDAL.userId = profileImage.userId != 0 ? profileImage.userId : null;
+			imageDAL.image = profileImage.image;
+			imageDAL.imageName = (profileImage.imageName != null ? profileImage.imageName : "")
+					+ (profileImage.imageType != null ? profileImage.imageType.getImageExtension() : "");
+			if (imageDAL.imageName.equals("")) {
+				imageDAL.imageName = null;
+			}
+		}
+		return imageDAL;
+	}
+
 	private DTO checkIfInputParametersIsCorrect(ProfileImage profileImage, String methodName) {
 		DTO dto = new DTO();
 		if (methodName.equals("editDefaultImage") && (profileImage.imageId < 1 || profileImage.imageId > 2)) {
@@ -258,8 +281,7 @@ public class ImageImpl implements IImage {
 	private DTO createInputParameterErrorDTO(Error error, String methodName) {
 		DTO errorDTO = new ObjectDTO<>();
 		errorDTO.message = error.getMessage();
-		_log.writeWarningMessage(error.getMessage(), true,
-				"Class: ImageImpl, Method: " + methodName + "(input parameters)");
+		_log.writeWarningMessage(error.getMessage(), "Class: ImageImpl, Method: " + methodName + "(input parameters)");
 		return errorDTO;
 	}
 

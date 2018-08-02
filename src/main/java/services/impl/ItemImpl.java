@@ -88,8 +88,8 @@ public class ItemImpl implements IItem {
 	}
 
 	/**
-	 * Creates new item. Item Id must be zero.
-	 * Returns DTO with created item Id inside.
+	 * Creates new item. Item Id must be zero. Returns DTO with created item Id
+	 * inside.
 	 */
 	@Override
 	public ObjectDTO<Integer> createNewItem(Item item) {
@@ -100,7 +100,7 @@ public class ItemImpl implements IItem {
 			return errorDTO;
 		}
 
-		return _higherService.createNewItem(item);
+		return _higherService.createNewItem(itemToItemDAL(item));
 	}
 
 	/**
@@ -112,8 +112,8 @@ public class ItemImpl implements IItem {
 		if (!correctInputDTO.success) {
 			return correctInputDTO;
 		}
-		
-		DTO updateDTO = _higherService.editItem(item);
+
+		DTO updateDTO = _higherService.editItem(itemToItemDAL(item));
 		if (updateDTO.success) {
 			_cache.removeItem(item.itemId);
 		}
@@ -127,7 +127,10 @@ public class ItemImpl implements IItem {
 			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, "deleteItem");
 		}
 
-		DTO deleteDTO = _higherService.deleteItem(itemId);
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		DTO deleteDTO = _higherService.deleteItem(itemDAL);
+		
 		if (deleteDTO.success) {
 			_cache.removeItem(itemId);
 		}
@@ -151,13 +154,28 @@ public class ItemImpl implements IItem {
 			item.itemImage = itemDAL.itemImage;
 			item.imageFormat = ImageType.getByImageExtension(itemDAL.imageFormat);
 			item.itemType = itemDAL.itemType;
-			item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description
-					: "";
+			item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description : "";
 			item.minCharacterLevel = itemDAL.minCharacterLevel != null ? itemDAL.minCharacterLevel : 0;
 			item.attackPoints = itemDAL.attackPoints != null ? itemDAL.attackPoints : 0;
 			item.defencePoints = itemDAL.defencePoints != null ? itemDAL.defencePoints : 0;
 		}
 		return item;
+	}
+
+	private ItemDAL itemToItemDAL(Item item) {
+		ItemDAL itemDAL = new ItemDAL();
+		if (item != null) {
+			itemDAL.itemId = item.itemId != 0 ? item.itemId : null;
+			itemDAL.itemName = (item.itemName != null && !item.itemName.equals("")) ? item.itemName : null;
+			itemDAL.itemImage = item.itemImage;
+			itemDAL.imageFormat = item.imageFormat.getImageExtension();
+			itemDAL.itemType = item.itemType;
+			itemDAL.description = (item.description != null && !item.description.equals("")) ? item.description : null;
+			itemDAL.minCharacterLevel = item.minCharacterLevel != 0 ? item.minCharacterLevel : null;
+			itemDAL.attackPoints = item.attackPoints != 0 ? item.attackPoints : null;
+			itemDAL.defencePoints = item.defencePoints != 0 ? item.defencePoints : null;
+		}
+		return itemDAL;
 	}
 
 	private DTO checkIfInputParametersIsCorrect(Item item, boolean editMethod) {
@@ -190,8 +208,7 @@ public class ItemImpl implements IItem {
 	private DTO createInputParameterErrorDTO(Error error, String methodName) {
 		DTO errorDTO = new DTO();
 		errorDTO.message = error.getMessage();
-		_log.writeWarningMessage(error.getMessage(), true,
-				"Class: ItemImpl, Method: " + methodName + "(input parameters)");
+		_log.writeWarningMessage(error.getMessage(), "Class: ItemImpl, Method: " + methodName + "(input parameters)");
 		return errorDTO;
 	}
 

@@ -26,12 +26,12 @@ public class ImageTest {
 
 		IImage item = new ImageImpl(new HigherService(new CRUDImpl()));
 
-		File file = new File("src\\main\\webapp\\resources\\images\\characters\\alex.png");
+		File file = new File("src\\main\\webapp\\resources\\images\\characters\\SFIII HiDef Sprites.gif");
 		ProfileImage profileImage = new ProfileImage();
 		profileImage.image = Files.readAllBytes(file.toPath());
-		profileImage.imageName = "Alex";
-		profileImage.imageType = ImageType.PNG;
-		profileImage.userId = 11;
+		profileImage.imageName = "SFIII HiDef Sprites";
+		profileImage.imageType = ImageType.GIF;
+		profileImage.userId = 39;
 		item.addImage(profileImage);
 
 	}

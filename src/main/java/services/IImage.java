@@ -1,7 +1,6 @@
 package services;
 
 import models.business.ProfileImage;
-import models.constant.ImageType;
 import models.dto.DTO;
 import models.dto.ObjectDTO;
 

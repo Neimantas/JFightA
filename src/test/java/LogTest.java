@@ -11,15 +11,15 @@ public class LogTest {
 	
 	ILog log = LogImpl.getInstance();
 
-	log.writeWarningMessage("Testing warning message", false, "test 1");
+	log.writeWarningMessage("Testing warning message", "test 1");
 	
 	try {
 		throw new Exception();
 	} catch (Exception e) {
-		log.writeErrorMessage(e, false, "test 2");
+		log.writeErrorMessage(e, "test 2");
 	}
 	
-	log.writeWarningMessage("Testing warning message", false, "test 3");
+	log.writeWarningMessage("Testing warning message", "test 3");
 	
 	System.out.println("\nToday log data:\n" + log.getLog(new Date()));
 
