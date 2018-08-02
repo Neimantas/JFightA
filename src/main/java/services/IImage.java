@@ -9,9 +9,9 @@ public interface IImage {
 
 	ObjectDTO<ProfileImage> getUserAImage(int userAId);
 	ObjectDTO<ProfileImage> getUserBImage(int userBId);
-	ObjectDTO<Integer> addImage(int userId, String imageName, ImageType imageType, byte[] image);
-	DTO editImage(int userId, String imageName, ImageType imageType, byte[] image);
-	DTO editDefaultImage(int imageId, String imageName, ImageType imageType, byte[] image);
+	ObjectDTO<Integer> addImage(ProfileImage profileImage);
+	DTO editImage(ProfileImage profileImage);
+	DTO editDefaultImage(ProfileImage profileImage);
 	DTO deleteImage(int userId);
 
 }
