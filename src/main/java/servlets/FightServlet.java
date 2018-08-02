@@ -17,12 +17,14 @@ import services.ICache;
 import services.IFightEngine;
 import services.IHigherService;
 import services.ILogger;
+import services.ILoginService;
 import services.impl.CRUDImpl;
 import services.impl.CacheImpl;
 import services.impl.FightEngineImpl;
 import services.impl.HigherService;
 import services.impl.ImageImpl;
 import services.impl.LoggerImpl;
+import services.impl.LoginService;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.business.Actions;
@@ -41,6 +43,7 @@ public class FightServlet extends HttpServlet {
 	private IHigherService _hService; //should test if it work with multiple users
 	private ILogger _logger;
 	private ICache _cache;
+	private ILoginService _logService;
 //	private String _playerAName;
 //	private String _playerBName;
 //	private String _fightId;
@@ -56,6 +59,7 @@ public class FightServlet extends HttpServlet {
     	_hService = StartupContainer.easyDI.getInstance(HigherService.class);
     	_logger =  StartupContainer.easyDI.getInstance(LoggerImpl.class);
     	_cache = CacheImpl.getInstance();
+    	_logService = StartupContainer.easyDI.getInstance(LoginService.class);
     }
 
 	/**
@@ -82,6 +86,11 @@ public class FightServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 //		doGet(request, response);
+		
+		if(!_logService.userValidator(request, response)) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+		}
+		
 		IFightEngine _engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
 		String playerAUserIdString = "";
 		String fightIdString = "";

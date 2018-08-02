@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import configuration.StartupContainer;
 import models.business.Player;
 import services.ICache;
+import services.ILoginService;
 import services.impl.CacheImpl;
+import services.impl.LoginService;
 
 /**
  * Servlet implementation class FightDataSetter
@@ -18,13 +21,14 @@ import services.impl.CacheImpl;
 @WebServlet("/setter")
 public class FightDataSetter extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private ILoginService _logService;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
     public FightDataSetter() {
         super();
-        // TODO Auto-generated constructor stub
+        _logService = StartupContainer.easyDI.getInstance(LoginService.class);
     }
 
 	/**
@@ -32,6 +36,11 @@ public class FightDataSetter extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//get player instance to set health points
+		
+		if(!_logService.userValidator(request, response)) {
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+		}
+		
 		ICache cache = CacheImpl.getInstance();
 		Player player = cache.getPlayer(Integer.parseInt(request.getParameter("name")));
 		

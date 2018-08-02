@@ -122,6 +122,8 @@ public class LoginService implements ILoginService {
 	@Override
 	public boolean userValidator(HttpServletRequest request, HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
+		if(cookies == null)
+			return false;
 		String cookieValue = "";
 		for (int i = cookies.length-1; i >= 0; i--) {
 			if (cookies[i].getName().equals("JFightUser")) {
