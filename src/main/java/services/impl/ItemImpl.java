@@ -87,57 +87,35 @@ public class ItemImpl implements IItem {
 		return userItems;
 	}
 
+	/**
+	 * Creates new item. Item Id must be zero. Returns DTO with created item Id
+	 * inside.
+	 */
 	@Override
-	public ObjectDTO<Integer> createNewItem(String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
-			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
-
-		if (itemName == null || itemName.equals("")) {
-			return createInputParameterErrorDTO(Error.ITEM_EMPTY_NAME, "createNewItem");
-		}
-		if (minCharacterLevel < 1) {
-			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, "createNewItem");
+	public ObjectDTO<Integer> createNewItem(Item item) {
+		DTO correctInputDTO = checkIfInputParametersIsCorrect(item, false);
+		if (!correctInputDTO.success) {
+			ObjectDTO<Integer> errorDTO = new ObjectDTO<>();
+			errorDTO.message = correctInputDTO.message;
+			return errorDTO;
 		}
 
-		Item item = new Item();
-		item.itemName = itemName;
-		item.itemImage = itemImage;
-		item.imageFormat = imageType;
-		item.itemType = itemType;
-		item.description = description;
-		item.minCharacterLevel = minCharacterLevel;
-		item.attackPoints = attackPoints;
-		item.defencePoints = defencePoints;
-		return _higherService.createNewItem(item);
+		return _higherService.createNewItem(itemToItemDAL(item));
 	}
 
+	/**
+	 * Method overwrites all item fields. All input item fields must be setted.
+	 */
 	@Override
-	public DTO editItem(int itemId, String itemName, byte[] itemImage, ImageType imageType, ItemType itemType,
-			String description, int minCharacterLevel, int attackPoints, int defencePoints) {
-
-		if (itemId < 1) {
-			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, "editItem");
-		}
-		if (itemName == null || itemName.equals("")) {
-			return createInputParameterErrorDTO(Error.ITEM_EMPTY_NAME, "editItem");
-		}
-		if (minCharacterLevel < 1) {
-			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, "editItem");
+	public DTO editItem(Item item) {
+		DTO correctInputDTO = checkIfInputParametersIsCorrect(item, true);
+		if (!correctInputDTO.success) {
+			return correctInputDTO;
 		}
 
-		Item item = new Item();
-		item.itemId = itemId;
-		item.itemName = itemName;
-		item.itemImage = itemImage;
-		item.imageFormat = imageType;
-		item.itemType = itemType;
-		item.description = description;
-		item.minCharacterLevel = minCharacterLevel;
-		item.attackPoints = attackPoints;
-		item.defencePoints = defencePoints;
-
-		DTO updateDTO = _higherService.editItem(item);
+		DTO updateDTO = _higherService.editItem(itemToItemDAL(item));
 		if (updateDTO.success) {
-			_cache.removeItem(itemId);
+			_cache.removeItem(item.itemId);
 		}
 
 		return updateDTO;
@@ -149,7 +127,10 @@ public class ItemImpl implements IItem {
 			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, "deleteItem");
 		}
 
-		DTO deleteDTO = _higherService.deleteItem(itemId);
+		ItemDAL itemDAL = new ItemDAL();
+		itemDAL.itemId = itemId;
+		DTO deleteDTO = _higherService.deleteItem(itemDAL);
+		
 		if (deleteDTO.success) {
 			_cache.removeItem(itemId);
 		}
@@ -165,14 +146,6 @@ public class ItemImpl implements IItem {
 		}
 	}
 
-	private ObjectDTO<Integer> createInputParameterErrorDTO(Error error, String methodName) {
-		ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
-		objectDTO.message = error.getMessage();
-		_log.writeWarningMessage(error.getMessage(), true,
-				"Class: ItemImpl, Method: " + methodName + "(input parameters)");
-		return objectDTO;
-	}
-
 	private Item itemDALtoItem(ItemDAL itemDAL) {
 		Item item = new Item();
 		if (itemDAL != null) {
@@ -181,13 +154,62 @@ public class ItemImpl implements IItem {
 			item.itemImage = itemDAL.itemImage;
 			item.imageFormat = ImageType.getByImageExtension(itemDAL.imageFormat);
 			item.itemType = itemDAL.itemType;
-			item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description
-					: "";
+			item.description = (itemDAL.description != null && !itemDAL.description.equals("")) ? itemDAL.description : "";
 			item.minCharacterLevel = itemDAL.minCharacterLevel != null ? itemDAL.minCharacterLevel : 0;
 			item.attackPoints = itemDAL.attackPoints != null ? itemDAL.attackPoints : 0;
 			item.defencePoints = itemDAL.defencePoints != null ? itemDAL.defencePoints : 0;
 		}
 		return item;
+	}
+
+	private ItemDAL itemToItemDAL(Item item) {
+		ItemDAL itemDAL = new ItemDAL();
+		if (item != null) {
+			itemDAL.itemId = item.itemId != 0 ? item.itemId : null;
+			itemDAL.itemName = (item.itemName != null && !item.itemName.equals("")) ? item.itemName : null;
+			itemDAL.itemImage = item.itemImage;
+			itemDAL.imageFormat = item.imageFormat.getImageExtension();
+			itemDAL.itemType = item.itemType;
+			itemDAL.description = (item.description != null && !item.description.equals("")) ? item.description : null;
+			itemDAL.minCharacterLevel = item.minCharacterLevel != 0 ? item.minCharacterLevel : null;
+			itemDAL.attackPoints = item.attackPoints != 0 ? item.attackPoints : null;
+			itemDAL.defencePoints = item.defencePoints != 0 ? item.defencePoints : null;
+		}
+		return itemDAL;
+	}
+
+	private DTO checkIfInputParametersIsCorrect(Item item, boolean editMethod) {
+		DTO dto = new DTO();
+		String methodName = editMethod == true ? "editItem" : "createNewItem";
+		if (editMethod && item.itemId < 1) {
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_ID, methodName);
+		}
+		if (item.itemName == null || item.itemName.equals("")) {
+			return createInputParameterErrorDTO(Error.ITEM_EMPTY_NAME, methodName);
+		}
+		if (item.itemImage == null || item.itemImage.length == 0) {
+			return createInputParameterErrorDTO(Error.IMAGE_IS_NOT_SETTED, methodName);
+		}
+		if (item.imageFormat == null) {
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_IMAGE_FORMAT, methodName);
+		}
+		if (item.itemType == null) {
+			return createInputParameterErrorDTO(Error.ITEM_TYPE_IS_NOT_SETTED, methodName);
+		}
+		if (item.minCharacterLevel < 1) {
+			return createInputParameterErrorDTO(Error.ITEM_WRONG_MIN_CHARACTER_LEVEL, methodName);
+		}
+
+		dto.message = Success.INPUT_PARAMETERS_IS_CORRECT.getMessage();
+		dto.success = true;
+		return dto;
+	}
+
+	private DTO createInputParameterErrorDTO(Error error, String methodName) {
+		DTO errorDTO = new DTO();
+		errorDTO.message = error.getMessage();
+		_log.writeWarningMessage(error.getMessage(), "Class: ItemImpl, Method: " + methodName + "(input parameters)");
+		return errorDTO;
 	}
 
 }

@@ -12,15 +12,18 @@ import models.dto.ObjectDTO;
 import services.ICache;
 import services.IHigherService;
 import services.IImage;
+import services.ILog;
 
 public class ImageImpl implements IImage {
 
 	private IHigherService _higherService;
 	private ICache _cache;
+	private ILog _log;
 
 	public ImageImpl(HigherService higherService) {
 		_higherService = higherService;
 		_cache = CacheImpl.getInstance();
+		_log = LogImpl.getInstance();
 	}
 
 	/**
@@ -45,24 +48,35 @@ public class ImageImpl implements IImage {
 
 	/**
 	 * Method add's new user image to database image table, updates user info in a
-	 * database user table, updates user info in a cache.
+	 * database user table, updates user info in a cache. ProfileImage Id must be
+	 * zero. Returns DTO with created image Id inside.
 	 */
 	@Override
-	public ObjectDTO<Integer> addImage(int userId, String imageName, ImageType imageType, byte[] image) {
-		ProfileImage profileImage = new ProfileImage();
-		profileImage.userId = userId;
-		profileImage.imageName = imageName;
-		profileImage.imageType = imageType;
-		profileImage.image = image;
+	public ObjectDTO<Integer> addImage(ProfileImage profileImage) {
 
-		ObjectDTO<Integer> createImageDTO = _higherService.createNewImage(profileImage);
+		DTO correctInputDTO = checkIfInputParametersIsCorrect(profileImage, "addImage");
+		if (!correctInputDTO.success) {
+			ObjectDTO<Integer> errorDTO = new ObjectDTO<>();
+			errorDTO.message = correctInputDTO.message;
+			return errorDTO;
+		}
+
+		ObjectDTO<Integer> createImageDTO = _higherService.createNewImage(profileImageToImageDAL(profileImage));
 		if (createImageDTO.success) {
-			ObjectDTO<UserDAL> userUpdateDTO = _higherService.updateUserImageId(userId, createImageDTO.transferData);
+			ObjectDTO<UserDAL> userUpdateDTO = _higherService.updateUserImageId(profileImage.userId,
+					createImageDTO.transferData);
 			if (userUpdateDTO.success) {
 				updateUserInCache(userUpdateDTO.transferData);
 				return createImageDTO;
 			} else {
-				_higherService.deleteImage(createImageDTO.transferData);
+				ImageDAL imageDAL = new ImageDAL();
+				imageDAL.imageId = createImageDTO.transferData;
+				DTO deleteDTO = _higherService.deleteImage(imageDAL);
+				if (!deleteDTO.success) {
+					_log.writeWarningMessage(deleteDTO.message, "ImageId: " + createImageDTO.transferData + ".",
+							"Class: ImageImpl, method: addImage(ProfileImage profileImage).");
+				}
+
 				ObjectDTO<Integer> unsuccessfulImageDTO = new ObjectDTO<>();
 				unsuccessfulImageDTO.message = userUpdateDTO.message;
 				return unsuccessfulImageDTO;
@@ -75,26 +89,27 @@ public class ImageImpl implements IImage {
 
 	/**
 	 * Changes user image in a database image table. Removes old user image from
-	 * cache if exists.
+	 * cache if exists. Method overwrites all image fields. All input profileImage
+	 * fields except image Id must be setted.
 	 */
 	@Override
-	public DTO editImage(int userId, String imageName, ImageType imageType, byte[] image) {
+	public DTO editImage(ProfileImage profileImage) {
 		DTO editDTO = new DTO();
-		ObjectDTO<Integer> imageIdDTO = getImageId(userId);
 
+		DTO correctInputDTO = checkIfInputParametersIsCorrect(profileImage, "editImage");
+		if (!correctInputDTO.success) {
+			return correctInputDTO;
+		}
+
+		ObjectDTO<Integer> imageIdDTO = getImageId(profileImage.userId);
 		if (!imageIdDTO.success) {
 			editDTO.message = imageIdDTO.message;
 			return editDTO;
 		}
 
-		ProfileImage profileImage = new ProfileImage();
 		profileImage.imageId = imageIdDTO.transferData;
-		profileImage.userId = userId;
-		profileImage.imageName = imageName;
-		profileImage.imageType = imageType;
-		profileImage.image = image;
 
-		editDTO = _higherService.updateImage(profileImage);
+		editDTO = _higherService.updateImage(profileImageToImageDAL(profileImage));
 		if (editDTO.success) {
 			_cache.removeImage(profileImage.imageId);
 		}
@@ -102,27 +117,22 @@ public class ImageImpl implements IImage {
 	}
 
 	/**
-	 * Changes default image (imageId can be only 1 or 2). Remove old default image
-	 * from cache if exists. Method should be used by administrators only.
+	 * Changes default image. Removes old default image from cache if exists. Method
+	 * overwrites all image fields. Image Id can be only 1 or 2. User Id must be
+	 * zero. Method should be used by administrators only.
 	 */
 	@Override
-	public DTO editDefaultImage(int imageId, String imageName, ImageType imageType, byte[] image) {
+	public DTO editDefaultImage(ProfileImage profileImage) {
 		DTO editDTO = new DTO();
 
-		if (imageId < 1 || imageId > 2) {
-			editDTO.message = Error.WRONG_DEFAULT_IMAGE_ID.getMessage();
-			return editDTO;
+		DTO correctInputDTO = checkIfInputParametersIsCorrect(profileImage, "editDefaultImage");
+		if (!correctInputDTO.success) {
+			return correctInputDTO;
 		}
 
-		ProfileImage profileImage = new ProfileImage();
-		profileImage.imageId = imageId;
-		profileImage.imageName = imageName;
-		profileImage.imageType = imageType;
-		profileImage.image = image;
-
-		editDTO = _higherService.updateImage(profileImage);
+		editDTO = _higherService.updateImage(profileImageToImageDAL(profileImage));
 		if (editDTO.success) {
-			_cache.removeImage(imageId);
+			_cache.removeImage(profileImage.imageId);
 		}
 		return editDTO;
 	}
@@ -132,6 +142,10 @@ public class ImageImpl implements IImage {
 	 */
 	@Override
 	public DTO deleteImage(int userId) {
+		if (userId < 1) {
+			return createInputParameterErrorDTO(Error.IMAGE_WRONG_USER_ID, "deleteImage");
+		}
+
 		DTO deleteDTO = new DTO();
 		ObjectDTO<Integer> imageIdDTO = getImageId(userId);
 
@@ -140,7 +154,9 @@ public class ImageImpl implements IImage {
 			return deleteDTO;
 		}
 
-		deleteDTO = _higherService.deleteImage(imageIdDTO.transferData);
+		ImageDAL imageDAL = new ImageDAL();
+		imageDAL.imageId = imageIdDTO.transferData;
+		deleteDTO = _higherService.deleteImage(imageDAL);
 		if (deleteDTO.success) {
 			_cache.removeImage(imageIdDTO.transferData);
 		}
@@ -220,6 +236,53 @@ public class ImageImpl implements IImage {
 			}
 		}
 		return profileImage;
+	}
+
+	private ImageDAL profileImageToImageDAL(ProfileImage profileImage) {
+		ImageDAL imageDAL = new ImageDAL();
+		if (profileImage != null) {
+			imageDAL.imageId = profileImage.imageId != 0 ? profileImage.imageId : null;
+			imageDAL.userId = profileImage.userId != 0 ? profileImage.userId : null;
+			imageDAL.image = profileImage.image;
+			imageDAL.imageName = (profileImage.imageName != null ? profileImage.imageName : "")
+					+ (profileImage.imageType != null ? profileImage.imageType.getImageExtension() : "");
+			if (imageDAL.imageName.equals("")) {
+				imageDAL.imageName = null;
+			}
+		}
+		return imageDAL;
+	}
+
+	private DTO checkIfInputParametersIsCorrect(ProfileImage profileImage, String methodName) {
+		DTO dto = new DTO();
+		if (methodName.equals("editDefaultImage") && (profileImage.imageId < 1 || profileImage.imageId > 2)) {
+			return createInputParameterErrorDTO(Error.WRONG_DEFAULT_IMAGE_ID, methodName);
+		}
+		if (methodName.equals("editDefaultImage") && profileImage.userId != 0) {
+			return createInputParameterErrorDTO(Error.DEFAULT_IMAGE_USER_ID_MUST_BE_ZERO, methodName);
+		}
+		if (!methodName.equals("editDefaultImage") && profileImage.userId < 0) {
+			return createInputParameterErrorDTO(Error.IMAGE_WRONG_USER_ID, methodName);
+		}
+		if (profileImage.image == null || profileImage.image.length == 0) {
+			return createInputParameterErrorDTO(Error.IMAGE_IS_NOT_SETTED, methodName);
+		}
+		if (profileImage.imageName == null || profileImage.imageName.equals("")) {
+			return createInputParameterErrorDTO(Error.IMAGE_EMPTY_NAME, methodName);
+		}
+		if (profileImage.imageType == null) {
+			return createInputParameterErrorDTO(Error.IMAGE_TYPE_IS_NOT_SETTED, methodName);
+		}
+		dto.message = Success.INPUT_PARAMETERS_IS_CORRECT.getMessage();
+		dto.success = true;
+		return dto;
+	}
+
+	private DTO createInputParameterErrorDTO(Error error, String methodName) {
+		DTO errorDTO = new ObjectDTO<>();
+		errorDTO.message = error.getMessage();
+		_log.writeWarningMessage(error.getMessage(), "Class: ImageImpl, Method: " + methodName + "(input parameters)");
+		return errorDTO;
 	}
 
 }

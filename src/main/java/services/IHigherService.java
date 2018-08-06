@@ -1,7 +1,5 @@
 package services;
 
-import models.business.Item;
-import models.business.ProfileImage;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dal.FightDataDAL;
@@ -26,14 +24,14 @@ public interface IHigherService {
 	ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB);
 	ObjectDTO<ItemDAL> getItem(int itemId);
 	ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json);
-	ObjectDTO<Integer> createNewItem(Item item);
-	DTO editItem(Item item);
-	DTO deleteItem(int itemId);
+	ObjectDTO<Integer> createNewItem(ItemDAL itemDAL);
+	DTO editItem(ItemDAL itemDAL);
+	DTO deleteItem(ItemDAL itemDAL);
 	ObjectDTO<UserDAL> getUser(int userId);
 	ObjectDTO<UserDAL> updateUserImageId(int userId, int imageId);
 	ObjectDTO<ImageDAL> getImage(int imageId);
 	ObjectDTO<Integer> getImageId(int userId);
-	ObjectDTO<Integer> createNewImage(ProfileImage profileImage);
-	DTO updateImage(ProfileImage profileImage);
-	DTO deleteImage(int imageId);
+	ObjectDTO<Integer> createNewImage(ImageDAL imageDAL);
+	DTO updateImage(ImageDAL imageDAL);
+	DTO deleteImage(ImageDAL imageDAL);
 }

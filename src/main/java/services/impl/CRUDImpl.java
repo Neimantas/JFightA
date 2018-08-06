@@ -76,7 +76,7 @@ public class CRUDImpl implements ICRUD {
 
 			return objectDTO;
 		} catch (Exception e) {
-			_log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e);
 			ObjectDTO<Integer> objectDTO = new ObjectDTO<>();
 			objectDTO.message = e.toString() + ".";
 			return objectDTO;
@@ -146,7 +146,7 @@ public class CRUDImpl implements ICRUD {
 
 			return listDTO;
 		} catch (Exception e) {
-			_log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e);
 			ListDTO<T> listDTO = new ListDTO<>();
 			listDTO.message = e.toString() + ".";
 			return listDTO;
@@ -171,7 +171,7 @@ public class CRUDImpl implements ICRUD {
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
 				dto.message = Error.DB_WRON_ID.getMessage();
-				_log.writeWarningMessage(Error.DB_UPDATE_FILED.getMessage() + " " + Error.DB_WRON_ID.getMessage(), true,
+				_log.writeWarningMessage(Error.DB_UPDATE_FILED.getMessage() + " " + Error.DB_WRON_ID.getMessage(),
 						"Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
@@ -194,7 +194,7 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (Exception e) {
-			_log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e);
 			DTO dto = new DTO();
 			dto.message = e.toString() + ".";
 			return dto;
@@ -218,7 +218,7 @@ public class CRUDImpl implements ICRUD {
 
 			if (firstFieldValue == null || firstFieldValue < 1) {
 				dto.message = Error.DB_WRON_ID.getMessage();
-				_log.writeWarningMessage(Error.DB_DELETE_FILED.getMessage() + " " + Error.DB_WRON_ID.getMessage(), true,
+				_log.writeWarningMessage(Error.DB_DELETE_FILED.getMessage() + " " + Error.DB_WRON_ID.getMessage(),
 						"Input object: " + dalClass.getSimpleName() + ".");
 				return dto;
 			}
@@ -234,7 +234,7 @@ public class CRUDImpl implements ICRUD {
 
 			return dto;
 		} catch (Exception e) {
-			_log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e);
 			DTO dto = new DTO();
 			dto.message = e.toString() + ".";
 			return dto;

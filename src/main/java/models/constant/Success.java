@@ -8,6 +8,7 @@ public enum Success {
 	DB_UPDATE_SUCCESSFUL("Update successful."),
 	DB_DELETE_SUCCESSFUL("Delete successful."),
 	ITEM_IS_TAKEN_FROM_CACHE("Item is taken from the cache."),
+	INPUT_PARAMETERS_IS_CORRECT("Input parameters is correct."),
 	IMAGE_IS_TAKEN_FROM_CACHE("Image is taken from the cache."),
 	USER_HAS_AN_IMAGE("User has an image.");
 

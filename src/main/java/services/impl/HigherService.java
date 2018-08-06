@@ -2,8 +2,6 @@
 package services.impl;
 
 import models.business.DefaultCharacter;
-import models.business.Item;
-import models.business.ProfileImage;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.constant.Error;
@@ -113,7 +111,7 @@ public class HigherService implements IHigherService {
 		try {
 			passwordHased = hashPassword.getSaltedHash(password);
 		} catch (Exception e) {
-			_log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e);
 		}
 		return passwordHased;
 
@@ -127,7 +125,7 @@ public class HigherService implements IHigherService {
 				return true;
 			}
 		} catch (Exception e) {
-			_log.writeErrorMessage(e, true);
+			_log.writeErrorMessage(e);
 		}
 		return false;
 	}
@@ -192,7 +190,7 @@ public class HigherService implements IHigherService {
 			return userDTO;
 
 		} else {
-			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "User No " + userId,
+			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), "User No " + userId,
 					"Class: HigherService, method: ObjectDTO<UserDAL> getUser(int userId).",
 					"crud read message: " + listDTO.message);
 			userDTO.message = listDTO.message;
@@ -242,7 +240,7 @@ public class HigherService implements IHigherService {
 			itemDTO.success = true;
 			return itemDTO;
 		} else {
-			_log.writeWarningMessage(Error.ITEM_WASNT_DOWNLOADED_FROM_DB.getMessage(), true, "Item No " + itemId,
+			_log.writeWarningMessage(Error.ITEM_WASNT_DOWNLOADED_FROM_DB.getMessage(), "Item No " + itemId,
 					"Class: HigherService, method: ObjectDTO<ItemDAL> getItem(int itemId).",
 					"crud read message: " + listDTO.message);
 			itemDTO.message = listDTO.message;
@@ -251,19 +249,17 @@ public class HigherService implements IHigherService {
 	}
 
 	@Override
-	public ObjectDTO<Integer> createNewItem(Item item) {
-		return _crud.create(itemToItemDAL(item));
+	public ObjectDTO<Integer> createNewItem(ItemDAL itemDAL) {
+		return _crud.create(itemDAL);
 	}
 
 	@Override
-	public DTO editItem(Item item) {
-		return _crud.update(itemToItemDAL(item));
+	public DTO editItem(ItemDAL itemDAL) {
+		return _crud.update(itemDAL);
 	}
 
 	@Override
-	public DTO deleteItem(int itemId) {
-		ItemDAL itemDAL = new ItemDAL();
-		itemDAL.itemId = itemId;
+	public DTO deleteItem(ItemDAL itemDAL) {
 		return _crud.delete(itemDAL);
 	}
 
@@ -302,51 +298,18 @@ public class HigherService implements IHigherService {
 	}
 
 	@Override
-	public ObjectDTO<Integer> createNewImage(ProfileImage profileImage) {
-		return _crud.create(profileImageToImageDAL(profileImage));
+	public ObjectDTO<Integer> createNewImage(ImageDAL imageDAL) {
+		return _crud.create(imageDAL);
 	}
 
 	@Override
-	public DTO updateImage(ProfileImage profileImage) {
-		return _crud.update(profileImageToImageDAL(profileImage));
+	public DTO updateImage(ImageDAL imageDAL) {
+		return _crud.update(imageDAL);
 	}
 
 	@Override
-	public DTO deleteImage(int imageId) {
-		ImageDAL imageDAL = new ImageDAL();
-		imageDAL.imageId = imageId;
+	public DTO deleteImage(ImageDAL imageDAL) {
 		return _crud.delete(imageDAL);
-	}
-
-	private ItemDAL itemToItemDAL(Item item) {
-		ItemDAL itemDAL = new ItemDAL();
-		if (item != null) {
-			itemDAL.itemId = item.itemId != 0 ? item.itemId : null;
-			itemDAL.itemName = (item.itemName != null && !item.itemName.equals("")) ? item.itemName : null;
-			itemDAL.itemImage = item.itemImage;
-			itemDAL.imageFormat = item.imageFormat.getImageExtension();
-			itemDAL.itemType = item.itemType;
-			itemDAL.description = (item.description != null && !item.description.equals("")) ? item.description : null;
-			itemDAL.minCharacterLevel = item.minCharacterLevel != 0 ? item.minCharacterLevel : null;
-			itemDAL.attackPoints = item.attackPoints != 0 ? item.attackPoints : null;
-			itemDAL.defencePoints = item.defencePoints != 0 ? item.defencePoints : null;
-		}
-		return itemDAL;
-	}
-
-	private ImageDAL profileImageToImageDAL(ProfileImage profileImage) {
-		ImageDAL imageDAL = new ImageDAL();
-		if (profileImage != null) {
-			imageDAL.imageId = profileImage.imageId != 0 ? profileImage.imageId : null;
-			imageDAL.userId = profileImage.userId != 0 ? profileImage.userId : null;
-			imageDAL.image = profileImage.image;
-			imageDAL.imageName = (profileImage.imageName != null ? profileImage.imageName : "")
-					+ (profileImage.imageType != null ? profileImage.imageType.getImageExtension() : "");
-			if (imageDAL.imageName.equals("")) {
-				imageDAL.imageName = null;
-			}
-		}
-		return imageDAL;
 	}
 
 }
