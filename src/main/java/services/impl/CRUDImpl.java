@@ -123,14 +123,12 @@ public class CRUDImpl implements ICRUD {
 							ImageDAL imageDAL = (ImageDAL) returnDAL;
 							imageDAL.image = resultSet.getBytes("Image");
 							returnDAL = (T) imageDAL;
-						} else if (dalClass == ItemDAL.class) {
-							if (!itemDALNonStandartFieldsSetted) {
-								ItemDAL itemDAL = (ItemDAL) returnDAL;
-								itemDAL.itemImage = resultSet.getBytes("ItemImage");
-								itemDAL.itemType = ItemType.getByItemTypeTitle(resultSet.getString("ItemType"));
-								returnDAL = (T) itemDAL;
-								itemDALNonStandartFieldsSetted = true;
-							}
+						} else if (dalClass == ItemDAL.class && !itemDALNonStandartFieldsSetted) {
+							ItemDAL itemDAL = (ItemDAL) returnDAL;
+							itemDAL.itemImage = resultSet.getBytes("ItemImage");
+							itemDAL.itemType = ItemType.getByItemTypeTitle(resultSet.getString("ItemType"));
+							returnDAL = (T) itemDAL;
+							itemDALNonStandartFieldsSetted = true;
 						}
 
 					}
