@@ -10,6 +10,7 @@ import models.constant.DefaultDamagePoints;
 import models.constant.Error;
 import models.constant.ItemType;
 import models.constant.Settings;
+import models.constant.Success;
 import models.constant.TimeMs;
 import models.dal.FightDataDAL;
 import models.dto.ListDTO;
@@ -87,9 +88,6 @@ public class FightEngineImpl implements IFightEngine {
 			}
 		}
 		if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage()))	{				//When Data is nor received from one of the Users.
-			System.out.println("ERROR: " + obj.message);
-			System.out.println("Here current user action data will be written");
-			System.out.println("");
 			ListDTO<FightDataDAL> ret = new ListDTO<FightDataDAL>();
 			ret.success = false;
 			ret.message = obj.message;
@@ -125,7 +123,7 @@ public class FightEngineImpl implements IFightEngine {
 		retList.add(opponentDAL);
 		
 		retSuccessDTO.success = true;
-		retSuccessDTO.message = "success";
+		retSuccessDTO.message = Success.SUCCESS.getMessage();
 		retSuccessDTO.transferDataList = retList;
 		return retSuccessDTO;															//send Info to Servlet.
 	}

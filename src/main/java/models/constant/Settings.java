@@ -37,5 +37,7 @@ public class Settings {
 	 * 	Determines how much time wait for player action in seconds
 	 */
 	public static final long PLAYER_ACTION_WAITING_TIME = 35;
+	
+	public static final int MISSING_PLAYER_USER_ID = -1;
 
 }

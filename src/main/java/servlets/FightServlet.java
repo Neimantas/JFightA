@@ -29,6 +29,7 @@ import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.business.Actions;
 import models.constant.Error;
+import models.constant.Settings;
 import models.constant.UserStatus;
 import models.dal.FightDataDAL;
 import models.dal.ResultDAL;
@@ -66,18 +67,7 @@ public class FightServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-//		response.getWriter().append("Served at: ").append(request.getContextPath());
-//		request.getRequestDispatcher("fight.jsp").forward(request, response);
-		
-//		String playerName = request.getParameter("name");
-//	
-////		playerBName = request.getParameter("nameB");
-//		String fightId = request.getParameter("fightId");
-//		Setting cookie with user Id
-		
 		doPost(request, response);
-		
 	}
 
 	/**
@@ -113,32 +103,11 @@ public class FightServlet extends HttpServlet {
 			if(c.getName().equals("health"))
 				playerAHealthString = c.getValue();
 		} 
-		if(playerAUserIdString == "" || fightIdString == "" || roundString == "" || playerAHealthString == "") {
+		if(playerAUserIdString.equals("") || fightIdString.equals("") || roundString.equals("") || playerAHealthString.equals("")) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
 			
-		String attackHead = request.getParameter("attackHead");
-		String attackBody = request.getParameter("attackBody");
-		String attackArms = request.getParameter("attackArms");
-		String attackLegs = request.getParameter("attackLegs");
-		
-		String defenceHead = request.getParameter("defenceHead");
-		String defenceBody = request.getParameter("defenceBody");
-		String defenceArms = request.getParameter("defenceArms");
-		String defenceLegs = request.getParameter("defenceLegs");
-		
-		Actions action = new Actions();
-		
-		action.attackArms = attackArms == null?0:1;
-		action.attackBody = attackBody == null?0:1;
-		action.attackHead = attackHead == null?0:1;
-		action.attackLegs = attackLegs == null?0:1;
-		
-		action.defenceArms = defenceArms == null?0:1;
-		action.defenceBody = defenceBody == null?0:1;
-		action.defenceHead = defenceHead == null?0:1;
-		action.defenceLegs = defenceLegs == null?0:1;
-		
+		Actions action = getActionFromRequest(request);		
 		int round = Integer.parseInt(roundString);
 		int playerAHealth = Integer.parseInt(playerAHealthString);
 		int fightId = Integer.parseInt(fightIdString);
@@ -149,9 +118,10 @@ public class FightServlet extends HttpServlet {
 		if(!dto.success && dto.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {
 //			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
 			//when DB didn't find opponent data, it means that player closed his browser. Then auto win
-			_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
+//			_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
 			//Other player did't found, so his id will be -1.
-			_hService.writeFightResult(fightId, playerAUserId, -1, false);
+//			_hService.writeFightResult(fightId, playerAUserId, -1, false);
+			endFight(fightId, playerAUserId, Settings.MISSING_PLAYER_USER_ID, true, false);
 			removeCookies(request, response);
 			request.getRequestDispatcher("win.jsp").forward(request, response);
 		} else {
@@ -188,18 +158,21 @@ public class FightServlet extends HttpServlet {
 			
 			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
 				//to separate method
-				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
-				_hService.writeFightResult(fightId, playerAUserId, playerBUserId, true);
+//				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
+//				_hService.writeFightResult(fightId, playerAUserId, playerBUserId, true);
+				endFight(fightId, playerAUserId, playerBUserId, false, true);
 				removeCookies(request, response);
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
 			} else if(playerBHealth<=0) {
-				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
-				_hService.writeFightResult(fightId, playerAUserId, playerBUserId, false);
-				_logger.logFightData(fightId, playerAUserId, playerBUserId);
+//				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
+//				_hService.writeFightResult(fightId, playerAUserId, playerBUserId, false);
+//				_logger.logFightData(fightId, playerAUserId, playerBUserId);
+				endFight(fightId, playerAUserId, playerBUserId, true, false);
 				removeCookies(request, response);
 				request.getRequestDispatcher("win.jsp").forward(request, response);
 			} else if(playerAHealth<=0) {
-				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
+//				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
+				endFight(fightId, playerAUserId, playerBUserId, false, false);
 				removeCookies(request, response);
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
 			} else {
@@ -230,5 +203,31 @@ public class FightServlet extends HttpServlet {
 				response.addCookie(c);
 			}
 		} 
+	}
+	
+	private void endFight(int fightId, int userAId, int userBId, boolean win, boolean draw) {
+		if(win) {
+			_cache.getPlayer(userAId).userStatus = UserStatus.NOT_READY;
+			_hService.writeFightResult(fightId, userAId, userBId, false);
+			_logger.logFightData(fightId, userAId, userBId);
+		} else if(draw) {
+			_cache.getPlayer(userAId).userStatus = UserStatus.NOT_READY;
+			_hService.writeFightResult(fightId, userAId, userBId, true);
+		} else {
+			_cache.getPlayer(userAId).userStatus = UserStatus.NOT_READY;
+		}
+	}
+	
+	private Actions getActionFromRequest(HttpServletRequest request) {
+		Actions action = new Actions();
+		action.attackArms = request.getParameter("attackArms") == null?0:1;
+		action.attackBody = request.getParameter("attackBody") == null?0:1;
+		action.attackHead = request.getParameter("attackHead") == null?0:1;
+		action.attackLegs = request.getParameter("attackLegs") == null?0:1;
+		action.defenceArms = request.getParameter("defenceArms") == null?0:1;
+		action.defenceBody = request.getParameter("defenceBody") == null?0:1;
+		action.defenceHead = request.getParameter("defenceHead") == null?0:1;
+		action.defenceLegs = request.getParameter("defenceLegs") == null?0:1;
+		return action;
 	}
 }
