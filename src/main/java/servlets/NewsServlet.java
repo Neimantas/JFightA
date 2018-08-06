@@ -49,7 +49,7 @@ public class NewsServlet extends HttpServlet {
 			Map<Integer, String> listPlayers = getReadyPlayers();
 			request.setAttribute("readyPlayers", listPlayers);
 			request.setAttribute("userName", player.user.name);
-			buttonsHandler(request, response);
+			buttonsHandler(request, response);												//Maybe these should be in separate service.
 		}
 
 	}
@@ -71,10 +71,10 @@ public class NewsServlet extends HttpServlet {
 
 				playButtonHandler(request, response, player);
 				
-				// On first page load there is no params, so
-				// If there is no params, set player as notReady.
+
 			}
-			
+			// On first page load there is no params, so
+			// If there is no params, set player as notReady.
 			else {
 				player.userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("News.jsp").forward(request, response);
@@ -83,7 +83,7 @@ public class NewsServlet extends HttpServlet {
 
 		
 		else {
-			readyMessageHandler(request, response);
+			readyMessageHandler(request, response);											//Looking to the future, If and else logic should be different.
 		}
 	}
 
@@ -156,7 +156,7 @@ public class NewsServlet extends HttpServlet {
 				return cache.getPlayer(entry.getValue().user.userId);
 			}
 		}
-		return player; // It must be not null, then we get unhandeled error
+		return player; // It must be not null, then we get unhandeled error. f.e. if user after login will delete his cookie - there will be exeption error.
 	}
 
 	// Get all player who status is ready and put them to HashMap.
