@@ -75,21 +75,7 @@ public class LogImpl implements ILog {
 	public String getLog(Date date) {
 		File file = new File(getLogLocationByDate(date));
 		if (file.exists()) {
-
-			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-				String returnString = "";
-				String line;
-				while ((line = bufferedReader.readLine()) != null) {
-					returnString += line + "\n";
-				}
-				if (returnString.equals("")) {
-					return Error.LOG_FILE_IS_EMPTY.getMessage();
-				}
-				return returnString;
-			} catch (IOException e) {
-				return e.toString();
-			}
-
+			return readLog(file);
 		} else {
 			return Error.NO_LOGS_AT_CURRENT_DATE.getMessage();
 		}
@@ -114,6 +100,22 @@ public class LogImpl implements ILog {
 			additionalMessage += additionalMessages[i] + ", ";
 		}
 		return additionalMessage.substring(0, additionalMessage.length() - 2);
+	}
+
+	private String readLog(File file) {
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+			String returnString = "";
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				returnString += line + "\n";
+			}
+			if (returnString.equals("")) {
+				return Error.LOG_FILE_IS_EMPTY.getMessage();
+			}
+			return returnString;
+		} catch (IOException e) {
+			return e.toString();
+		}
 	}
 
 }
