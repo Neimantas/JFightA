@@ -1,22 +1,15 @@
 package servlets;
 
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import configuration.StartupContainer;
-import models.business.User;
 import models.business.UserLoginData;
 import models.dto.DTO;
-import models.dto.PlayerDTO;
-import models.dto.UserDTO;
-import models.dto.UserFrontDTO;
 import services.ILoginService;
-import services.impl.HigherService;
 import services.impl.LoginService;
 
 /**

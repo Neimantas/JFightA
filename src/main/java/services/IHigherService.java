@@ -10,12 +10,10 @@ import models.dal.ImageDAL;
 import models.dal.ItemDAL;
 import models.dal.UserDAL;
 import models.dto.DTO;
-import models.dto.PlayerDalDTO;
-import models.dto.UserLoginDataDTO;
 
 public interface IHigherService {
-	PlayerDalDTO login(UserLoginData user);
-	UserLoginDataDTO registration(UserRegIn userRegIn);
+	ObjectDTO login(UserLoginData user);
+	ObjectDTO<UserLoginData> registration(UserRegIn userRegIn);
 	String hashPassword (String password);
 	boolean passwordCheck(String password, String paswordInDB);
 	Integer getNewFightId();
