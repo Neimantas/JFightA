@@ -119,15 +119,10 @@
 				<div class="row mb-0">
 					<div class="col">
 						<div class="form-group mb-1">
-							<select class="form-control" size="10"
-								id="exampleFormControlSelect2">
-								<option>Player 1</option>
-								<option>Player 2</option>
-								<option>Player 3</option>
-								<option>Player 4</option>
-								<option>Player 5</option>
-								<option>Player 6</option>
-								<option>Player 7</option>
+							<select class="form-control" size="10" id="onlinePlayers">
+								<c:forEach items="${onlinePlayers}" var="players">
+									<option value="${players.key}">${players.value}</option>
+								</c:forEach>
 							</select>
 						</div>
 					</div>
@@ -157,13 +152,12 @@
 				</div>
 				<div class="row">
 					<div class="col pr-3">
-						<button class="btn btn-dark btn-sm float-right ml-1 mb-1" id="play"
-							onclick="play()">Play</button>
-						<button class="btn btn-dark btn-sm float-right ml-1 mb-1" id="refresh"
-							onclick="clicker(this.id)">Refresh</button>
-						<button class="btn btn-danger btn-sm float-right" id="ready"
+						<button class="btn btn-dark btn-sm float-right ml-1 mb-1"
+							id="play" onclick="play()">Play</button>
+						<button class="btn btn-dark btn-sm float-right ml-1 mb-1"
+							id="refresh" onclick="clicker(this.id)">Refresh</button>
+						<button class="btn btn-sm float-right" id="ready"
 							onclick="rdyBtn(this.innerText)">${Ready}</button>
-						<%-- <div class="row justify-content-center" id="message">${ReadyMessage}</div> --%>
 					</div>
 				</div>
 			</div>
