@@ -69,13 +69,7 @@ public class ImageImpl implements IImage {
 				updateUserInCache(userUpdateDTO.transferData);
 				return createImageDTO;
 			} else {
-				ImageDAL imageDAL = new ImageDAL();
-				imageDAL.imageId = createImageDTO.transferData;
-				DTO deleteDTO = _higherService.deleteImage(imageDAL);
-				if (!deleteDTO.success) {
-					_log.writeWarningMessage(deleteDTO.message, "ImageId: " + createImageDTO.transferData + ".",
-							"Class: ImageImpl, method: addImage(ProfileImage profileImage).");
-				}
+				deleteCreatedImage(createImageDTO.transferData);
 
 				ObjectDTO<Integer> unsuccessfulImageDTO = new ObjectDTO<>();
 				unsuccessfulImageDTO.message = userUpdateDTO.message;
@@ -201,6 +195,16 @@ public class ImageImpl implements IImage {
 			player.user.imageId = userDAL.imageId;
 		}
 	}
+	
+	public void deleteCreatedImage(int imageId) {
+		ImageDAL imageDAL = new ImageDAL();
+		imageDAL.imageId = imageId;
+		DTO deleteDTO = _higherService.deleteImage(imageDAL);
+		if (!deleteDTO.success) {
+			_log.writeWarningMessage(deleteDTO.message, "ImageId: " + imageId + ".",
+					"Class: ImageImpl, method: addImage(ProfileImage profileImage).");
+		}
+	}
 
 	private ObjectDTO<Integer> getImageId(int userId) {
 		ObjectDTO<Integer> imageIdDTO = new ObjectDTO<>();
@@ -279,7 +283,7 @@ public class ImageImpl implements IImage {
 	}
 
 	private DTO createInputParameterErrorDTO(Error error, String methodName) {
-		DTO errorDTO = new ObjectDTO<>();
+		DTO errorDTO = new DTO();
 		errorDTO.message = error.getMessage();
 		_log.writeWarningMessage(error.getMessage(), "Class: ImageImpl, Method: " + methodName + "(input parameters)");
 		return errorDTO;

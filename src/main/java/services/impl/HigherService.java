@@ -17,8 +17,6 @@ import models.dal.UserDAL;
 import models.dto.DTO;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
-import models.dto.PlayerDalDTO;
-import models.dto.UserLoginDataDTO;
 import services.ICRUD;
 import services.IHigherService;
 import services.ILog;
@@ -34,17 +32,14 @@ public class HigherService implements IHigherService {
 	}
 
 	@Override
-	public PlayerDalDTO login(UserLoginData userIn) {
+	public ObjectDTO login(UserLoginData userIn) {
 		UserDAL userInDal = new UserDAL();
 		userInDal.name = userIn.name;
 		// userInDal.password = userIn.password;
-
 		ListDTO<UserDAL> userDTO = _crud.read(userInDal);
-
 		// Takes UserDal
 		if (userDTO.success && !userDTO.transferDataList.isEmpty()) {
 			UserDAL userDal = userDTO.transferDataList.get(0);
-
 			if (passwordCheck(userIn.password, userDal.password)) {
 				// Makes charDal and fills just userID field, it need to get chat form CRUD
 				CharacterDAL takeCharacterData = new CharacterDAL();
@@ -57,17 +52,16 @@ public class HigherService implements IHigherService {
 					PlayerDAL player = new PlayerDAL();
 					player.characterDal = charDal;
 					player.userDal = userDal;
-					return new PlayerDalDTO(true, "success", player);
+					return new ObjectDTO(true, "success", player);
 				}
-				return new PlayerDalDTO(false, charDTO.message, null);
+				return new ObjectDTO(false, charDTO.message, null);
 			}
-			;
 		}
-		return new PlayerDalDTO(false, userDTO.message, null);
+		return new ObjectDTO(false, userDTO.message, null);
 	}
 
 	@Override
-	public UserLoginDataDTO registration(UserRegIn userRegIn) {
+	public ObjectDTO<UserLoginData> registration(UserRegIn userRegIn) {
 		// Fills new user info
 		UserDAL userInDal = new UserDAL();
 		userInDal.name = userRegIn.name;
@@ -97,11 +91,11 @@ public class HigherService implements IHigherService {
 				UserLoginData user = new UserLoginData();
 				user.name = userInDal.name;
 				user.password = userInDal.password;
-				return new UserLoginDataDTO(true, "success", user);
+				return new ObjectDTO<UserLoginData>(true, "success", user);
 			}
-			return new UserLoginDataDTO(false, characterCreat.message, null);
+			return new ObjectDTO<UserLoginData>(false, characterCreat.message, null);
 		}
-		return new UserLoginDataDTO(false, newUserDto.message, null);
+		return new ObjectDTO<UserLoginData>(false, newUserDto.message, null);
 	}
 
 	@Override
@@ -114,7 +108,6 @@ public class HigherService implements IHigherService {
 			_log.writeErrorMessage(e);
 		}
 		return passwordHased;
-
 	}
 
 	@Override
@@ -140,22 +133,17 @@ public class HigherService implements IHigherService {
 
 	@Override
 	public ListDTO<FightDataDAL> getFightDataDAL(int fightId) {
-
 		FightDataDAL dalF = new FightDataDAL();
-
 		dalF.fightId = fightId;
 		ListDTO<FightDataDAL> dtoF = _crud.<FightDataDAL>read(dalF);
-
 		return dtoF;
 	}
 
 	@Override
 	public ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB) {
 		LogDAL dalL = new LogDAL();
-
 		dalL.user1Id = userIdA;
 		dalL.user2Id = userIdB;
-
 		ListDTO<LogDAL> dtoLog = _crud.<LogDAL>read(dalL);
 		return dtoLog;
 	}
@@ -188,7 +176,6 @@ public class HigherService implements IHigherService {
 			userDTO.message = listDTO.message;
 			userDTO.success = true;
 			return userDTO;
-
 		} else {
 			_log.writeWarningMessage(Error.USER_WASNT_DOWNLOADED_FROM_DB.getMessage(), "User No " + userId,
 					"Class: HigherService, method: ObjectDTO<UserDAL> getUser(int userId).",
@@ -201,12 +188,10 @@ public class HigherService implements IHigherService {
 	@Override
 	public ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json) {
 		LogDAL dalL = new LogDAL();
-
 		dalL.fightId = fightId;
 		dalL.user1Id = userIdA;
 		dalL.user2Id = userIdB;
 		dalL.log = json;
-
 		ObjectDTO<Integer> dtoCreate = _crud.<LogDAL>create(dalL);
 		return dtoCreate;
 	}

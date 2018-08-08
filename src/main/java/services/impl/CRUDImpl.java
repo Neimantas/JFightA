@@ -118,22 +118,18 @@ public class CRUDImpl implements ICRUD {
 					Class<?> dalField = dalClassFields[j].getType();
 					if (dalField != byte[].class && dalField != ItemType.class) {
 						dalClassFields[j].set(returnDAL, (dalField.cast(resultSet.getObject(j + 1))));
-					} else {
-						if (dalClass == ImageDAL.class) {
-							ImageDAL imageDAL = (ImageDAL) returnDAL;
-							imageDAL.image = resultSet.getBytes("Image");
-							returnDAL = (T) imageDAL;
-						} else if (dalClass == ItemDAL.class) {
-							if (!itemDALNonStandartFieldsSetted) {
-								ItemDAL itemDAL = (ItemDAL) returnDAL;
-								itemDAL.itemImage = resultSet.getBytes("ItemImage");
-								itemDAL.itemType = ItemType.getByItemTypeTitle(resultSet.getString("ItemType"));
-								returnDAL = (T) itemDAL;
-								itemDALNonStandartFieldsSetted = true;
-							}
-						}
-
+					} else if (dalClass == ImageDAL.class) {
+						ImageDAL imageDAL = (ImageDAL) returnDAL;
+						imageDAL.image = resultSet.getBytes("Image");
+						returnDAL = (T) imageDAL;
+					} else if (dalClass == ItemDAL.class && !itemDALNonStandartFieldsSetted) {
+						ItemDAL itemDAL = (ItemDAL) returnDAL;
+						itemDAL.itemImage = resultSet.getBytes("ItemImage");
+						itemDAL.itemType = ItemType.getByItemTypeTitle(resultSet.getString("ItemType"));
+						returnDAL = (T) itemDAL;
+						itemDALNonStandartFieldsSetted = true;
 					}
+
 				}
 				dalList.add(returnDAL);
 			}
@@ -263,7 +259,6 @@ public class CRUDImpl implements ICRUD {
 
 		columnValues = columnValues.substring(0, columnValues.length() - 2);
 		String createQuery = "INSERT INTO " + tableName + " VALUES (" + columnValues + ");";
-		System.out.println("\n" + createQuery);
 		return createQuery;
 	}
 
@@ -306,7 +301,6 @@ public class CRUDImpl implements ICRUD {
 		whereCondition += ";";
 
 		readQuery = "SELECT * FROM " + tableName + whereCondition;
-		System.out.println("\n" + readQuery);
 		return readQuery;
 	}
 
@@ -333,7 +327,6 @@ public class CRUDImpl implements ICRUD {
 				}
 			}
 		}
-		System.out.println("\n" + readQuery);
 		return readQuery;
 	}
 
@@ -347,7 +340,6 @@ public class CRUDImpl implements ICRUD {
 		String user2Id = dalClassFields[3].get(dal).toString();
 		String readQuery = "SELECT * FROM `log` WHERE (User1Id = " + user1Id + " AND User2Id = " + user2Id
 				+ ") OR (User1Id = " + user2Id + " AND User2Id = " + user1Id + ");";
-		System.out.println("\n" + readQuery);
 		return readQuery;
 	}
 
@@ -372,7 +364,6 @@ public class CRUDImpl implements ICRUD {
 		columnValues = columnValues.substring(0, columnValues.length() - 2);
 		String whereCondition = " WHERE " + dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String updateQuery = "UPDATE " + tableName + " SET " + columnValues + whereCondition;
-		System.out.println("\n" + updateQuery);
 		return updateQuery;
 	}
 
@@ -381,7 +372,6 @@ public class CRUDImpl implements ICRUD {
 		String tableName = "`" + dalClass.getSimpleName().replace("DAL", "") + "`";
 		String columnValue = dalClassFields[0].getName() + " = " + dalClassFields[0].get(dal) + ";";
 		String deleteQuery = "DELETE FROM " + tableName + " WHERE " + columnValue;
-		System.out.println("\n" + deleteQuery);
 		return deleteQuery;
 	}
 

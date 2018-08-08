@@ -6,12 +6,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import configuration.StartupContainer;
 import models.business.UserLoginData;
 import models.business.UserRegIn;
 import models.dto.DTO;
-import models.dto.UserLoginDataDTO;
+import models.dto.ObjectDTO;
 import services.ILoginService;
 import services.impl.LoginService;
 
@@ -47,12 +46,10 @@ public class RegistrationServlet extends HttpServlet {
 		userRegInfo.name= request.getParameter("username");
 		userRegInfo.password= request.getParameter("pass");
 		userRegInfo.mail=request.getParameter("mail");
-		UserLoginDataDTO dto=_logService.registration(userRegInfo);
-		System.out.println(">>>>>>>>>>>>>>"+dto.userloginData.name);
-		System.out.println(">>>>>>>>>>>>>>"+dto.userloginData.password);
+		ObjectDTO<UserLoginData> dto=_logService.registration(userRegInfo);
 		if(dto.success) {
 			UserLoginData userLogin=new UserLoginData();
-			userLogin.name=dto.userloginData.name;
+			userLogin.name=dto.transferData.name;
 			userLogin.password=userRegInfo.password;
 			DTO playerDTO=_logService.login(response,userLogin);
 			if (playerDTO.success) {
