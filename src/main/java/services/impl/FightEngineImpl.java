@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import models.business.Actions;
+import models.business.FightData;
 import models.business.Item;
 import models.constant.DefaultDamagePoints;
 import models.constant.Error;
@@ -61,12 +62,12 @@ public class FightEngineImpl implements IFightEngine {
 	}
 
 	@Override
-	public ListDTO<FightDataDAL> engine(int fightId, int roundId, int health, int userID, Actions yourAction) {
+	public ListDTO<FightDataDAL> engine(FightData fightData, Actions yourAction) {
 		FightDataDAL insertDAL = new FightDataDAL();									//Fill Users darta to FightData DB.
-		insertDAL.fightId = fightId;
-		insertDAL.round = roundId;
-		insertDAL.userId = userID;
-		insertDAL.healthPoints = health;
+		insertDAL.fightId = fightData.fightId;
+		insertDAL.round = fightData.round;
+		insertDAL.userId = fightData.playerAUserId;
+		insertDAL.healthPoints = fightData.playerAHealth;
 		insertDAL.attackHead = yourAction.attackHead;
 		insertDAL.attackBody = yourAction.attackBody;
 		insertDAL.attackArms = yourAction.attackArms;
@@ -79,10 +80,10 @@ public class FightEngineImpl implements IFightEngine {
 		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
 		
 		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * TimeMs.SECOND.getMilliseconds();
-		ObjectDTO<FightDataDAL> obj = getOpponentData(fightId, roundId, userID);
+		ObjectDTO<FightDataDAL> obj = getOpponentData(fightData.fightId, fightData.round, fightData.playerAUserId);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
 			if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {			//needs upgrade, if data not received - autoWin for waiting user.
-				obj = getOpponentData(fightId, roundId, userID);
+				obj = getOpponentData(fightData.fightId, fightData.round, fightData.playerAUserId);
 			} else {
 				break;
 			}
@@ -105,14 +106,14 @@ public class FightEngineImpl implements IFightEngine {
 		opponentActions.defenceArms = opponentDAL.defenceArms == null?0:opponentDAL.defenceArms;
 		opponentActions.defenceLegs = opponentDAL.defenceLegs == null?0:opponentDAL.defenceLegs;
 		
-		int[] damages = calculateDamage(yourAction, opponentActions, userID, opponentDAL.userId); //CalculateDamage :)
+		int[] damages = calculateDamage(yourAction, opponentActions, fightData.playerAUserId, opponentDAL.userId); //CalculateDamage :)
 		
-		int yourHealth = health - damages[1];											//sending these to Servlet
+		int yourHealth = fightData.playerAHealth - damages[1];											//sending these to Servlet
 		int opponentHealth = opponentDAL.healthPoints - damages[0];
 		FightDataDAL yourDAL = new FightDataDAL();										//to send DAL to Servlet
-		yourDAL.fightId = fightId;
-		yourDAL.round = roundId;
-		yourDAL.userId = userID;
+		yourDAL.fightId = fightData.fightId;
+		yourDAL.round = fightData.round;
+		yourDAL.userId = fightData.playerAUserId;
 		yourDAL.healthPoints = yourHealth;
 		//update opponentHealthPoints
 		opponentDAL.healthPoints = opponentHealth;										//to show oponents health.

@@ -28,6 +28,7 @@ import services.impl.LoginService;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import models.business.Actions;
+import models.business.FightData;
 import models.constant.Error;
 import models.constant.Settings;
 import models.constant.UserStatus;
@@ -40,23 +41,14 @@ import models.dal.ResultDAL;
 @WebServlet(urlPatterns = "/fight")
 public class FightServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    
 	private IHigherService _hService; //should test if it work with multiple users
 	private ILogger _logger;
 	private ICache _cache;
 	private ILoginService _logService;
-//	private String _playerAName;
-//	private String _playerBName;
-//	private String _fightId;
-//	private IFightEngine _engine;
-//	private int _round = 0;
-//	private int _health = 100; //hardcoded, let's make it not hardcoded :)
     /**
      * @see HttpServlet#HttpServlet()
      */
     public FightServlet() {
-//    	_engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
-//        _engine = new FightEngineImpl();
     	_hService = StartupContainer.easyDI.getInstance(HigherService.class);
     	_logger =  StartupContainer.easyDI.getInstance(LoggerImpl.class);
     	_cache = CacheImpl.getInstance();
@@ -74,105 +66,49 @@ public class FightServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-//		doGet(request, response);
 		
 		if(!_logService.userValidator(request, response)) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
-		
 		IFightEngine _engine = StartupContainer.easyDI.getInstance(FightEngineImpl.class);
-		String playerAUserIdString = "";
-		String fightIdString = "";
-		String roundString = "";
-		String playerAHealthString = "";
-//		ICache cache = CacheImpl.getInstance();
-		//need to add validation method
+		FightData fightData = new FightData();
 		Cookie[] cookies = request.getCookies();
 		if (cookies == null) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
 		}
-		
-		for(Cookie c : cookies) {
-			if (c.getName().equals("userId"))
-				playerAUserIdString = c.getValue();
-			if (c.getName().equals("fightId"))
-				fightIdString = c.getValue();
-			if(c.getName().equals("round"))
-				roundString = c.getValue();
-			if(c.getName().equals("health"))
-				playerAHealthString = c.getValue();
-		} 
-		if(playerAUserIdString.equals("") || fightIdString.equals("") || roundString.equals("") || playerAHealthString.equals("")) {
+		setFightData(fightData, request);
+		if(!fightData.isDataSet()) {
 			request.getRequestDispatcher("index.jsp").forward(request, response);
+			return;
 		}
-			
-		Actions action = getActionFromRequest(request);		
-		int round = Integer.parseInt(roundString);
-		int playerAHealth = Integer.parseInt(playerAHealthString);
-		int fightId = Integer.parseInt(fightIdString);
-		int playerAUserId = Integer.parseInt(playerAUserIdString);
 		
-		ListDTO<FightDataDAL> dto = _engine.engine(fightId, round, playerAHealth, playerAUserId, action); //Sending info to fight engine.
+		Actions action = getActionFromRequest(request);		
+		ListDTO<FightDataDAL> dto = _engine.engine(fightData, action); //Sending info to fight engine.
 		
 		if(!dto.success && dto.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {
-//			response.getWriter().append("Error occurred. " + dto.message); //Print error to page.
 			//when DB didn't find opponent data, it means that player closed his browser. Then auto win
-//			_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
 			//Other player did't found, so his id will be -1.
-//			_hService.writeFightResult(fightId, playerAUserId, -1, false);
-			endFight(fightId, playerAUserId, Settings.MISSING_PLAYER_USER_ID, true, false);
+			endFight(fightData.fightId, fightData.playerAUserId, Settings.MISSING_PLAYER_USER_ID, true, false);
 			removeCookies(request, response);
 			request.getRequestDispatcher("win.jsp").forward(request, response);
 		} else {
-			//first sent round param 0, then get heatl results from figth table
-			//engine - returns healhtA and healthB
-			//
-			round++; //after success increment round counter
+			
 			List<FightDataDAL> dals = dto.transferDataList; //index:0-you, index:1-opponent
-			playerAHealth = dals.get(0).healthPoints;
-			int playerBUserId = dals.get(1).userId;
-			int playerBHealth = dals.get(1).healthPoints;
-			String playerAName = _cache.getPlayer(playerAUserId).user.name;
-			String playerBName = _cache.getPlayer(playerBUserId).user.name;
+			setDataToFront(fightData, dals, request);
+			fightData.round++; //increase round;
+			response.addCookie(new Cookie("round", Integer.toString(fightData.round))); //add round cookie
+			response.addCookie(new Cookie("health", Integer.toString(fightData.playerAHealth))); //add health cookie
 			
-			int attackItemAId = _cache.getPlayer(playerAUserId).characterInfo.attackItemId;
-			int defenceItemAId = _cache.getPlayer(playerAUserId).characterInfo.defenceItemId;
-			int attackItemBId = _cache.getPlayer(playerBUserId).characterInfo.attackItemId;
-			int defenceItemBId = _cache.getPlayer(playerBUserId).characterInfo.defenceItemId;
-			
-			request.setAttribute("playerAName", playerAName);								//Sending refreshed info to page.
-			request.setAttribute("playerBName", playerBName);
-			request.setAttribute("healthA", playerAHealth);
-			request.setAttribute("healthB", playerBHealth);
-			//avatar id
-			request.setAttribute("idA", playerAUserId);													
-			request.setAttribute("idB", playerBUserId);
-			request.setAttribute("attackItemA", attackItemAId);
-			request.setAttribute("defenceItemA", defenceItemAId);
-			request.setAttribute("attackItemB", attackItemBId);
-			request.setAttribute("defenceItemB", defenceItemBId);
-			
-			response.addCookie(new Cookie("round", Integer.toString(round))); //add round cookie
-			response.addCookie(new Cookie("health", Integer.toString(playerAHealth))); //add health cookie
-			
-			if(playerBHealth<=0 && playerAHealth <= 0) {									//check if fight is lost/win/draw, and react acordingly.
-				//to separate method
-//				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
-//				_hService.writeFightResult(fightId, playerAUserId, playerBUserId, true);
-				endFight(fightId, playerAUserId, playerBUserId, false, true);
+			if(fightData.playerBHealth<=0 && fightData.playerAHealth<=0) {									//check if fight is lost/win/draw, and react acordingly.
+				endFight(fightData.fightId, fightData.playerAUserId, fightData.playerBUserId, false, true);
 				removeCookies(request, response);
 				request.getRequestDispatcher("draw.jsp").forward(request, response);
-			} else if(playerBHealth<=0) {
-//				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
-//				_hService.writeFightResult(fightId, playerAUserId, playerBUserId, false);
-//				_logger.logFightData(fightId, playerAUserId, playerBUserId);
-				endFight(fightId, playerAUserId, playerBUserId, true, false);
+			} else if(fightData.playerBHealth<=0) {
+				endFight(fightData.fightId, fightData.playerAUserId, fightData.playerBUserId, true, false);
 				removeCookies(request, response);
 				request.getRequestDispatcher("win.jsp").forward(request, response);
-			} else if(playerAHealth<=0) {
-//				_cache.getPlayer(playerAUserId).userStatus = UserStatus.NOT_READY;
-				endFight(fightId, playerAUserId, playerBUserId, false, false);
+			} else if(fightData.playerAHealth<=0) {
+				endFight(fightData.fightId, fightData.playerAUserId, fightData.playerBUserId, false, false);
 				removeCookies(request, response);
 				request.getRequestDispatcher("lost.jsp").forward(request, response);
 			} else {
@@ -229,5 +165,39 @@ public class FightServlet extends HttpServlet {
 		action.defenceHead = request.getParameter("defenceHead") == null?0:1;
 		action.defenceLegs = request.getParameter("defenceLegs") == null?0:1;
 		return action;
+	}
+	
+	private void setFightData(FightData data, HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		for(Cookie c : cookies) {
+			if (c.getName().equals("userId"))
+				data.setPlayerAUserIdString(c.getValue());
+			if (c.getName().equals("fightId"))
+				data.setFightIdString(c.getValue());
+			if(c.getName().equals("round"))
+				data.setRoundString(c.getValue());
+			if(c.getName().equals("health"))
+				data.setPlayerAHealthString(c.getValue());
+		} 
+	}
+	
+	private void setDataToFront(FightData fightData, List<FightDataDAL> dals, HttpServletRequest request) {
+		int playerAUserId = fightData.playerAUserId;
+		int playerBUserId = dals.get(1).userId;
+		fightData.playerBUserId = dals.get(1).userId; //setting opponent userId
+		fightData.playerAHealth = dals.get(0).healthPoints;
+		fightData.playerBHealth = dals.get(1).healthPoints;
+		
+		request.setAttribute("playerAName", _cache.getPlayer(playerAUserId).user.name);								//Sending refreshed info to page.
+		request.setAttribute("playerBName", _cache.getPlayer(playerBUserId).user.name);
+		request.setAttribute("healthA", fightData.playerAHealth);
+		request.setAttribute("healthB", fightData.playerBHealth);
+		//avatar id
+		request.setAttribute("idA", playerAUserId);													
+		request.setAttribute("idB", playerBUserId);
+		request.setAttribute("attackItemA", _cache.getPlayer(playerAUserId).characterInfo.attackItemId);
+		request.setAttribute("defenceItemA", _cache.getPlayer(playerAUserId).characterInfo.defenceItemId);
+		request.setAttribute("attackItemB", _cache.getPlayer(playerBUserId).characterInfo.attackItemId);
+		request.setAttribute("defenceItemB", _cache.getPlayer(playerBUserId).characterInfo.defenceItemId);
 	}
 }
