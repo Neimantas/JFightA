@@ -62,8 +62,6 @@ public class LoggerImpl implements ILogger {
 		retFailure.success = false;
 		retFailure.message = dtoLog.message;
 
-		System.out.println("Failure");
-
 		return retFailure;
 	}
 

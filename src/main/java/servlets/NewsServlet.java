@@ -29,13 +29,13 @@ public class NewsServlet extends HttpServlet {
 	public NewsServlet() {
 		super();
 		_logService = StartupContainer.easyDI.getInstance(LoginService.class);
-		_hService=StartupContainer.easyDI.getInstance(HigherService.class);
+		_hService = StartupContainer.easyDI.getInstance(HigherService.class);
 
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		userValidation(request, response);
 		Player player = getThisPlayer(request);
 		// If current player status is playing - redirect him to fight.jsp. News.jsp
@@ -46,7 +46,9 @@ public class NewsServlet extends HttpServlet {
 
 		// If player Is not playing and not moved to Fight, execute other stuff.
 		else {
+			Map<Integer, String> onlinePlayers = getOnlinePlayers();
 			Map<Integer, String> listPlayers = getReadyPlayers();
+			request.setAttribute("onlinePlayers", onlinePlayers);
 			request.setAttribute("readyPlayers", listPlayers);
 			request.setAttribute("userName", player.user.name);
 			buttonsHandler(request, response);
@@ -70,18 +72,17 @@ public class NewsServlet extends HttpServlet {
 					&& player.user.userId != Integer.parseInt(request.getParameter("selectedPlayer"))) {
 
 				playButtonHandler(request, response, player);
-				
+
 				// On first page load there is no params, so
 				// If there is no params, set player as notReady.
 			}
-			
+
 			else {
 				player.userStatus = UserStatus.NOT_READY;
 				request.getRequestDispatcher("News.jsp").forward(request, response);
 			}
 		}
 
-		
 		else {
 			readyMessageHandler(request, response);
 		}
@@ -93,20 +94,18 @@ public class NewsServlet extends HttpServlet {
 		response.sendRedirect(url);
 	}
 
-	private void playButtonHandler(HttpServletRequest request, HttpServletResponse response,
-			Player player) throws IOException {
+	private void playButtonHandler(HttpServletRequest request, HttpServletResponse response, Player player)
+			throws IOException {
 		ICache cache = CacheImpl.getInstance();
 		// After Play button is pressed, set remote player from list status as playing.
-		cache.getPlayer(
-				Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
+		cache.getPlayer(Integer.parseInt(request.getParameter("selectedPlayer"))).userStatus = UserStatus.PLAYING;
 		// set current player as playing.
 		player.userStatus = UserStatus.PLAYING;
 
 		// Get unused fightID
 		Integer lastFightID = _hService.getNewFightId();
 		// Set in what FightID should remote player be transfered.
-		cache.getPlayer(
-				Integer.parseInt(request.getParameter("selectedPlayer"))).currentFightID = lastFightID;
+		cache.getPlayer(Integer.parseInt(request.getParameter("selectedPlayer"))).currentFightID = lastFightID;
 		// Set and Redirect current player to Fight.jsp with FightID.
 		String url = "/JFight/setter?name=" + player.user.userId + "&fightId=" + lastFightID;
 		response.sendRedirect(url);
@@ -116,18 +115,15 @@ public class NewsServlet extends HttpServlet {
 			throws ServletException, IOException {
 		Player player = getThisPlayer(request);
 		// Checking Player status and writing message and button text accordingly.
-		Boolean ready = request.getParameter("ready") == null ? false
-				: Boolean.valueOf(request.getParameter("ready"));
+		Boolean ready = request.getParameter("ready") == null ? false : Boolean.valueOf(request.getParameter("ready"));
 
 		if (ready == false) {
-			request.setAttribute("ReadyMessage", "YOU ARE NOT READY");
 			player.userStatus = UserStatus.NOT_READY;
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 
 			// Skip this step if player is set to play, in this case player can't set no
 			// ready and will be redirected to fight engine.
 		} else if (ready == true && player.userStatus != UserStatus.PLAYING) {
-			request.setAttribute("ReadyMessage", "YOU ARE READY");
 			player.userStatus = UserStatus.READY;
 			request.getRequestDispatcher("News.jsp").forward(request, response);
 		}
@@ -173,6 +169,18 @@ public class NewsServlet extends HttpServlet {
 			}
 		}
 		return listPlayers;
+	}
+
+	private Map<Integer, String> getOnlinePlayers() {
+		ICache cache = CacheImpl.getInstance();
+		Map<Integer, Player> players = cache.getPlayers();
+		Map<Integer, String> onlinePlayers = new HashMap<>();
+
+		for (Entry<Integer, Player> entry : players.entrySet()) {
+			onlinePlayers.put(entry.getValue().user.userId, entry.getValue().user.name);
+		}
+
+		return onlinePlayers;
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
