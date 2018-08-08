@@ -63,22 +63,8 @@ public class FightEngineImpl implements IFightEngine {
 
 	@Override
 	public ListDTO<FightDataDAL> engine(FightData fightData, Actions yourAction) {
-		FightDataDAL insertDAL = new FightDataDAL();									//Fill Users darta to FightData DB.
-		insertDAL.fightId = fightData.fightId;
-		insertDAL.round = fightData.round;
-		insertDAL.userId = fightData.playerAUserId;
-		insertDAL.healthPoints = fightData.playerAHealth;
-		insertDAL.attackHead = yourAction.attackHead;
-		insertDAL.attackBody = yourAction.attackBody;
-		insertDAL.attackArms = yourAction.attackArms;
-		insertDAL.attackLegs = yourAction.attackLegs;
-		insertDAL.defenceHead = yourAction.defenceHead;
-		insertDAL.defenceBody = yourAction.defenceBody;
-		insertDAL.defenceArms = yourAction.defenceArms;
-		insertDAL.defenceLegs = yourAction.defenceLegs;
-		
-		_crud.<FightDataDAL>create(insertDAL);											//Insert Data to FightData. Need to make check if Successfull
-		
+		//Insert Data to FightData. Need to make check if Successfull
+		insertData(fightData, yourAction);
 		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * TimeMs.SECOND.getMilliseconds();
 		ObjectDTO<FightDataDAL> obj = getOpponentData(fightData.fightId, fightData.round, fightData.playerAUserId);
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
@@ -180,6 +166,24 @@ public class FightEngineImpl implements IFightEngine {
 		} else {
 			return itemAttackPoints - itemDefencePoints;
 		}
+	}
+	
+	private void insertData(FightData fightData, Actions yourAction) {
+		FightDataDAL insertDAL = new FightDataDAL();									//Fill Users darta to FightData DB.
+		insertDAL.fightId = fightData.fightId;
+		insertDAL.round = fightData.round;
+		insertDAL.userId = fightData.playerAUserId;
+		insertDAL.healthPoints = fightData.playerAHealth;
+		insertDAL.attackHead = yourAction.attackHead;
+		insertDAL.attackBody = yourAction.attackBody;
+		insertDAL.attackArms = yourAction.attackArms;
+		insertDAL.attackLegs = yourAction.attackLegs;
+		insertDAL.defenceHead = yourAction.defenceHead;
+		insertDAL.defenceBody = yourAction.defenceBody;
+		insertDAL.defenceArms = yourAction.defenceArms;
+		insertDAL.defenceLegs = yourAction.defenceLegs;
+		
+		_crud.<FightDataDAL>create(insertDAL);	
 	}
 	
 }
