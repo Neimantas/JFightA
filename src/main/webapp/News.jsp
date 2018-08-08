@@ -31,7 +31,7 @@
 <link rel="stylesheet" type="text/css" href="resources/css/news.css">
 
 <!--===============================================================================================-->
-<title>News</title>
+<title>News - JFight</title>
 </head>
 <body>
 
