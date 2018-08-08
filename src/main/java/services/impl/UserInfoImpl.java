@@ -6,6 +6,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import models.business.Player;
+import models.constant.UserStatus;
 import models.dto.ObjectDTO;
 import services.ICache;
 import services.IUserInfo;
@@ -21,7 +22,7 @@ public class UserInfoImpl implements IUserInfo {
 	@Override
 	public ObjectDTO<Player> getUserInfo(int userId) {
 		Player player = _cache.getPlayer(userId);
-		//Get other logged in user's information from cache
+		// Get other logged in user's information from cache
 		if (player != null) {
 			ObjectDTO<Player> retSuccess = new ObjectDTO<Player>();
 			retSuccess.success = true;
@@ -38,7 +39,7 @@ public class UserInfoImpl implements IUserInfo {
 	public ObjectDTO<Player> getLoggedUserInfo(HttpServletRequest request) {
 		ObjectDTO<Player> ret = new ObjectDTO<Player>();
 
-		//Get current logged in user's cookie value
+		// Get current logged in user's cookie value
 		Cookie[] cookies = request.getCookies();
 		String cookieValue = "";
 		for (int i = 0; i < cookies.length; i++) {
@@ -46,7 +47,7 @@ public class UserInfoImpl implements IUserInfo {
 				cookieValue = cookies[i].getValue();
 			}
 		}
-		//Get current logged in user's information from cache using cookie value
+		// Get current logged in user's information from cache using cookie value
 		for (Entry<Integer, Player> entry : _cache.getPlayers().entrySet()) {
 			if (entry.getValue().user.cookiesValue.equals(cookieValue)) {
 				Player player = _cache.getPlayer(entry.getValue().user.userId);
@@ -62,4 +63,7 @@ public class UserInfoImpl implements IUserInfo {
 		return ret;
 	}
 
+	public void setNotReady(int userId) {
+		_cache.getPlayer(userId).userStatus = UserStatus.NOT_READY;
+	}
 }

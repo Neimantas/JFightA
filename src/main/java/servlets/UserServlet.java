@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import configuration.StartupContainer;
 import models.business.Player;
+import models.constant.UserStatus;
 import models.dto.ListDTO;
 import models.dto.ObjectDTO;
 import services.ILogger;
@@ -42,6 +43,8 @@ public class UserServlet extends HttpServlet {
 		userValidator(request, response);
 
 		_player = showLoggedUsersInfo(request, _player, userId);
+
+		_userInfo.setNotReady(_player.user.userId);
 
 		showOtherUsersInfoAndLog(request, _player, userId);
 
