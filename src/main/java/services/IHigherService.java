@@ -32,4 +32,5 @@ public interface IHigherService {
 	ObjectDTO<Integer> createNewImage(ImageDAL imageDAL);
 	DTO updateImage(ImageDAL imageDAL);
 	DTO deleteImage(ImageDAL imageDAL);
+	DTO deleteFightData(int fightId);
 }

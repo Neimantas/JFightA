@@ -296,5 +296,12 @@ public class HigherService implements IHigherService {
 	public DTO deleteImage(ImageDAL imageDAL) {
 		return _crud.delete(imageDAL);
 	}
+	
+	public DTO deleteFightData(int fightId) {
+		FightDataDAL fightDAL = new FightDataDAL();
+		fightDAL.fightId = fightId;
+		
+		return _crud.delete(fightDAL);
+	}
 
 }
