@@ -65,8 +65,11 @@ public class FightEngineImpl implements IFightEngine {
 	public ListDTO<FightDataDAL> engine(FightData fightData, Actions yourAction) {
 		//Insert Data to FightData. Need to make check if Successfull
 		insertData(fightData, yourAction);
-		long waitForOtherUserAction = System.currentTimeMillis() + Settings.PLAYER_ACTION_WAITING_TIME * TimeMs.SECOND.getMilliseconds();
-		ObjectDTO<FightDataDAL> obj = getOpponentData(fightData.fightId, fightData.round, fightData.playerAUserId);
+		long waitForOtherUserAction = System.currentTimeMillis() 
+				+ Settings.PLAYER_ACTION_WAITING_TIME * TimeMs.SECOND.getMilliseconds();
+		ObjectDTO<FightDataDAL> obj = getOpponentData(fightData.fightId, fightData.round, 
+				fightData.playerAUserId);
+		
 		while(System.currentTimeMillis() < waitForOtherUserAction) {															//Loop witch is waiting for users input. 30sec waiting solution made in frontend
 			if(!obj.success && obj.message.equals(Error.OPPONENT_IS_MISSING.getMessage())) {			//needs upgrade, if data not received - autoWin for waiting user.
 				obj = getOpponentData(fightData.fightId, fightData.round, fightData.playerAUserId);
@@ -80,35 +83,18 @@ public class FightEngineImpl implements IFightEngine {
 			ret.message = obj.message;
 			return ret;
 		}
-			
 		FightDataDAL opponentDAL = obj.transferData;									//Fill data to DAL when all data received successfull. DAL for sending to servlet.
-		Actions opponentActions = new Actions();
-		opponentActions.attackHead = opponentDAL.attackHead == null?0:opponentDAL.attackHead;		//if form DB getting info with null - make it "0".
-		opponentActions.attackBody = opponentDAL.attackBody == null?0:opponentDAL.attackBody;
-		opponentActions.attackArms = opponentDAL.attackArms == null?0:opponentDAL.attackArms;
-		opponentActions.attackLegs = opponentDAL.attackLegs == null?0:opponentDAL.attackLegs;
-		opponentActions.defenceHead = opponentDAL.defenceHead == null?0:opponentDAL.defenceHead;
-		opponentActions.defenceBody = opponentDAL.defenceBody == null?0:opponentDAL.defenceBody;
-		opponentActions.defenceArms = opponentDAL.defenceArms == null?0:opponentDAL.defenceArms;
-		opponentActions.defenceLegs = opponentDAL.defenceLegs == null?0:opponentDAL.defenceLegs;
-		
+		Actions opponentActions = getOpponentActions(opponentDAL);
 		int[] damages = calculateDamage(yourAction, opponentActions, fightData.playerAUserId, opponentDAL.userId); //CalculateDamage :)
-		
-		int yourHealth = fightData.playerAHealth - damages[1];											//sending these to Servlet
-		int opponentHealth = opponentDAL.healthPoints - damages[0];
-		FightDataDAL yourDAL = new FightDataDAL();										//to send DAL to Servlet
-		yourDAL.fightId = fightData.fightId;
-		yourDAL.round = fightData.round;
-		yourDAL.userId = fightData.playerAUserId;
-		yourDAL.healthPoints = yourHealth;
-		//update opponentHealthPoints
-		opponentDAL.healthPoints = opponentHealth;										//to show oponents health.
-				
+		FightDataDAL yourDAL = new FightDataDAL();										//yourDAL is only needed transfer yourHeath to Servlet
+		//update players healthPoints
+		yourDAL.healthPoints = fightData.playerAHealth - damages[1];
+		opponentDAL.healthPoints = opponentDAL.healthPoints - damages[0];										//to show oponents health.
+		//build success dto		
 		ListDTO<FightDataDAL> retSuccessDTO = new ListDTO<FightDataDAL>();
 		List<FightDataDAL> retList = new ArrayList<>();
 		retList.add(yourDAL);
 		retList.add(opponentDAL);
-		
 		retSuccessDTO.success = true;
 		retSuccessDTO.message = Success.SUCCESS.getMessage();
 		retSuccessDTO.transferDataList = retList;
@@ -186,4 +172,16 @@ public class FightEngineImpl implements IFightEngine {
 		_crud.<FightDataDAL>create(insertDAL);	
 	}
 	
+	private Actions getOpponentActions(FightDataDAL opponentDAL) {
+		Actions opponentActions = new Actions();
+		opponentActions.attackHead = opponentDAL.attackHead == null?0:opponentDAL.attackHead;		//if form DB getting info with null - make it "0".
+		opponentActions.attackBody = opponentDAL.attackBody == null?0:opponentDAL.attackBody;
+		opponentActions.attackArms = opponentDAL.attackArms == null?0:opponentDAL.attackArms;
+		opponentActions.attackLegs = opponentDAL.attackLegs == null?0:opponentDAL.attackLegs;
+		opponentActions.defenceHead = opponentDAL.defenceHead == null?0:opponentDAL.defenceHead;
+		opponentActions.defenceBody = opponentDAL.defenceBody == null?0:opponentDAL.defenceBody;
+		opponentActions.defenceArms = opponentDAL.defenceArms == null?0:opponentDAL.defenceArms;
+		opponentActions.defenceLegs = opponentDAL.defenceLegs == null?0:opponentDAL.defenceLegs;
+		return opponentActions;
+	}
 }
