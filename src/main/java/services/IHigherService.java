@@ -17,11 +17,11 @@ public interface IHigherService {
 	String hashPassword (String password);
 	boolean passwordCheck(String password, String paswordInDB);
 	Integer getNewFightId();
-	ListDTO<FightDataDAL> getFightDataDAL(int fightId);
+	ListDTO<FightDataDAL> getFightData(int fightId);
 	void writeFightResult(int fightId, int winPlayerId, int losePlayerId, boolean draw);
-	ListDTO<LogDAL> logInfoDAL(int userIdA, int userIdB);
+	ListDTO<LogDAL> logInfo(int userIdA, int userIdB);
 	ObjectDTO<ItemDAL> getItem(int itemId);
-	ObjectDTO<Integer> logFightDataDAL(int fightId, int userIdA, int userIdB, String json);
+	ObjectDTO<Integer> logFightData(int fightId, int userIdA, int userIdB, String json);
 	ObjectDTO<Integer> createNewItem(ItemDAL itemDAL);
 	DTO editItem(ItemDAL itemDAL);
 	DTO deleteItem(ItemDAL itemDAL);
@@ -32,4 +32,5 @@ public interface IHigherService {
 	ObjectDTO<Integer> createNewImage(ImageDAL imageDAL);
 	DTO updateImage(ImageDAL imageDAL);
 	DTO deleteImage(ImageDAL imageDAL);
+	DTO deleteFightData(int fightId);
 }
