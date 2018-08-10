@@ -31,7 +31,7 @@
 <link rel="stylesheet" type="text/css" href="resources/css/news.css">
 
 <!--===============================================================================================-->
-<title>News</title>
+<title>News - JFight</title>
 </head>
 <body>
 
@@ -71,13 +71,78 @@
 	</nav>
 
 	<div class="container">
-			<div class="row">
-				<div class="col-6">
-					<div class="row justify-content-center" id="message">${ReadyMessage}</div>
-					<div class="row justify-content-center">
-						<div class="col">
-							<select class="custom-select pLayerSelect" size="100"
-								id="readyPlayers">
+		<div class="row">
+			<div class="col-md-7 col-sm-12">
+				<div class="row mx-auto mb-2">
+					<div class="col text-center">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">News title</h5>
+								<h6 class="card-subtitle mb-2 text-muted">News subtitle</h6>
+								<p class="card-text">Some quick example text to build on the
+									card title and make up the bulk of the card's content.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mx-auto mb-2">
+					<div class="col text-center">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">News title</h5>
+								<h6 class="card-subtitle mb-2 text-muted">News subtitle</h6>
+								<p class="card-text">Some quick example text to build on the
+									card title and make up the bulk of the card's content.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mx-auto mb-2">
+					<div class="col text-center">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">News title</h5>
+								<h6 class="card-subtitle mb-2 text-muted">News subtitle</h6>
+								<p class="card-text">Some quick example text to build on the
+									card title and make up the bulk of the card's content.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 col-sm-12">
+				<div class="row">
+					<div class="col text-center">
+						<h5>Online Players</h5>
+					</div>
+				</div>
+				<div class="row mb-0">
+					<div class="col">
+						<div class="form-group mb-1">
+							<select class="form-control" size="10" id="onlinePlayers">
+								<c:forEach items="${onlinePlayers}" var="players">
+									<option value="${players.key}">${players.value}</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="row mb-4">
+					<div class="col pr-3">
+						<button class="btn btn-dark btn-sm float-right" id="info"
+							onclick="info()">Info</button>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col text-center">
+						<h5>Fight Lobby</h5>
+					</div>
+				</div>
+				<div class="row mb-0">
+					<div class="col">
+						<div class="form-group mb-1">
+							<select class="form-control" size="10" id="readyPlayers">
 								<c:forEach items="${readyPlayers}" var="players">
 									<option value="${players.key}">${players.value}</option>
 								</c:forEach>
@@ -85,20 +150,18 @@
 						</div>
 					</div>
 				</div>
-
-				<div class="col-6">
-					<div class="row justify-content-center">
-						<button class="btn-default" id="play" onclick="play()">Play</button>
-						<button class="btn-default" id="ready"
+				<div class="row">
+					<div class="col pr-3">
+						<button class="btn btn-dark btn-sm float-right ml-1 mb-1"
+							id="play" onclick="play()">Play</button>
+						<button class="btn btn-dark btn-sm float-right ml-1 mb-1"
+							id="refresh" onclick="clicker(this.id)">Refresh</button>
+						<button class="btn btn-sm float-right" id="ready"
 							onclick="rdyBtn(this.innerText)">${Ready}</button>
-						<button class="btn-default" id="info" onclick="info()">Info</button>
-						<button class="btn-default" id="refresh"
-							onclick="clicker(this.id)">Refresh</button>
 					</div>
-					<div class="row justify-content-center">put here some text
-						from admin</div>
 				</div>
 			</div>
+		</div>
 	</div>
 
 	<input id="slaptas" type="hidden"
