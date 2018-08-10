@@ -25,7 +25,7 @@ public class LoggerImpl implements ILogger {
 	public ObjectDTO<FightDataDAL> logFightData(int fightId, int userIdA, int userIdB) {
 		JSONArray json = new JSONArray();
 
-		ListDTO<FightDataDAL> dtoF = _hService.getFightDataDAL(fightId);
+		ListDTO<FightDataDAL> dtoF = _hService.getFightData(fightId);
 		if (dtoF.success) {
 			List<FightDataDAL> list = dtoF.transferDataList;
 			for (FightDataDAL d : list) {
@@ -46,7 +46,7 @@ public class LoggerImpl implements ILogger {
 	@Override
 	public ListDTO<String> getLogs(int userIdA, int userIdB) {
 
-		ListDTO<LogDAL> dtoLog = _hService.logInfoDAL(userIdA, userIdB);
+		ListDTO<LogDAL> dtoLog = _hService.logInfo(userIdA, userIdB);
 		if (dtoLog.success) {
 
 			List<String> returnList = makeTableFromFightData(dtoLog);
@@ -90,7 +90,7 @@ public class LoggerImpl implements ILogger {
 	}
 
 	private ObjectDTO<FightDataDAL> createLogRecord(int fightId, int userIdA, int userIdB, JSONArray json) {
-		ObjectDTO<Integer> dtoL = _hService.logFightDataDAL(fightId, userIdA, userIdB, json.toString());
+		ObjectDTO<Integer> dtoL = _hService.logFightData(fightId, userIdA, userIdB, json.toString());
 		if (dtoL.success) {
 			ObjectDTO<FightDataDAL> retSuccess = new ObjectDTO<FightDataDAL>();
 			retSuccess.success = true;
